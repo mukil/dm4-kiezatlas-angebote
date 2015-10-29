@@ -48,8 +48,6 @@ function get_users_angebote() {
                 +item.id+'">Infos editieren</a><a href="/kiezatlas/angebot/zuordnen/'
                 +item.id+'">Zuordnungen anpassen</a></li>')
     }
-    
-    
 }
 
 
