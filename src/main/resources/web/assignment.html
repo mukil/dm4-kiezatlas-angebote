@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Kiezatlas 2 Angebote</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+
+        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
+        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+
+        <script type="text/javascript">
+            
+            $(document).ready(function(e) {
+                $("#name-search").on("change", function (c) {
+                    console.log("name-search onchange:", c)
+                })
+                get_username(show_user_dialog)
+                init_angebot()
+                init_datepicker()
+            })
+            
+        </script>
+    </head>
+    <body class="kiezatlas assignment">
+        
+        <div id="user"></div>
+
+        <div id="navigation"></div>
+
+        <div id="task-info">
+            <h3><span class="angebot-name">Diese Angebotsinfo</span> einer Einrichtung zuordnen</h3>
+        </div>
+        
+        <div class="form-area assignment">
+            <form action="javascript:geo_objects_by_name(show_geo_objects)" id="name-search-form" accept-charset="UTF-8">
+                <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
+                <input id="do-search" type="submit" class="btn" value="Suchen"></input>
+            </form>
+            <div class="geo-objects-area">
+                <div class="einrichtungen"></div>
+            </div>
+        </div>
+        
+        <div class="date-area disabled">
+            <h3>Zeitraum in dem <span class="angebot-name">dieses Angebot</span> in <span class="einrichtung-name">dieser Einrichtung</span> angeboten wird</h3>
+            <form id="date-select-form" action="javascript:do_assign_angebot()" accept-charset="UTF-8">
+                <label for="from">Von</label><br/>
+                <input type="text" id="from" name="from"><br/>
+                <label for="to">Bis</label><br/>
+                <input type="text" id="to" name="to">
+                <input id="do-assign" type="submit" class="btn" value="Speichern"></input>
+            </form>
+        </div>
+
+        <div id="bottom">
+            <div class="menu">
+                <ul>
+                    <li>
+                        <a href="/kiezatlas/angebot" title="Zurück zur Übersicht">Zur&uuml;ck</a>
+                    </li>
+                </ul>
+            </div>
+            <br/>
+            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas Logo" alt="Grafik: Kiezatlas Logo"/>
+        </div>
+        
+    </body>
+</html>
+

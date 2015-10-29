@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Kiezatlas 2 Angebote</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+
+        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
+        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+
+        <script type="text/javascript">
+            
+            $(document).ready(function(e) {
+                $("#name-search").on("change", function (c) {
+                    console.log("name-search onchange:", c)
+                })
+                get_username(show_user_dialog)
+                clear_angebot_form_area()
+                init_datepicker()
+            })
+            
+        </script>
+    </head>
+    <body class="kiezatlas angebot">
+        
+        <div id="user"></div>
+
+        <div id="navigation"></div>
+
+        <div id="task-info">
+            <h3>Neue Angebotsinfos anlegen/ Vorhandene editieren</h3>
+        </div>
+
+        <div class="form-area angebot">
+            <form action="javascript:do_save_angebot()" id="angebot-form" accept-charset="UTF-8">
+                <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
+                <input id="angebot-name" type="text" placeholder="Name des Angebots"></input>
+                <br/>
+                <!--label for="angebot-beschreibung" id="beschreibung-label">Kurzbeschreibung</label-->
+                <textarea id="angebot-beschreibung" type="text" placeholder="Beschreibung des Angebots"></textarea>
+                <br/>
+                <label for="angebot-kontakt" id="kontakt-label">Kontakt zum Angebot</label><br/>
+                <input id="angebot-kontakt" type="text" placeholder="Kontakt"></input>
+                <br/>
+                <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot</label><br/>
+                <input id="angebot-webpage" type="url" placeholder="http://"></input>
+                <br/>
+                <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label><br/>
+                <input id="angebot-tags" type="text" placeholder=".., .."></input>
+                <br/>
+                <input id="do-save" type="submit" class="btn" value="Speichern"></input>
+            </form>
+        </div>
+        
+        <!--div class="form-area assignment">
+            <form action="javascript:geo_objects_by_name()" id="name-search-form" accept-charset="UTF-8">
+                <label for="name-search" id="fulltext-label">Einrichtung</label>
+                <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
+                <input id="do-search" type="submit" class="btn" value="Ok"></input>
+            </form>
+            <p>&nbsp;</p>
+            <div>
+                <form id="date-select">
+                    <label for="from">Von</label>
+                    <input type="text" id="from" name="from"><br/>
+                    <label for="to">Bis</label>
+                    <input type="text" id="to" name="to">
+                </form>
+            </div>
+        </div-->
+
+        <div id="bottom">
+            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas Logo" alt="Grafik: Kiezatlas Logo"/>
+        </div>
+        
+    </body>
+</html>
+

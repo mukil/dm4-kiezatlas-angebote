@@ -1,0 +1,85 @@
+{
+    "topic_types": [
+        {
+            "value":            "Name des Angebots",
+            "uri":              "ka2.angebot.name",
+            "data_type_uri":    "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+        },
+        {
+            "value":            "Kurzbeschreibung des Angebots",
+            "uri":              "ka2.angebot.beschreibung",
+            "data_type_uri":    "dm4.core.html",
+            "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+        },
+        {
+            "value":            "Webpage des Angebots",
+            "uri":              "ka2.angebot.webpage",
+            "data_type_uri":    "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext_key"],
+            "view_config_topics": [
+                {
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.simple_renderer_uri": "de.kiezatlas.angebote.website_single"
+                    }
+                }
+            ]
+        },
+        {
+            "value":            "Kontakt des Angebots",
+            "uri":              "ka2.angebot.kontakt",
+            "data_type_uri":    "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext_key", "dm4.core.fulltext"]
+        },
+        {
+            "value":            "Kiezatlas Angebot",
+            "uri":              "ka2.angebot",
+            "data_type_uri":    "dm4.core.composite",
+            "assoc_defs": [
+                {
+                    "child_type_uri":         "ka2.angebot.name",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "ka2.angebot.beschreibung",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "ka2.angebot.kontakt",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "ka2.angebot.webpage",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                },
+                {
+                    "child_type_uri":         "dm4.tags.tag",
+                    "child_cardinality_uri":  "dm4.core.many",
+                    "parent_cardinality_uri": "dm4.core.many",
+                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                }
+            ], "view_config_topics": [
+                {
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.icon": "/de.kiezatlas.angebote/images/1444222545_date.png",
+                        "dm4.webclient.show_in_create_menu": true,
+                        "dm4.webclient.searchable_as_unit": true
+                    }
+                }
+            ]
+        }
+    ],
+    "assoc_types": [
+        ### Termin-Assoziation zwischen "Geo Object" und "Kiezatlas Angebot"
+    ]
+}

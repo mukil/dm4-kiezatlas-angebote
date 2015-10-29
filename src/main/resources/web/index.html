@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Kiezatlas 2 Angebote</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+
+        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
+        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+
+        <script type="text/javascript">
+            
+            $(document).ready(function(e) {
+                get_username(show_user_dialog)
+                get_users_angebote()
+            })
+            
+        </script>
+    </head>
+    <body class="kiezatlas angebote">
+        
+        <div id="user"></div>
+
+        <div id="navigation"></div>
+
+        <div id="task-info">
+            <h3>Liste meiner Kiezatlas Angebotsinformationen</h3>
+        </div>
+
+        <div class="angebot-area">
+            <ul class="angebote"></ul>
+        </div>
+
+        <div id="bottom">
+            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas Logo" alt="Grafik: Kiezatlas Logo"/>
+        </div>
+        
+    </body>
+</html>
+
