@@ -38,7 +38,7 @@ a {
 
 #user {
     margin: 15px;
-    color: #0078A8;
+    color: #8f1414; /** #0078A8; **/
 }
 
 div.ui-datepicker {
@@ -59,6 +59,8 @@ div.ui-datepicker {
 .geo-objects-area {
     position: relative;
     padding-left: 7px;
+    max-height: 220px;
+    overflow-y: auto;
 }
 
 .angebot-area {
@@ -88,6 +90,10 @@ span.angebot-name {
     font-weight: bold;
 }
 
+.angebot-area label,
+.form-area label,
+.geo-objects-area label,
+.angebot-area input[type="submit"],
 .geo-objects-area input[type="radio"],
 .date-area input[type="submit"],
 .form-area input[type="submit"],
@@ -111,6 +117,7 @@ span.angebot-name {
     min-height: 160px;
 }
 
+.angebot-area input, 
 .form-area textarea,
 .form-area input,
 .date-area input {
@@ -120,8 +127,7 @@ span.angebot-name {
     margin: 0px 5px 15px 0px;
 }
 
-.date-area.disabled,
-.form-area.disabled {
+div.disabled {
     opacity: .3;
     pointer-events: none;
 }
@@ -129,6 +135,7 @@ span.angebot-name {
 .angebot-area ul.angebote {
     padding-left: 0px;
     list-style-type: none;
+    margin-bottom: 30px;
 }
 
 .angebot-area li {
@@ -153,7 +160,6 @@ span.angebot-name {
 
 .menu {
     position: relative;
-    top: 30px;
     width: 90%;
     margin: auto;
     padding: 15px;
@@ -164,6 +170,7 @@ span.angebot-name {
     list-style-type: none;
     font-size: 1.2em;
     padding-left: 0px;
+    margin: 0px;
 }
 
 .menu ul li {

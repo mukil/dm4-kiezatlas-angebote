@@ -1,0 +1,45 @@
+{
+    "topic_types": [
+        {
+            "value":    "Kiezatlas Assignment Kontakt",
+            "uri":      "ka2.angebot.assignment_kontakt",
+            "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
+            "data_type_uri": "dm4.core.text"
+        },
+        {
+            "value":    "Kiezatlas Assignment Zusatzinfo",
+            "uri":      "ka2.angebot.assignment_zusatz",
+            "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
+            "data_type_uri": "dm4.core.text"
+        }
+    ],
+    "assoc_types": [
+        {
+            "value":            "Kiezatlas Angebots Assignment",
+            "uri":              "ka2.angebot.assignment",
+            "data_type_uri":    "dm4.core.composite",
+            "assoc_defs": [
+                {
+                    "child_type_uri":           "ka2.angebot.assignment_kontakt",
+                    "child_cardinality_uri":    "dm4.core.one",
+                    "parent_cardinality_uri":   "dm4.core.one",
+                    "assoc_type_uri":           "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":           "ka2.angebot.assignment_zusatz",
+                    "child_cardinality_uri":    "dm4.core.one",
+                    "parent_cardinality_uri":   "dm4.core.one",
+                    "assoc_type_uri":           "dm4.core.composition_def"
+                }
+            ],
+            "view_config_topics": [
+                {
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.color": "#ad5f5f"
+                    }
+                }
+            ]
+        }
+    ]
+}

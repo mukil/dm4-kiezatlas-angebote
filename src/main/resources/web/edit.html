@@ -17,11 +17,7 @@
         <script type="text/javascript">
             
             $(document).ready(function(e) {
-                $("#name-search").on("change", function (c) {
-                    console.log("name-search onchange:", c)
-                })
-                get_username(show_user_dialog)
-                clear_angebot_form_area()
+                load_username(show_user_dialog)
                 init_datepicker()
             })
             
@@ -30,8 +26,6 @@
     <body class="kiezatlas angebot">
         
         <div id="user"></div>
-
-        <div id="navigation"></div>
 
         <div id="task-info">
             <h3>Neue Angebotsinfos anlegen/ Vorhandene editieren</h3>
@@ -67,7 +61,7 @@
                 </ul>
             </div>
             <br/>
-            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas Logo" alt="Grafik: Kiezatlas Logo"/>
+            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
         </div>
 
     </body>

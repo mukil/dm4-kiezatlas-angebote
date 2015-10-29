@@ -1,5 +1,5 @@
 
-// ---- Methods to create new and update existing Angebote --- //
+// ---- Methods to CREATE/UPDATE Angebote --- //
 
 var restc = new RESTClient()
 
@@ -24,8 +24,8 @@ function do_save_angebot() {
                 "dm4.tags.label": tags,
                 "dm4.tags.definition": ""
             }]
-        }        
-    }
+        }
+    } // ### fix tags and revise for edits
     restc.create_topic(topic_model)
     clear_angebot_form_area()
 }
@@ -39,32 +39,22 @@ function clear_angebot_form_area() {
     $('#angebot-tags').val('')
 }
 
-function get_users_angebote() {
+function load_users_angebote() {
     var result = restc.request("GET", "/kiezatlas/angebot/list")
     for (var el in result) {
         var item = result[el]
         $('ul.angebote').append('<li id="'+item.id+'">'
-                +item.value+ '<a href="/kiezatlas/angebot/edit/'
-                +item.id+'">Infos editieren</a><a href="/kiezatlas/angebot/zuordnen/'
-                +item.id+'">Zuordnungen anpassen</a></li>')
+            +item.value+ '<a href="/kiezatlas/angebot/edit/'
+            +item.id+'">Infos editieren</a><a href="/kiezatlas/angebot/zuordnen/'
+            +item.id+'">Zuordnungen anpassen</a></li>')
     }
 }
 
 
-// ---- Methods used in assignment screen (angebote to a geo object) --- //
+// ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
 
 var selected_angebot,
     selected_geo_object
-
-function select_geo_object(e) {
-    var geo_object = restc.get_topic_by_id(e.target.id)
-    // gui state
-    selected_geo_object = geo_object
-    // update label
-    $('.einrichtung-name').text(geo_object.value)
-    // update area
-    $('.date-area').removeClass("disabled")
-}
 
 function init_angebot() {
     var current_url = document.location.pathname
@@ -94,33 +84,79 @@ function init_datepicker() {
     });
 }
 
-function geo_objects_by_name(renderer) {
-    var query = $("#name-search").val()
-        if (query.indexOf("*") === -1) {
-            query += "*"
-            console.log("Appending * to query=", query)
+function search_objects_by_name(renderer) {
+    var queryString = $("#name-search").val()
+        if (queryString.indexOf("*") === -1) {
+            queryString += "*"
         }
-        query = encodeURIComponent(query, "UTF-8")
+        queryString = encodeURIComponent(queryString, "UTF-8")
         $.ajax({
-            type: "GET", url: "/kiezatlas/by_name?query=" + query,
+            type: "GET", url: "/kiezatlas/by_name?query=" + queryString,
             success: function(obj) {
-                console.log("SUCCESS", obj)
                 renderer(obj)
             },
             error: function(x, s, e) {
-                console.warn("ERROR", "x: " + x + " s: " + s + " e: " + e)
+                throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
             }
         })
 }
 
-// ---- Generic Methods used across all screens ---- //
+function select_geo_object(e) {
+    var geo_object = restc.get_topic_by_id(e.target.id)
+    // gui state
+    selected_geo_object = geo_object
+    // update label
+    $('.einrichtung-name').text(geo_object.value)
+    // update area
+    $('.date-area').removeClass("disabled")
+}
 
-function get_username(renderer) {
+
+function do_assign_angebot() {
+    // ### Insert default values to initialize if not specified
+    var fromInput = $('input#from').val()
+    var toInput = $('input#to').val()
+    var fromDate = -1
+    var toDate = -1
+    if (fromInput.length > 0) {
+        fromDate = new Date(fromInput).getTime()
+    }
+    if (toInput.length > 0) {
+        toDate = new Date(toInput).getTime() // ### we want to shift this value always about 24hours
+    }
+    console.log("Datepicker delivered us from:to", fromDate, toDate)
+    if (!selected_geo_object) throw new Error("Assertion failed: A geo object must be selected before an assignment can be created.")
+    if (!selected_angebot) throw new Error("Assertion failed: An angebot must be loaded before an assignment can be created.")
+    var assocModel = {
+	"type_uri": "ka2.angebot.assignment",
+	"role_1": {
+            "topic_id": selected_angebot.id,
+            "role_type_uri":"dm4.core.parent"
+	},
+        "role_2": {
+            "topic_id": selected_geo_object.id,
+            "role_type_uri":"dm4.core.child"
+	}
+    }
+    console.log("Trying to post assignment", assocModel)
+    restc.request("POST", "/kiezatlas/angebot/assignment/" + fromDate + "/" + toDate, assocModel)
+}
+
+
+// ---- Generic Methods used ACROSS all screens ---- //
+
+function load_username(renderer) {
     $.ajax({
         type: "GET", url: "/accesscontrol/user",
         success: function(obj) {
-            console.log("OK", obj)
-            renderer(obj)
+            if (obj) {
+                console.log("OK", obj)
+                renderer(obj)
+            } else {
+                $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Angebote zu bearbeiten.')
+                $('#task-info').addClass('disabled')
+                $('div.angebot-area').addClass('disabled')
+            }
         },
         error: function(x, s, e) {
             console.warn("ERROR", "x: " + x + " s: " + s + " e: " + e)

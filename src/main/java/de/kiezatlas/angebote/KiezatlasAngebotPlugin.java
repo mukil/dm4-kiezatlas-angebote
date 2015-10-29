@@ -1,7 +1,9 @@
 package de.kiezatlas.angebote;
 
+import de.kiezatlas.angebote.model.AngebotViewModel;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
-import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -10,6 +12,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import java.io.InputStream;
@@ -18,10 +21,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 
@@ -92,13 +97,60 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
 				null, null, "dm4.accesscontrol.username");
 			String alias = aclService.getUsername();
 			if (username != null && (username.getSimpleValue().toString().equals(alias))) {
-				my.add(element);	
-			} else {
+				my.add(element);
+			} else { // ### To be removed after next clean install / DB reset
 				logger.warning("Angebot " + element.getSimpleValue() + " hat keinen Username assoziiert!");
 				// logger.warning("Angebot Relations " + element.getRelatedTopics("dm4.core.association", 0).toJSON().toString());
 			}
 		}
 		return my;
+	}
+
+	@POST
+	@Path("/assignment/{from}/{to}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
+	public Association createAngebotsAssignment(AssociationModel assocModel,
+		@PathParam("from") long fromDate, @PathParam("to") long toDate) {
+		Association result = null;
+		if (assocModel == null) throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
+		try {
+			result = dms.createAssociation(assocModel);
+			result.setProperty(ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
+			result.setProperty(ANGEBOT_END_TIME, toDate, true);
+			logger.info("Succesfully created Kiezatlas Angebots Assignment from " + new Date(fromDate).toGMTString()
+				+ " to " + new Date(toDate).toGMTString());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+
+	@GET
+	@Path("/filter/{now}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<AngebotViewModel> getAngeboteFiltered(@PathParam("now") long nowDate) {
+		ResultList<RelatedAssociation> assocs = dms.getAssociations("ka2.angebot.assignment");
+		ArrayList<AngebotViewModel> result = new ArrayList<AngebotViewModel>();
+		Iterator<RelatedAssociation> iterator = assocs.iterator();
+		while (iterator.hasNext()) {
+			RelatedAssociation assoc = iterator.next();
+			if (isAssignmentActiveInTime(assoc, nowDate)) {
+				Topic angebotTopic = assoc.getTopic("dm4.core.parent");
+				Topic geoObjectTopic = assoc.getTopic("dm4.core.child");
+				result.add(new AngebotViewModel(angebotTopic, geoObjectTopic, geomapsService));
+			}
+		}
+		logger.info("Filtered " + result.size() + " items out for " + new Date(nowDate).toGMTString());
+		return result;
+	}
+
+	private boolean isAssignmentActiveInTime(Association assoc, long timestamp) {
+		Long from = (Long) assoc.getProperty(ANGEBOT_START_TIME);
+		Long to = (Long) assoc.getProperty(ANGEBOT_END_TIME);
+		return ((from < timestamp && to > timestamp) || // == "An activity currently open"
+				(from < 0 && to > timestamp) || // == "No start date given AND toDate is in the future
+				(from < timestamp && to < 0)); // == "Has started and has no toDate set
 	}
 
     /**
@@ -123,7 +175,7 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
             }
         }
         return results;
-    } **/
+    }
 
     private GeoCoordinate geoCoordinate(Topic geoObjectTopic) {
         Topic address = geoObjectTopic.getChildTopics().getTopic("dm4.contacts.address");
@@ -138,21 +190,23 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         AngebotViewModel angebot = new AngebotViewModel();
         angebot.setName(topic.getSimpleValue().toString());
         // ### which place to locate and render this angebot?
-        // ### many geo-objects assigned
+        // ### if many geo-objects assigned
         // geoObject.setBezirk(bezirk.getSimpleValue().toString());
         // angebot.setGeoCoordinate(geoCoord);
         // geoObject.setLink(link(topic, bezirk));
-        //
         return angebot;
-    }
+    } **/
 
+
+	// ------------------------------------------------------------------------------------------------------- Hooks
+
+	/** Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed. */
 	public void postCreateTopic(Topic topic) {
 		if (topic.getTypeUri().equals("ka2.angebot")) {
 			Topic usernameTopic = aclService.getUsername(aclService.getUsername());
 			dms.createAssociation(new AssociationModel("dm4.core.association",
 				new TopicRoleModel(topic.getId(), "dm4.core.parent"),
 				new TopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
-			logger.info("We did custom assignment stuff here!");
 		}
 	}
 

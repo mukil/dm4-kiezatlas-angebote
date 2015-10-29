@@ -20,7 +20,7 @@
                 $("#name-search").on("change", function (c) {
                     console.log("name-search onchange:", c)
                 })
-                get_username(show_user_dialog)
+                load_username(show_user_dialog)
                 init_angebot()
                 init_datepicker()
             })
@@ -31,14 +31,12 @@
         
         <div id="user"></div>
 
-        <div id="navigation"></div>
-
         <div id="task-info">
             <h3><span class="angebot-name">Diese Angebotsinfo</span> einer Einrichtung zuordnen</h3>
         </div>
         
         <div class="form-area assignment">
-            <form action="javascript:geo_objects_by_name(show_geo_objects)" id="name-search-form" accept-charset="UTF-8">
+            <form action="javascript:search_objects_by_name(show_geo_objects)" id="name-search-form" accept-charset="UTF-8">
                 <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
                 <input id="do-search" type="submit" class="btn" value="Suchen"></input>
             </form>
@@ -48,7 +46,7 @@
         </div>
         
         <div class="date-area disabled">
-            <h3>Zeitraum in dem <span class="angebot-name">dieses Angebot</span> in <span class="einrichtung-name">dieser Einrichtung</span> angeboten wird</h3>
+            <h3>Zeitraum f&uuml;r <span class="angebot-name">dieses Angebot</span> am Standort <span class="einrichtung-name">...</span></h3>
             <form id="date-select-form" action="javascript:do_assign_angebot()" accept-charset="UTF-8">
                 <label for="from">Von</label><br/>
                 <input type="text" id="from" name="from"><br/>
@@ -67,7 +65,7 @@
                 </ul>
             </div>
             <br/>
-            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas Logo" alt="Grafik: Kiezatlas Logo"/>
+            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
         </div>
         
     </body>

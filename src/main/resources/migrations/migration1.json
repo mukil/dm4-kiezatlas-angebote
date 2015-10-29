@@ -80,6 +80,6 @@
         }
     ],
     "assoc_types": [
-        ### Termin-Assoziation zwischen "Geo Object" und "Kiezatlas Angebot"
+        ### Termin-Assoziation zwischen "Geo Object" und "Kiezatlas Angebot" (see migration3.json)
     ]
 }

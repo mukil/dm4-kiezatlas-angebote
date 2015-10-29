@@ -17,8 +17,8 @@
         <script type="text/javascript">
             
             $(document).ready(function(e) {
-                get_username(show_user_dialog)
-                get_users_angebote()
+                load_username(show_user_dialog)
+                load_users_angebote()
             })
             
         </script>
@@ -27,18 +27,19 @@
         
         <div id="user"></div>
 
-        <div id="navigation"></div>
-
         <div id="task-info">
             <h3>Liste meiner Kiezatlas Angebotsinformationen</h3>
         </div>
 
         <div class="angebot-area">
             <ul class="angebote"></ul>
+            <form method="GET" action="/kiezatlas/angebot/edit/0" id="angebot-form" accept-charset="UTF-8">
+                <input id="do-add" type="submit" class="btn" value="Neue Angebotsinformationen eintragen"></input>
+            </form>
         </div>
 
         <div id="bottom">
-            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas Logo" alt="Grafik: Kiezatlas Logo"/>
+            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
         </div>
         
     </body>
