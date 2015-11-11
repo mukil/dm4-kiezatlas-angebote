@@ -16,13 +16,6 @@
         <version>4.4.3</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>deepamehta-public-repository</id>
-            <url>http://m2.deepamehta.de</url>
-        </repository>
-    </repositories>    
-
     <dependencies>
         <dependency>
             <groupId>de.kiezatlas</groupId>
@@ -59,6 +52,14 @@
                         </Bundle-Activator>
                         <Embed-Dependency>commons-collections4</Embed-Dependency>
                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
         </plugins>
