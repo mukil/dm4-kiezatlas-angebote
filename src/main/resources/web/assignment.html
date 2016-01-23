@@ -23,6 +23,7 @@
                 load_username(show_user_dialog)
                 init_angebot()
                 init_datepicker()
+                load_assignments(show_assignments)
             })
             
         </script>
@@ -31,29 +32,41 @@
         
         <div id="user"></div>
 
-        <div id="task-info">
-            <h3><span class="angebot-name">Diese Angebotsinfo</span> einer Einrichtung zuordnen</h3>
+        <div class="left-side">
+            <div class="task-info">
+                <h3>Neue Zuordnung von <span class="angebot-name">Diese Angebotsinfo</span> zu einer Einrichtung</h3>
+            </div>
+
+            <div class="form-area assignment">
+                <form action="javascript:search_objects_by_name(show_geo_objects_assign)" id="name-search-form" accept-charset="UTF-8">
+                    <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
+                    <input id="do-search" type="submit" class="btn" value="Einrichtung suchen"></input>
+                </form>
+                <div class="geo-objects-area">
+                    <div class="einrichtungen"></div>
+                </div>
+            </div>
+
+            <div class="date-area disabled">
+                <h3>Zeitraum des Angebots am Standort <span class="einrichtung-name">...</span></h3>
+                <form id="date-select-form" action="javascript:do_assign_angebot()" accept-charset="UTF-8">
+                    <label for="from">Von</label><br/>
+                    <input type="text" id="from" name="from"><br/>
+                    <label for="to">Bis</label><br/>
+                    <input type="text" id="to" name="to">
+                    <input id="do-assign" type="submit" class="btn" value="Speichern"></input>
+                </form>
+            </div>
         </div>
-        
-        <div class="form-area assignment">
-            <form action="javascript:search_objects_by_name(show_geo_objects)" id="name-search-form" accept-charset="UTF-8">
-                <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
-                <input id="do-search" type="submit" class="btn" value="Suchen"></input>
-            </form>
+        <div class="right-side">
+            <div class="task-info">
+                <h3>Einrichtungen denen <span class="angebot-name">dieses Angebot</span> aktuell zugeordnet ist</h3>
+                </h3>
+                <p>Bitte w&auml;hlen sie eine Zurdnung aus um diese zu bearbeiten.</p>
+            </div>
             <div class="geo-objects-area">
                 <div class="einrichtungen"></div>
             </div>
-        </div>
-        
-        <div class="date-area disabled">
-            <h3>Zeitraum f&uuml;r <span class="angebot-name">dieses Angebot</span> am Standort <span class="einrichtung-name">...</span></h3>
-            <form id="date-select-form" action="javascript:do_assign_angebot()" accept-charset="UTF-8">
-                <label for="from">Von</label><br/>
-                <input type="text" id="from" name="from"><br/>
-                <label for="to">Bis</label><br/>
-                <input type="text" id="to" name="to">
-                <input id="do-assign" type="submit" class="btn" value="Speichern"></input>
-            </form>
         </div>
 
         <div id="bottom">

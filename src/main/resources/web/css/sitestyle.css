@@ -28,12 +28,35 @@ a {
     text-decoration-color: #8f1414;
 }
 
-#task-info {
+.task-info {
     margin: 15px;
 }
 
-.kiezatlas.angebot #task-info {
+.kiezatlas.angebot .task-info {
     margin-top: 30px;
+}
+
+.left-side {
+    width: 45%;
+    display: inline-block;
+}
+
+.right-side {
+    width: 45%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.concrete-assignment {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #002856;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.conrete-assignment span {
+    font-size: 0.9em;
 }
 
 #user {

@@ -2,8 +2,8 @@ package de.kiezatlas.angebote.model;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
-import de.deepamehta.plugins.geomaps.service.GeomapsService;
-import de.kiezatlas.website.model.MapEntryView;
+import de.deepamehta.plugins.geomaps.GeomapsService;
+import de.kiezatlas.website.model.GeoObjectView;
 import java.util.logging.Logger;
 import org.codehaus.jettison.json.JSONException;
 
@@ -21,15 +21,19 @@ public class AngebotViewModel implements JSONEnabled {
 
     private JSONObject json = new JSONObject();
     private Topic topic = null;
-	private MapEntryView geoObject = null;
+	private GeoObjectView geoObject = null;
 	private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-	
-	public AngebotViewModel(Topic angebot, Topic geoObject, GeomapsService geomapsService) {
-		this.topic = angebot.loadChildTopics();
-		this.geoObject= new MapEntryView(geoObject, geomapsService);
-	}
+
+    public AngebotViewModel(Topic angebot, Topic geoObject, GeomapsService geomapsService) {
+        this.topic = angebot.loadChildTopics();
+        this.geoObject= new GeoObjectView(geoObject, geomapsService);
+    }
+
+    public AngebotViewModel(Topic angebot) {
+        this.topic = angebot.loadChildTopics();
+    }
 
     @Override
     public JSONObject toJSON() {
@@ -39,7 +43,7 @@ public class AngebotViewModel implements JSONEnabled {
 			json.put("beschreibung", getDescription());
 			json.put("website", getWebpage());
 			json.put("kontakt", getKontakt());
-			json.put("geo_object", getGeoObject());
+			// Many json.put("geo_object", getGeoObject());
 			json.put("tags", getTags());
 			return json;
 		} catch (JSONException ex) {

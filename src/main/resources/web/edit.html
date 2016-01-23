@@ -18,7 +18,14 @@
             
             $(document).ready(function(e) {
                 load_username(show_user_dialog)
-                init_datepicker()
+                has_angebote_membership(function() {
+                    // parse route
+                    var id = parse_angebots_id()
+                    // load topic
+                    load_angebot(id)
+                    // init edit form
+                    init_datepicker()
+                })
             })
             
         </script>
@@ -27,7 +34,7 @@
         
         <div id="user"></div>
 
-        <div id="task-info">
+        <div class="task-info">
             <h3>Neue Angebotsinfos anlegen/ Vorhandene editieren</h3>
         </div>
 

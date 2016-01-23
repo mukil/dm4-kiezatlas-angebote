@@ -1,9 +1,10 @@
 package de.kiezatlas.angebote;
 
 import de.kiezatlas.angebote.model.AngebotViewModel;
+import de.kiezatlas.angebote.model.AssignmentViewModel;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.plugins.geomaps.service.GeomapsService;
+import de.deepamehta.plugins.geomaps.GeomapsService;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -14,7 +15,8 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
-import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
+import de.deepamehta.plugins.accesscontrol.AccessControlService;
+import de.deepamehta.plugins.workspaces.WorkspacesService;
 import java.io.InputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,8 +41,8 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
     
     // ------------------------------------------------------------------------------------------------------ Properties
     
-    private static final String ANGEBOT_START_TIME          = "ka2.angebot.start_time";
-    private static final String ANGEBOT_END_TIME            = "ka2.angebot.end_time";
+    public static final String ANGEBOT_START_TIME          = "ka2.angebot.start_time";
+    public static final String ANGEBOT_END_TIME            = "ka2.angebot.end_time";
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -51,10 +53,12 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
     // The URIs of KA2 Geo Object topics have this prefix.
     // The remaining part of the URI is the original KA1 topic id.
     private static final String KA2_GEO_OBJECT_URI_PREFIX   = "de.kiezatlas.topic.";
+    private static final String WORKSPACE_ANGEBOTE_URI      = "de.kiezatlas.angebote_ws";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject private GeomapsService geomapsService;
+    @Inject private WorkspacesService workspaceService;
     @Inject private AccessControlService aclService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -62,11 +66,30 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 	@GET
-	@Path("/")
 	@Produces(MediaType.TEXT_HTML)
 	public InputStream getAngeboteView() {
 		return getStaticResource("web/index.html");
 	}
+
+    @GET
+    @Path("/{topicId}")
+    public AngebotViewModel getAngebotsinformation(@PathParam("topicId") long topicId) {
+        Topic angebot = dms.getTopic(topicId);
+        return new AngebotViewModel(angebot);
+    }
+
+    @GET
+    @Path("/membership")
+    public String hasWorkspaceMembership() {
+        logger.info("Checking Angebote User Membership");
+        Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+        logger.info("Loaded Angebote Workspace");
+        if (!aclService.getUsername().equals("")) {
+            logger.info("Checking Membership for Username=" + aclService.getUsername());
+            return "" + aclService.isMember(aclService.getUsername(), ws.getId());
+        }
+        return "false";
+    }
 
 	@GET
 	@Path("/zuordnen/{topicID}")
@@ -92,19 +115,48 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
 		ArrayList<RelatedTopic> my = new ArrayList<RelatedTopic>();
 		Iterator<RelatedTopic> iterator = all.iterator();
 		while (iterator.hasNext()) {
-			RelatedTopic element = iterator.next();
-			RelatedTopic username = element.getRelatedTopic("dm4.core.association",
+			RelatedTopic angebot = iterator.next();
+			RelatedTopic username = angebot.getRelatedTopic("dm4.core.association",
 				null, null, "dm4.accesscontrol.username");
 			String alias = aclService.getUsername();
 			if (username != null && (username.getSimpleValue().toString().equals(alias))) {
-				my.add(element);
+				my.add(angebot);
 			} else { // ### To be removed after next clean install / DB reset
-				logger.warning("Angebot " + element.getSimpleValue() + " hat keinen Username assoziiert!");
+				logger.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
 				// logger.warning("Angebot Relations " + element.getRelatedTopics("dm4.core.association", 0).toJSON().toString());
 			}
 		}
 		return my;
 	}
+
+    @GET
+    @Path("/list/assignments/{angebotId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<AssignmentViewModel> getAngeboteAssignments(@PathParam("angebotId") String topicId) {
+        List<RelatedTopic> all = getUsersAngebote();
+        List<AssignmentViewModel> results = new ArrayList<AssignmentViewModel>();
+        Iterator<RelatedTopic> iterator = all.iterator();
+        while (iterator.hasNext()) {
+            RelatedTopic angebot = iterator.next();
+            if (angebot.getId() == Long.parseLong(topicId)) {
+                ResultList<RelatedTopic> geoObjects = angebot.getRelatedTopics("ka2.angebot.assignment", null, null,
+                        "ka2.geo_object", 0);
+                Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
+                while (geoIterator.hasNext()) {
+                    RelatedTopic einrichtung = geoIterator.next();
+                    /** Association assignment = dms.getAssociation("ka2.angebot.assignment", angebot.getId(),
+                            einrichtung.getId(), "dm4.core.default", "dm4.core.default"); **/
+                    results.add(new AssignmentViewModel(einrichtung.getRelatingAssociation(), einrichtung, geomapsService));
+                    /** Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
+                    String roleTypeUri1, String roleTypeUri2); **/
+                }
+            } else {
+                /** logger.info("Angebot \"" + angebot.getSimpleValue() + "\" is not assigned to Geo Object " +
+                    geoobject.getSimpleValue()); **/
+            }
+        }
+        return results;
+    }
 
 	@POST
 	@Path("/assignment/{from}/{to}")
@@ -203,7 +255,7 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
 	/** Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed. */
 	public void postCreateTopic(Topic topic) {
 		if (topic.getTypeUri().equals("ka2.angebot")) {
-			Topic usernameTopic = aclService.getUsername(aclService.getUsername());
+			Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
 			dms.createAssociation(new AssociationModel("dm4.core.association",
 				new TopicRoleModel(topic.getId(), "dm4.core.parent"),
 				new TopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
