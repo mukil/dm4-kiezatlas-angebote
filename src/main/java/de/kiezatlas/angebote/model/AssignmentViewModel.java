@@ -22,14 +22,14 @@ public class AssignmentViewModel implements JSONEnabled {
 
     private JSONObject json = new JSONObject();
     private Association topic = null;
-	private GeoObjectView geoObject = null;
-	private Logger logger = Logger.getLogger(getClass().getName());
+    private GeoObjectView geoObject = null;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public AssignmentViewModel(Association assignment, Topic geoObject, GeomapsService geomapsService) {
         this.topic = assignment.loadChildTopics();
-        this.geoObject= new GeoObjectView(geoObject, geomapsService);
+        this.geoObject = new GeoObjectView(geoObject, geomapsService);
     }
 
     public AssignmentViewModel(Association angebot) {
@@ -38,17 +38,17 @@ public class AssignmentViewModel implements JSONEnabled {
 
     @Override
     public JSONObject toJSON() {
-		try {
-			json.put("id", topic.getId());
-			json.put("name", geoObject.getName());
-			json.put("von", getStartDate());
-			json.put("bis", getEndDate());
-			json.put("zusatzinfo", getZusatzInfo());
-			json.put("kontakt", getZusatzKontakt());
-			return json;
-		} catch (JSONException ex) {
-			throw new RuntimeException("Constructing an AssignmentViewModel failed", ex);
-		}
+        try {
+            json.put("id", topic.getId());
+            json.put("name", geoObject.getName());
+            json.put("von", getStartDate());
+            json.put("bis", getEndDate());
+            json.put("zusatzinfo", getZusatzInfo());
+            json.put("kontakt", getZusatzKontakt());
+            return json;
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing an AssignmentViewModel failed", ex);
+        }
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -77,24 +77,12 @@ public class AssignmentViewModel implements JSONEnabled {
         }
     }
 
-    private String getWebpage() {
-		String value = null;
-        try {
-			if (this.topic.getChildTopics().has("ka2.angebot.webpage")) {
-				value = this.topic.getChildTopics().getString("ka2.angebot.webpage");
-			}
-            return value;
-        } catch (Exception e) {
-            throw new RuntimeException("Constructing an AssignmentViewModel failed", e);
-        }
-    }
-
     private String getZusatzKontakt() {
-		String value = null;
+        String value = null;
         try {
-			if (this.topic.getChildTopics().has("ka2.angebot.assignment_kontakt")) {
-				value = this.topic.getChildTopics().getString("ka2.angebot.assignment_kontakt");
-			}
+            if (this.topic.getChildTopics().has("ka2.angebot.assignment_kontakt")) {
+                value = this.topic.getChildTopics().getString("ka2.angebot.assignment_kontakt");
+            }
             return value;
         } catch (Exception e) {
             throw new RuntimeException("Constructing an AssignmentViewModel failed", e);
@@ -102,18 +90,18 @@ public class AssignmentViewModel implements JSONEnabled {
     }
 
     private String getZusatzInfo() {
-		String value = null;
+        String value = null;
         try {
-			if (this.topic.getChildTopics().has("ka2.angebot.assignment_info")) {
-				value = this.topic.getChildTopics().getString("ka2.angebot.assignment_info");
-			}
+            if (this.topic.getChildTopics().has("ka2.angebot.assignment_info")) {
+                value = this.topic.getChildTopics().getString("ka2.angebot.assignment_info");
+            }
             return value;
         } catch (Exception e) {
             throw new RuntimeException("Constructing an AssignmentViewModel failed", e);
         }
     }
 
-	private JSONObject getGeoObject() {
+    private JSONObject getGeoObject() {
         try {
             return geoObject.toJSON();
         } catch (Exception e) {

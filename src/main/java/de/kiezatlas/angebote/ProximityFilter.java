@@ -5,7 +5,7 @@ import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 
 
 /**
- * A filter used in the retirval API to restrict the result set by proximity (geo coordinate + radius).
+ * A filter used in the retrieval API to restrict the result set by proximity (geo coordinate + radius).
  */
 public class ProximityFilter {
 

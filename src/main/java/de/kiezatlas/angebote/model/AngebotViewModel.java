@@ -2,12 +2,16 @@ package de.kiezatlas.angebote.model;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.plugins.geomaps.GeomapsService;
 import de.kiezatlas.website.model.GeoObjectView;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Logger;
 import org.codehaus.jettison.json.JSONException;
-
 import org.codehaus.jettison.json.JSONObject;
+import java.util.List;
 
 
 
@@ -41,7 +45,7 @@ public class AngebotViewModel implements JSONEnabled {
 			json.put("id", topic.getId());
 			json.put("name", topic.getSimpleValue());
 			json.put("beschreibung", getDescription());
-			json.put("website", getWebpage());
+			json.put("webpage", getWebpage());
 			json.put("kontakt", getKontakt());
 			// Many json.put("geo_object", getGeoObject());
 			json.put("tags", getTags());
@@ -97,10 +101,19 @@ public class AngebotViewModel implements JSONEnabled {
         }
     }
 
-	private JSONObject getTags() {
-		JSONObject tags = null;
+	private List<JSONObject> getTags() {
+		List<JSONObject> tags = new ArrayList<JSONObject>();
         try {
-			// ### logger.info("Tags for AngebotViewModel=" + this.topic.getChildTopics().getTopics("dm4.tags.tag").toString());
+            if (this.topic.getChildTopics().has("dm4.tags.tag")) {
+                List<RelatedTopic> all = this.topic.getChildTopics().getTopics("dm4.tags.tag");
+                Iterator<RelatedTopic> iterator = all.iterator();
+                while(iterator.hasNext()) {
+                    Topic tag = iterator.next();
+                    JSONObject dto = new JSONObject().put("label", tag.getSimpleValue()).put("id", tag.getId());
+                    tags.add(dto);
+                    logger.info("Added Tag for AngebotViewModel=" + dto.toString());
+                }
+            }
             return tags;
         } catch (Exception e) {
             throw new RuntimeException("Constructing an AngebotViewModel failed", e);

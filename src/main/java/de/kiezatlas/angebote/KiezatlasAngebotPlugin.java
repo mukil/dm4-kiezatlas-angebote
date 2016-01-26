@@ -31,6 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.WebApplicationException;
 
 
 
@@ -38,9 +39,9 @@ import javax.ws.rs.core.MediaType;
 @Consumes("application/json")
 @Produces("application/json")
 public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreateTopicListener {
-    
+
     // ------------------------------------------------------------------------------------------------------ Properties
-    
+
     public static final String ANGEBOT_START_TIME          = "ka2.angebot.start_time";
     public static final String ANGEBOT_END_TIME            = "ka2.angebot.end_time";
 
@@ -65,17 +66,22 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-	@GET
-	@Produces(MediaType.TEXT_HTML)
-	public InputStream getAngeboteView() {
-		return getStaticResource("web/index.html");
-	}
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public InputStream getAngeboteView() {
+        return getStaticResource("web/index.html");
+    }
 
     @GET
     @Path("/{topicId}")
     public AngebotViewModel getAngebotsinformation(@PathParam("topicId") long topicId) {
-        Topic angebot = dms.getTopic(topicId);
-        return new AngebotViewModel(angebot);
+        List<RelatedTopic> angebote = getUsersAngebote();
+        Iterator<RelatedTopic> iterator = angebote.iterator();
+        while (iterator.hasNext()) {
+            RelatedTopic angebot = iterator.next();
+            if (angebot.getId() == topicId) return new AngebotViewModel(angebot);
+        }
+        throw new WebApplicationException(404);
     }
 
     @GET
@@ -91,43 +97,43 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return "false";
     }
 
-	@GET
-	@Path("/zuordnen/{topicID}")
-	@Produces(MediaType.TEXT_HTML)
-	public InputStream getAngebotAssignmentView(@PathParam("topicID") String id) {
-		// Disposing topicID
-		return getStaticResource("web/assignment.html");
-	}
+    @GET
+    @Path("/zuordnen/{topicID}")
+    @Produces(MediaType.TEXT_HTML)
+    public InputStream getAngebotAssignmentView(@PathParam("topicID") String id) {
+        // Disposing topicID
+        return getStaticResource("web/assignment.html");
+    }
 
-	@GET
-	@Path("/edit/{topicID}")
-	@Produces(MediaType.TEXT_HTML)
-	public InputStream getAngebotEditView(@PathParam("topicID") String id) {
-		// Disposing topicID
-		return getStaticResource("web/edit.html");
-	}
+    @GET
+    @Path("/edit/{topicID}")
+    @Produces(MediaType.TEXT_HTML)
+    public InputStream getAngebotEditView(@PathParam("topicID") String id) {
+        // Disposing topicID
+        return getStaticResource("web/edit.html");
+    }
 
-	@GET
-	@Path("/list")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<RelatedTopic> getUsersAngebote() {
-		ResultList<RelatedTopic> all = dms.getTopics("ka2.angebot", 0);
-		ArrayList<RelatedTopic> my = new ArrayList<RelatedTopic>();
-		Iterator<RelatedTopic> iterator = all.iterator();
-		while (iterator.hasNext()) {
-			RelatedTopic angebot = iterator.next();
-			RelatedTopic username = angebot.getRelatedTopic("dm4.core.association",
-				null, null, "dm4.accesscontrol.username");
-			String alias = aclService.getUsername();
-			if (username != null && (username.getSimpleValue().toString().equals(alias))) {
-				my.add(angebot);
-			} else { // ### To be removed after next clean install / DB reset
-				logger.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
-				// logger.warning("Angebot Relations " + element.getRelatedTopics("dm4.core.association", 0).toJSON().toString());
-			}
-		}
-		return my;
-	}
+    @GET
+    @Path("/list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RelatedTopic> getUsersAngebote() {
+        ResultList<RelatedTopic> all = dms.getTopics("ka2.angebot", 0);
+        ArrayList<RelatedTopic> my = new ArrayList<RelatedTopic>();
+        Iterator<RelatedTopic> iterator = all.iterator();
+        String usernameAlias = aclService.getUsername();
+        while (iterator.hasNext()) {
+            RelatedTopic angebot = iterator.next();
+            RelatedTopic usernameTopic = angebot.getRelatedTopic("dm4.core.association", null, null,
+                    "dm4.accesscontrol.username");
+            if (usernameTopic != null && (usernameTopic.getSimpleValue().toString().equals(usernameAlias))) {
+                my.add(angebot);
+            } else { // ### To be removed after next clean install / DB reset
+                logger.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
+                // logger.warning("Angebot Relations " + element.getRelatedTopics("dm4.core.association", 0).toJSON().toString());
+            }
+        }
+        return my;
+    }
 
     @GET
     @Path("/list/assignments/{angebotId}")
@@ -158,52 +164,84 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return results;
     }
 
-	@POST
-	@Path("/assignment/{from}/{to}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public Association createAngebotsAssignment(AssociationModel assocModel,
-		@PathParam("from") long fromDate, @PathParam("to") long toDate) {
-		Association result = null;
-		if (assocModel == null) throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
-		try {
-			result = dms.createAssociation(assocModel);
-			result.setProperty(ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
-			result.setProperty(ANGEBOT_END_TIME, toDate, true);
-			logger.info("Succesfully created Kiezatlas Angebots Assignment from " + new Date(fromDate).toGMTString()
-				+ " to " + new Date(toDate).toGMTString());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return result;
-	}
+    @POST
+    @Path("/assignment/{from}/{to}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Association createAngebotsAssignment(AssociationModel assocModel,
+                                                @PathParam("from") long fromDate, @PathParam("to") long toDate) {
+        Association result = null;
+        if (assocModel == null) throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
+        try {
+            result = dms.createAssociation(assocModel);
+            result.setProperty(ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
+            result.setProperty(ANGEBOT_END_TIME, toDate, true);
+            logger.info("Succesfully created Kiezatlas Angebots Assignment from " + new Date(fromDate).toGMTString()
+                + " to " + new Date(toDate).toGMTString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
 
-	@GET
-	@Path("/filter/{now}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<AngebotViewModel> getAngeboteFiltered(@PathParam("now") long nowDate) {
-		ResultList<RelatedAssociation> assocs = dms.getAssociations("ka2.angebot.assignment");
-		ArrayList<AngebotViewModel> result = new ArrayList<AngebotViewModel>();
-		Iterator<RelatedAssociation> iterator = assocs.iterator();
-		while (iterator.hasNext()) {
-			RelatedAssociation assoc = iterator.next();
-			if (isAssignmentActiveInTime(assoc, nowDate)) {
-				Topic angebotTopic = assoc.getTopic("dm4.core.parent");
-				Topic geoObjectTopic = assoc.getTopic("dm4.core.child");
-				result.add(new AngebotViewModel(angebotTopic, geoObjectTopic, geomapsService));
-			}
-		}
-		logger.info("Filtered " + result.size() + " items out for " + new Date(nowDate).toGMTString());
-		return result;
-	}
+    @POST
+    @Path("/assignment/{id}/{from}/{to}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    public Association updateAngebotsAssignmentDate(@PathParam("id") long assocId, @PathParam("from") long fromDate,
+                                                    @PathParam("to") long toDate) {
+        Association result = dms.getAssociation(assocId);
+        try {
+            result.setProperty(ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
+            result.setProperty(ANGEBOT_END_TIME, toDate, true);
+            logger.info("Succesfully updated Angebots Assignment Dates from " + new Date(fromDate).toGMTString()
+                    + " to " + new Date(toDate).toGMTString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
 
-	private boolean isAssignmentActiveInTime(Association assoc, long timestamp) {
-		Long from = (Long) assoc.getProperty(ANGEBOT_START_TIME);
-		Long to = (Long) assoc.getProperty(ANGEBOT_END_TIME);
-		return ((from < timestamp && to > timestamp) || // == "An activity currently open"
-				(from < 0 && to > timestamp) || // == "No start date given AND toDate is in the future
-				(from < timestamp && to < 0)); // == "Has started and has no toDate set
-	}
+    @POST
+    @Path("/assignment/{id}/delete")
+    @Transactional
+    public void deleteAngebotsAssignment(@PathParam("id") long assocId) {
+        Association result = dms.getAssociation(assocId);
+        AssignmentViewModel dummy = new AssignmentViewModel(result);
+        try {
+            result.delete();
+            logger.info("Succesfully DELETED Angebots Assignment Date, Association: " + assocId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GET
+    @Path("/filter/{now}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<AngebotViewModel> getAngeboteFiltered(@PathParam("now") long nowDate) {
+        ResultList<RelatedAssociation> assocs = dms.getAssociations("ka2.angebot.assignment");
+        ArrayList<AngebotViewModel> result = new ArrayList<AngebotViewModel>();
+        Iterator<RelatedAssociation> iterator = assocs.iterator();
+        while (iterator.hasNext()) {
+            RelatedAssociation assoc = iterator.next();
+            if (isAssignmentActiveInTime(assoc, nowDate)) {
+                Topic angebotTopic = assoc.getTopic("dm4.core.parent");
+                Topic geoObjectTopic = assoc.getTopic("dm4.core.child");
+                result.add(new AngebotViewModel(angebotTopic, geoObjectTopic, geomapsService));
+            }
+        }
+        logger.info("Filtered " + result.size() + " items out for " + new Date(nowDate).toGMTString());
+        return result;
+    }
+
+    private boolean isAssignmentActiveInTime(Association assoc, long timestamp) {
+        Long from = (Long) assoc.getProperty(ANGEBOT_START_TIME);
+        Long to = (Long) assoc.getProperty(ANGEBOT_END_TIME);
+        return ((from < timestamp && to > timestamp) || // == "An activity currently open"
+                (from < 0 && to > timestamp) || // == "No start date given AND toDate is in the future
+                (from < timestamp && to < 0)); // == "Has started and has no toDate set
+    }
 
     /**
      * Filters the given list by proximity filter if such is no null and thus excludes topics related
@@ -250,16 +288,16 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
     } **/
 
 
-	// ------------------------------------------------------------------------------------------------------- Hooks
+    // ------------------------------------------------------------------------------------------------------- Hooks
 
-	/** Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed. */
-	public void postCreateTopic(Topic topic) {
-		if (topic.getTypeUri().equals("ka2.angebot")) {
-			Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
-			dms.createAssociation(new AssociationModel("dm4.core.association",
-				new TopicRoleModel(topic.getId(), "dm4.core.parent"),
-				new TopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
-		}
-	}
+    /** Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed. */
+    public void postCreateTopic(Topic topic) {
+        if (topic.getTypeUri().equals("ka2.angebot")) {
+            Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
+            dms.createAssociation(new AssociationModel("dm4.core.association",
+                new TopicRoleModel(topic.getId(), "dm4.core.parent"),
+                new TopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
+        }
+    }
 
 }
