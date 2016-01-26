@@ -10,29 +10,46 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
-        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/wautocomplete/jquery-ui-1.9.2.custom.min.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/ckeditor/ckeditor.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/ckeditor/config.js"></script>
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script src="/de.kiezatlas.angebote/tags-ui.js"></script>
 
         <script type="text/javascript">
-            
+
             $(document).ready(function(e) {
-                load_username(show_user_dialog)
+                load_username(render_user_menu)
                 has_angebote_membership(function() {
-                    // parse route
+                    // parse topic id from path
                     var id = parse_angebots_id()
-                    // load topic
-                    load_angebot(id)
-                    // init edit form
-                    init_datepicker()
+                    if (id != 0) {
+                        // Update Angebotsinfos
+                        load_angebot()
+                        tagging.init()
+                        render_angebot_form()
+                    } else {
+                        // Create Angebotsinfos
+                        // init_datepicker()
+                    }
                 })
+                // ckEditor
+                CKEDITOR.inline('angebot-beschreibung')
             })
-            
+
         </script>
     </head>
     <body class="kiezatlas angebot">
-        
-        <div id="user"></div>
+
+        <div id="navigation">
+            <ul>
+                <li class="register"><a href="/sign-up/">Registrieren</a></li>
+                <li class="login"><a href="/sign-up/login">Anmelden</a></li>
+                <li class="angebote"><a href="/kiezatlas/angebot/">Meine Angebotsinfos</a></li>
+                <li class="logout"><a href="/#logout/" onclick="javascript:logout()">Abmelden</a></li>
+            </ul>
+        </div>
 
         <div class="task-info">
             <h3>Neue Angebotsinfos anlegen/ Vorhandene editieren</h3>
@@ -44,13 +61,16 @@
                 <input id="angebot-name" type="text" placeholder="Name des Angebots"></input>
                 <br/>
                 <!--label for="angebot-beschreibung" id="beschreibung-label">Kurzbeschreibung</label-->
-                <textarea id="angebot-beschreibung" type="text" placeholder="Beschreibung des Angebots"></textarea>
+                <textarea id="angebot-beschreibung" contenteditable="true" type="text"
+                          placeholder="Beschreibung des Angebots"></textarea>
                 <br/>
                 <label for="angebot-kontakt" id="kontakt-label">Kontakt zum Angebot</label><br/>
                 <input id="angebot-kontakt" type="text" placeholder="Kontakt"></input>
                 <br/>
-                <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot</label><br/>
-                <input id="angebot-webpage" type="url" placeholder="http://"></input>
+                <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)
+                </label><br/>
+                <input id="angebot-webpage" type="url" onkeyup="autocorrect_url(this.value)"
+                       placeholder="http://www.kiezatlas.de"></input>
                 <br/>
                 <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label><br/>
                 <input id="angebot-tags" type="text" placeholder=".., .."></input>

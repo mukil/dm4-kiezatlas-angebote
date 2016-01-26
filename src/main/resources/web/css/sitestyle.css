@@ -39,12 +39,23 @@ a {
 .left-side {
     width: 45%;
     display: inline-block;
+    margin-right: 5%;
+    margin-left: 30px;
+    margin-top: 30px;
 }
 
 .right-side {
     width: 45%;
     display: inline-block;
     vertical-align: top;
+    margin-top: 30px;
+}
+
+.right-side h3.linked a {
+    font-size: .9em;
+    float: right;
+    font-weight: normal;
+    text-decoration: none;
 }
 
 .concrete-assignment {
@@ -55,8 +66,25 @@ a {
     margin: 5px;
 }
 
-.conrete-assignment span {
-    font-size: 0.9em;
+.concrete-assignment h3,
+.concrete-assignment p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.concrete-assignment:hover {
+    box-shadow: 2px 2px 2px 0px #a9a9a9;
+}
+.concrete-assignment.selected {
+    box-shadow: 3px 3px 2px 0px #a9a9a9;
+}
+
+.hidden {
+    display: none;
+}
+
+div.help {
+    margin: 15px;
 }
 
 #user {
@@ -82,8 +110,11 @@ div.ui-datepicker {
 .geo-objects-area {
     position: relative;
     padding-left: 7px;
-    max-height: 220px;
     overflow-y: auto;
+}
+
+.form-area .geo-objects-area {
+    max-height: 220px;
 }
 
 .angebot-area {
@@ -102,17 +133,18 @@ span.angebot-name {
     font-style: italic;
 }
 
-.assignment #task-info h3,
+.assignment .task-info h3,
 .assignment .date-area h3 {
     font-weight: normal;
 }
 
-.assignment #task-info .angebot-name,
+.assignment .task-info .angebot-name,
 .assignment .date-area .angebot-name,
 .assignment .date-area .einrichtung-name {
     font-weight: bold;
 }
 
+.input#do-delete,
 .angebot-area label,
 .form-area label,
 .geo-objects-area label,
@@ -134,6 +166,10 @@ span.angebot-name {
     margin-top: 5px;
 }
 
+#name-search {
+    width: 300px;
+}
+
 .date-area textarea,
 .form-area textarea {
     min-width: 420px;
@@ -148,6 +184,11 @@ span.angebot-name {
     padding-left: 7px;
     font-size: 1em;
     margin: 0px 5px 15px 0px;
+}
+
+.form-area textarea {
+    margin: 0px 5px 45px 0px;
+    max-width: 460px;
 }
 
 div.disabled {
@@ -174,9 +215,26 @@ div.disabled {
     font-size: 0.9em;
 }
 
+.right-side h3.linked a:hover,
 .angebot-area li a:hover {
     text-decoration: underline;
     text-decoration-color: #8f1414;
+}
+
+ul.angebote li small {
+    float: right;
+    color: #999;
+}
+
+/** --- Upper Top Menu --- **/
+
+#navigation ul {
+    margin-top: 0px;
+}
+
+#navigation .logout,
+#navigation .angebote {
+    display: none;
 }
 
 /** ---- Lower main menu ---- */
@@ -189,11 +247,23 @@ div.disabled {
     text-align: center;
 }
 
+#navigation ul,
 .menu ul {
     list-style-type: none;
     font-size: 1.2em;
     padding-left: 0px;
     margin: 0px;
+}
+
+#navigation ul li {
+    display: inline-block;
+    background-color: #fff;
+    padding: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-top: 0px;
 }
 
 .menu ul li {
@@ -207,10 +277,12 @@ div.disabled {
     margin-top: 15px;
 }
 
+#navigation ul li a,
 .menu ul li a {
     text-decoration: none;
 }
 
+#navigation ul li:hover a,
 .menu ul li:hover a {
     text-decoration: underline;
     text-decoration-color: #8f1414;
@@ -227,3 +299,20 @@ div.disabled {
     background-color: #fff;
 }
 
+
+/** CKEditor Overrides */
+
+/* Make the content area look like an input field */
+.cke_wysiwyg_frame {
+    box-shadow: inset 0px 1px 2px #444;
+}
+
+.cke_editable {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #9f9f9f;
+    border-radius: 4px;
+    max-width: 640px;
+    min-height: 140px;
+    margin-top: 35px;
+}
