@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
+    <!DOCTYPE html>
+    <html>
     <head>
         <title>Kiezatlas 2 Angebote</title>
 
@@ -11,30 +11,38 @@
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
+        <!-- script src="/de.kiezatlas.angebote/vendor/jquery/ui/datepicker-de.js"></script-->
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
 
         <script type="text/javascript">
-            
+
             $(document).ready(function(e) {
                 $("#name-search").on("change", function (c) {
                     console.log("name-search onchange:", c)
                 })
-                load_username(show_user_dialog)
-                init_angebot()
-                init_datepicker()
-                load_assignments(show_assignments)
+                load_username(render_user_menu)
+                render_assignment_page()
             })
-            
+
         </script>
     </head>
     <body class="kiezatlas assignment">
-        
-        <div id="user"></div>
+
+        <div id="navigation">
+            <ul>
+                <li class="register"><a href="/sign-up/">Registrieren</a></li>
+                <li class="login"><a href="/sign-up/login">Anmelden</a></li>
+                <li class="angebote"><a href="/kiezatlas/angebot/">Meine Angebotsinfos</a></li>
+                <li class="edit"><a href="/kiezatlas/angebot/" id="angebots-link">Angebotsinfo bearbeiten</a></li>
+                <li class="logout"><a href="/#logout/" onclick="javascript:logout()">Abmelden</a></li>
+            </ul>
+        </div>
 
         <div class="left-side">
             <div class="task-info">
-                <h3>Neue Zuordnung von <span class="angebot-name">Diese Angebotsinfo</span> zu einer Einrichtung</h3>
+                <h3>1. Zuordnung von <span class="angebot-name">dieser Angebotsinfo</span> zu einer Einrichtung</h3>
+                <p>Bitte geben Sie im folgenden Eingabefeld einen Einrichtungsnamen ein</p>
             </div>
 
             <div class="form-area assignment">
@@ -48,25 +56,30 @@
             </div>
 
             <div class="date-area disabled">
-                <h3>Zeitraum des Angebots am Standort <span class="einrichtung-name">...</span></h3>
-                <form id="date-select-form" action="javascript:do_assign_angebot()" accept-charset="UTF-8">
-                    <label for="from">Von</label><br/>
+                <h3>2. Zeitraum des Angebots am Standort <span class="einrichtung-name">...</span> festlegen</h3>
+                <form id="date-select-form" action="javascript:do_save_assignment()" accept-charset="UTF-8">
+                    <label for="from">Das Angebot findet hier statt vom</label><br/>
                     <input type="text" id="from" name="from"><br/>
-                    <label for="to">Bis</label><br/>
-                    <input type="text" id="to" name="to">
+                    <label for="to">bis zum</label><br/>
+                    <input type="text" id="to" name="to"><br/>
                     <input id="do-assign" type="submit" class="btn" value="Speichern"></input>
+                    <input id="do-delete" type="button" onclick="javascript:do_delete_assignment()" class="btn hidden"
+                           value="Zeitraum löschen"></input>
                 </form>
             </div>
         </div>
         <div class="right-side">
             <div class="task-info">
-                <h3>Einrichtungen denen <span class="angebot-name">dieses Angebot</span> aktuell zugeordnet ist</h3>
+                <h3>
+                    Die Angebotsinfo<br/><br/><span class="angebot-name">dieses Angebot</span>
                 </h3>
-                <p>Bitte w&auml;hlen sie eine Zurdnung aus um diese zu bearbeiten.</p>
+                <p class="angebot-infos"></p>
+                <h3>wird in Kiezatlas-Einrichtungen &uuml;ber folgende Zeitr&auml;ume angezeigt</h3>
             </div>
             <div class="geo-objects-area">
                 <div class="einrichtungen"></div>
             </div>
+            <div class="help"></div>
         </div>
 
         <div id="bottom">
@@ -80,7 +93,7 @@
             <br/>
             <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
         </div>
-        
+
     </body>
-</html>
+    </html>
 
