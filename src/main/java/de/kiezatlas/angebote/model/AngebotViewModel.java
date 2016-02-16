@@ -111,7 +111,6 @@ public class AngebotViewModel implements JSONEnabled {
                     Topic tag = iterator.next();
                     JSONObject dto = new JSONObject().put("label", tag.getSimpleValue()).put("id", tag.getId());
                     tags.add(dto);
-                    logger.info("Added Tag for AngebotViewModel=" + dto.toString());
                 }
             }
             return tags;

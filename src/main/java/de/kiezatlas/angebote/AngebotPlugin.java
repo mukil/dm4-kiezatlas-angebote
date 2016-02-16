@@ -32,20 +32,28 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.WebApplicationException;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 
 
 
 @Path("/kiezatlas/angebot")
 @Consumes("application/json")
 @Produces("application/json")
-public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreateTopicListener {
+public class AngebotPlugin extends PluginActivator implements AngebotService,
+                                                              PostCreateTopicListener {
 
-    // ------------------------------------------------------------------------------------------------------ Properties
+    // --------------------------------------------------------------------------------------------------------- Types
+    public static final String ANGEBOT_TYPE                = "ka2.angebot";
+    public static final String ANGEBOT_ASSIGNMENT          = "ka2.angebot.assignment";
+    public static final String GEO_OBJECT_TYPE             = "ka2.geo_object";
+
+    // ---------------------------------------------------------------------------------------------------- Properties
 
     public static final String ANGEBOT_START_TIME          = "ka2.angebot.start_time";
     public static final String ANGEBOT_END_TIME            = "ka2.angebot.end_time";
 
-    // ------------------------------------------------------------------------------------------------------- Constants
+    // ----------------------------------------------------------------------------------------------------- Constants
 
     // The URIs of KA2 Bezirk topics have this prefix.
     // The remaining part of the URI is the original KA1 overall map alias.
@@ -56,7 +64,7 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
     private static final String KA2_GEO_OBJECT_URI_PREFIX   = "de.kiezatlas.topic.";
     private static final String WORKSPACE_ANGEBOTE_URI      = "de.kiezatlas.angebote_ws";
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
+    // -------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject private GeomapsService geomapsService;
     @Inject private WorkspacesService workspaceService;
@@ -64,37 +72,17 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+    // ------------------------------------------------------------------------------------------------ Public Methods
 
+    /**
+     * Responds with the main HTML (AJAX Single) page for managing Angebote.
+     *
+     * @return
+     */
     @GET
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngeboteView() {
         return getStaticResource("web/index.html");
-    }
-
-    @GET
-    @Path("/{topicId}")
-    public AngebotViewModel getAngebotsinformation(@PathParam("topicId") long topicId) {
-        List<RelatedTopic> angebote = getUsersAngebote();
-        Iterator<RelatedTopic> iterator = angebote.iterator();
-        while (iterator.hasNext()) {
-            RelatedTopic angebot = iterator.next();
-            if (angebot.getId() == topicId) return new AngebotViewModel(angebot);
-        }
-        throw new WebApplicationException(404);
-    }
-
-    @GET
-    @Path("/membership")
-    public String hasWorkspaceMembership() {
-        logger.info("Checking Angebote User Membership");
-        Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
-        logger.info("Loaded Angebote Workspace");
-        if (!aclService.getUsername().equals("")) {
-            logger.info("Checking Membership for Username=" + aclService.getUsername());
-            return "" + aclService.isMember(aclService.getUsername(), ws.getId());
-        }
-        return "false";
     }
 
     @GET
@@ -113,11 +101,51 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return getStaticResource("web/edit.html");
     }
 
+    // ---------------------------------------------------------------------------------------- Angebotsinfo Resources
+
+    @GET
+    @Path("/list/{geoObjectId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public ResultList<RelatedTopic> getGeoObjectAngeboteTopics(@PathParam("geoObjectId") long geoObjectId) {
+        Topic geoObject = dms.getTopic(geoObjectId);
+        return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT_TYPE, 0);
+    }
+
+    /**
+     * Fethes all Angebotsinfos for the given list (JSON Array) of geo object ids.
+     *
+     * @param payloadListing
+     * @return
+     */
+    @POST
+    @Path("/list/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Override
+    public List<RelatedTopic> getGeoObjectAngeboteTopics(String payloadListing) {
+        List<RelatedTopic> results = new ArrayList<RelatedTopic>();
+        logger.info("Geo Object IDs \"" + payloadListing + "\"");
+        try {
+            JSONArray geoObjectIdList = new JSONArray(payloadListing);
+            logger.info("Collecting Angebot for " + geoObjectIdList.length() + " Geo Object IDs");
+            for (int i = 0; i < geoObjectIdList.length(); i++) {
+                ResultList<RelatedTopic> assignedAngebote = getGeoObjectAngeboteTopics(geoObjectIdList.getLong(i));
+                results.addAll(assignedAngebote.getItems());
+            }
+        } catch(JSONException jex) {
+            throw new WebApplicationException(jex);
+        }
+        return results;
+    }
+
+    // -------------------------------------------------------------------------------- Username Related Angebotsinfos
+
     @GET
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<RelatedTopic> getUsersAngebote() {
-        ResultList<RelatedTopic> all = dms.getTopics("ka2.angebot", 0);
+    public List<RelatedTopic> getUsersAngeboteTopics() {
+        ResultList<RelatedTopic> all = dms.getTopics(ANGEBOT_TYPE, 0);
         ArrayList<RelatedTopic> my = new ArrayList<RelatedTopic>();
         Iterator<RelatedTopic> iterator = all.iterator();
         String usernameAlias = aclService.getUsername();
@@ -129,30 +157,43 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
                 my.add(angebot);
             } else { // ### To be removed after next clean install / DB reset
                 logger.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
-                // logger.warning("Angebot Relations " + element.getRelatedTopics("dm4.core.association", 0).toJSON().toString());
             }
         }
         return my;
     }
 
     @GET
+    @Path("/{topicId}")
+    @Override
+    public AngebotViewModel getUsersAngebotsinfo(@PathParam("topicId") long topicId) {
+        List<RelatedTopic> angebote = getUsersAngeboteTopics();
+        Iterator<RelatedTopic> iterator = angebote.iterator();
+        while (iterator.hasNext()) {
+            RelatedTopic angebot = iterator.next();
+            if (angebot.getId() == topicId) return new AngebotViewModel(angebot);
+        }
+        throw new WebApplicationException(404);
+    }
+
+    @GET
     @Path("/list/assignments/{angebotId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<AssignmentViewModel> getAngeboteAssignments(@PathParam("angebotId") String topicId) {
-        List<RelatedTopic> all = getUsersAngebote();
+    public List<AssignmentViewModel> getUsersAngebotsAssignments(@PathParam("angebotId") long topicId) {
+        List<RelatedTopic> all = getUsersAngeboteTopics();
         List<AssignmentViewModel> results = new ArrayList<AssignmentViewModel>();
         Iterator<RelatedTopic> iterator = all.iterator();
         while (iterator.hasNext()) {
             RelatedTopic angebot = iterator.next();
-            if (angebot.getId() == Long.parseLong(topicId)) {
-                ResultList<RelatedTopic> geoObjects = angebot.getRelatedTopics("ka2.angebot.assignment", null, null,
-                        "ka2.geo_object", 0);
+            if (angebot.getId() == topicId) {
+                ResultList<RelatedTopic> geoObjects = angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null,
+                        GEO_OBJECT_TYPE, 0);
                 Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
                 while (geoIterator.hasNext()) {
                     RelatedTopic einrichtung = geoIterator.next();
-                    /** Association assignment = dms.getAssociation("ka2.angebot.assignment", angebot.getId(),
+                    /** Association assignment = dms.getAssociation(ANGEBOT_ASSIGNMENT, angebot.getId(),
                             einrichtung.getId(), "dm4.core.default", "dm4.core.default"); **/
-                    results.add(new AssignmentViewModel(einrichtung.getRelatingAssociation(), einrichtung, geomapsService));
+                    results.add(new AssignmentViewModel(einrichtung.getRelatingAssociation(), einrichtung,
+                        geomapsService));
                     /** Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
                     String roleTypeUri1, String roleTypeUri2); **/
                 }
@@ -164,6 +205,11 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return results;
     }
 
+
+
+    // ------------------------------------------------------------------------------------- CRUD Angebots-Assignments
+
+    /** Creates an association of type "ka2.angebot.assignment" with two properties (timestamp "from" and "to"). */
     @POST
     @Path("/assignment/{from}/{to}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -184,6 +230,7 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return result;
     }
 
+    /** Updates an association of type "ka2.angebot.assignment" with its two properties (timestamp "from" and "to"). */
     @POST
     @Path("/assignment/{id}/{from}/{to}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -202,6 +249,7 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return result;
     }
 
+    /** Deletes an association of type "ka2.angebot.assignment" with two properties (timestamp "from" and "to"). */
     @POST
     @Path("/assignment/{id}/delete")
     @Transactional
@@ -216,11 +264,15 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         }
     }
 
+
+
+    // ------------------------------------------------------------------------------------------- Angebots Filter API
+
     @GET
     @Path("/filter/{now}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<AngebotViewModel> getAngeboteFiltered(@PathParam("now") long nowDate) {
-        ResultList<RelatedAssociation> assocs = dms.getAssociations("ka2.angebot.assignment");
+    public List<AngebotViewModel> getAllAngebotsinfosByNow(@PathParam("now") long nowDate) {
+        ResultList<RelatedAssociation> assocs = dms.getAssociations(ANGEBOT_ASSIGNMENT);
         ArrayList<AngebotViewModel> result = new ArrayList<AngebotViewModel>();
         Iterator<RelatedAssociation> iterator = assocs.iterator();
         while (iterator.hasNext()) {
@@ -287,12 +339,27 @@ public class KiezatlasAngebotPlugin extends PluginActivator implements PostCreat
         return angebot;
     } **/
 
+    // --------------------------------------------------------------------------------------------- Utility Resources
 
-    // ------------------------------------------------------------------------------------------------------- Hooks
+    @GET
+    @Path("/membership")
+    public String hasAngeboteWorkspaceMembership() {
+        Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+        if (!aclService.getUsername().equals("")) {
+            logger.info("Checking Membership for Username=" + aclService.getUsername());
+            return "" + aclService.isMember(aclService.getUsername(), ws.getId());
+        }
+        return "false";
+    }
 
-    /** Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed. */
+    // --------------------------------------------------------------------------------------------------------- Hooks
+
+    /**
+     * Associates each Angebot to the currently logged in username who issued the creation (request).
+     * Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed.
+     */
     public void postCreateTopic(Topic topic) {
-        if (topic.getTypeUri().equals("ka2.angebot")) {
+        if (topic.getTypeUri().equals(ANGEBOT_TYPE)) {
             Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
             dms.createAssociation(new AssociationModel("dm4.core.association",
                 new TopicRoleModel(topic.getId(), "dm4.core.parent"),

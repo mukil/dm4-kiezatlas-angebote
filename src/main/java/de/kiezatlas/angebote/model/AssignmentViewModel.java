@@ -4,7 +4,7 @@ import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Association;
 import de.deepamehta.plugins.geomaps.GeomapsService;
-import de.kiezatlas.angebote.KiezatlasAngebotPlugin;
+import de.kiezatlas.angebote.AngebotPlugin;
 import de.kiezatlas.website.model.GeoObjectView;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -56,8 +56,8 @@ public class AssignmentViewModel implements JSONEnabled {
     private Long getStartDate() {
         Long value = new Long(-1);
         try {
-            if (this.topic.hasProperty(KiezatlasAngebotPlugin.ANGEBOT_START_TIME)) {
-                value = (Long) this.topic.getProperty(KiezatlasAngebotPlugin.ANGEBOT_START_TIME);
+            if (this.topic.hasProperty(AngebotPlugin.ANGEBOT_START_TIME)) {
+                value = (Long) this.topic.getProperty(AngebotPlugin.ANGEBOT_START_TIME);
             }
             return value;
         } catch (Exception e) {
@@ -68,8 +68,8 @@ public class AssignmentViewModel implements JSONEnabled {
     private Long getEndDate() {
         Long value = new Long(-1);
         try {
-            if (this.topic.hasProperty(KiezatlasAngebotPlugin.ANGEBOT_END_TIME)) {
-                value = (Long) this.topic.getProperty(KiezatlasAngebotPlugin.ANGEBOT_END_TIME);
+            if (this.topic.hasProperty(AngebotPlugin.ANGEBOT_END_TIME)) {
+                value = (Long) this.topic.getProperty(AngebotPlugin.ANGEBOT_END_TIME);
             }
             return value;
         } catch (Exception e) {

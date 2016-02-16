@@ -48,7 +48,7 @@
                     <instructions>
                         <Bundle-SymbolicName>de.kiezatlas.angebote</Bundle-SymbolicName>
                         <Bundle-Activator>
-                            de.kiezatlas.angebote.KiezatlasAngebotPlugin
+                            de.kiezatlas.angebote.AngebotPlugin
                         </Bundle-Activator>
                         <Embed-Dependency>commons-collections4</Embed-Dependency>
                     </instructions>
