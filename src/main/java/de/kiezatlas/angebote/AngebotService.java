@@ -1,6 +1,7 @@
 package de.kiezatlas.angebote;
 
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ResultList;
 import de.kiezatlas.angebote.model.AngebotViewModel;
 import java.util.List;
@@ -24,6 +25,11 @@ public interface AngebotService {
      * @return      List of all "Angebotsinfos" related to the given Geo Object (typeUri="ka2.geo_object").
      */
     ResultList<RelatedTopic> getGeoObjectAngeboteTopics(long geoObjectId);
+
+    /**
+     * @return      List of all "Angebotsinfos" related to the given Geo Object (typeUri="ka2.geo_object").
+     */
+    ResultList<RelatedTopic> getGeoObjectAngeboteTopics(Topic geoObject);
 
     /**
      * @return      List of all "Angebotsinfos" related to all the given Geo Objects

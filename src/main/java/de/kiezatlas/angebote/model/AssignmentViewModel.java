@@ -5,6 +5,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.Association;
 import de.deepamehta.plugins.geomaps.GeomapsService;
 import de.kiezatlas.angebote.AngebotPlugin;
+import de.kiezatlas.angebote.AngebotService;
 import de.kiezatlas.website.model.GeoObjectView;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -27,9 +28,10 @@ public class AssignmentViewModel implements JSONEnabled {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public AssignmentViewModel(Association assignment, Topic geoObject, GeomapsService geomapsService) {
+    public AssignmentViewModel(Association assignment, Topic geoObject, GeomapsService geomapsService,
+            AngebotService angebote) {
         this.topic = assignment.loadChildTopics();
-        this.geoObject = new GeoObjectView(geoObject, geomapsService);
+        this.geoObject = new GeoObjectView(geoObject, geomapsService, angebote);
     }
 
     public AssignmentViewModel(Association angebot) {

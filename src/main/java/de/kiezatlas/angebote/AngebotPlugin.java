@@ -109,6 +109,12 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Override
     public ResultList<RelatedTopic> getGeoObjectAngeboteTopics(@PathParam("geoObjectId") long geoObjectId) {
         Topic geoObject = dms.getTopic(geoObjectId);
+        return getGeoObjectAngeboteTopics(geoObject);
+    }
+
+    @GET
+    @Override
+    public ResultList<RelatedTopic> getGeoObjectAngeboteTopics(Topic geoObject) {
         return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT_TYPE, 0);
     }
 
@@ -193,7 +199,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                     /** Association assignment = dms.getAssociation(ANGEBOT_ASSIGNMENT, angebot.getId(),
                             einrichtung.getId(), "dm4.core.default", "dm4.core.default"); **/
                     results.add(new AssignmentViewModel(einrichtung.getRelatingAssociation(), einrichtung,
-                        geomapsService));
+                        geomapsService, this));
                     /** Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
                     String roleTypeUri1, String roleTypeUri2); **/
                 }
@@ -280,7 +286,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             if (isAssignmentActiveInTime(assoc, nowDate)) {
                 Topic angebotTopic = assoc.getTopic("dm4.core.parent");
                 Topic geoObjectTopic = assoc.getTopic("dm4.core.child");
-                result.add(new AngebotViewModel(angebotTopic, geoObjectTopic, geomapsService));
+                result.add(new AngebotViewModel(angebotTopic, geoObjectTopic));
             }
         }
         logger.info("Filtered " + result.size() + " items out for " + new Date(nowDate).toGMTString());
