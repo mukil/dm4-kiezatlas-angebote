@@ -37,4 +37,18 @@ public interface AngebotService {
      */
     List<RelatedTopic> getGeoObjectAngeboteTopics(String payloadListing);
 
+    /**
+     * Fetches all Angebotsinfos with a _current_ (now > from && now < to) Geo Object Assignment.
+     * @param now
+     * @return
+     */
+    List<AngebotViewModel> getAllAngebotsinfosByNow(long now);
+
+    /**
+     * Fetches all Angebotsinfos by searching four child types: Name, Beschreibung, Kontakt und Tags.
+     * @param query
+     * @return
+     */
+    List<AngebotViewModel> searchAngebotsinfosByText(String query);
+
 }

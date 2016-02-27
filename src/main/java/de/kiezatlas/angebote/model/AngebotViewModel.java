@@ -42,6 +42,14 @@ public class AngebotViewModel implements JSONEnabled {
         this.topic = angebot.loadChildTopics();
     }
 
+    public GeoObjectView getGeoObjectView() {
+        return this.geoObject;
+    }
+
+    public Topic getGeoObjectTopic() {
+        return this.geoObjectTopic;
+    }
+
     @Override
     public JSONObject toJSON() {
         try {

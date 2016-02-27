@@ -24,16 +24,16 @@ import javax.ws.rs.Consumes;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.WebApplicationException;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 
 
 
@@ -266,6 +266,35 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     // ------------------------------------------------------------------------------------------- Angebots Filter API
 
+     /**
+     * Builds up a list of search results (Geo Objects to be displayed in a map) by text query.
+     * @param query
+     */
+    @GET
+    @Path("/search")
+    public List<AngebotViewModel> searchAngebotsinfosByText(@QueryParam("search") String query) {
+        // TODO: Maybe it is also desirable that we wrap the users query into quotation marks
+        // (to allow users to search for a combination of words)
+        try {
+            ArrayList<AngebotViewModel> results = new ArrayList<AngebotViewModel>();
+            if (query.isEmpty()) {
+                logger.warning("No search term entered, returning empty resultset");
+                return results;
+            }
+            List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(query);
+            // iterate over merged results
+            logger.info("Start building response for " + angebotsinfos.size() + " OVERALL");
+            for (Topic topic : angebotsinfos) {
+                // ### and filter out all not currently active
+                results.add(new AngebotViewModel(topic));
+            }
+            logger.info("Build up response " + results.size() + " geo objects across all districts");
+            return results;
+        } catch (Exception e) {
+            throw new RuntimeException("Searching geo object topics failed", e);
+        }
+    }
+
     @GET
     @Path("/filter/{now}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -292,6 +321,38 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 (from < 0 && to > timestamp) || // == "No start date given AND toDate is in the future
                 (from < timestamp && to < 0)); // == "Has started and has no toDate set
     }
+
+    private List<Topic> searchInAngebotsinfoChildsByText(String query) {
+        HashMap<Long, Topic> uniqueResults = new HashMap<Long, Topic>();
+        List<Topic> searchResults = dms.searchTopics(query, "ka2.angebot.beschreibung");
+        List<Topic> descrResults = dms.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
+        List<Topic> tagResults = dms.searchTopics(query, "dm4.tags.tag"); // Todo: check index modes
+        List<Topic> kontaktResults = dms.searchTopics(query, "ka2.angebot.kontakt"); // Todo: check index modes
+        // List<Topic> sonstigesResults = dms.searchTopics(query, "ka2.sonstiges");
+        // List<Topic> traegerNameResults = dms.searchTopics(query, "ka2.traeger.name");
+        logger.info("> " + searchResults.size() + ", " + descrResults.size() + ", " + tagResults.size()
+            + ", " + kontaktResults.size() + " results in four types for query=\"" + query + "\" in ANGEBOTSINFOS");
+        // merge all four types in search results
+        searchResults.addAll(descrResults);
+        searchResults.addAll(tagResults);
+        searchResults.addAll(kontaktResults);
+        // make search results only contain unique geo object topics
+        Iterator<Topic> iterator = searchResults.iterator();
+        while (iterator.hasNext()) {
+            Topic next = iterator.next();
+            Topic geoObject = getAngebotsinfoParent(next); // now this is never null
+            if (!uniqueResults.containsKey(geoObject.getId())) {
+                uniqueResults.put(geoObject.getId(), geoObject);
+            }
+        }
+        logger.info("searchResultLength=" + (searchResults.size()) + ", " + "uniqueResultLength=" + uniqueResults.size());
+        return new ArrayList(uniqueResults.values());
+    }
+
+    private Topic getAngebotsinfoParent(Topic entry) {
+        return entry.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", "ka2.angebot");
+    }
+
 
     /**
      * Filters the given list by proximity filter if such is no null and thus excludes topics related
