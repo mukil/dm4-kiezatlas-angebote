@@ -112,7 +112,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return getGeoObjectAngeboteTopics(geoObject);
     }
 
-    @GET
     @Override
     public ResultList<RelatedTopic> getGeoObjectAngeboteTopics(Topic geoObject) {
         return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT_TYPE, 0);
@@ -121,26 +120,19 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     /**
      * Fethes all Angebotsinfos for the given list (JSON Array) of geo object ids.
      *
-     * @param payloadListing
+     * @param payloadListing    String (Semicolon separated list of ids)
      * @return
      */
-    @POST
-    @Path("/list/")
+    @GET
+    @Path("/list/many/{ids}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.TEXT_PLAIN)
     @Override
-    public List<RelatedTopic> getGeoObjectAngeboteTopics(String payloadListing) {
+    public List<RelatedTopic> getGeoObjectAngeboteTopics(@PathParam("ids") String payloadListing) {
         List<RelatedTopic> results = new ArrayList<RelatedTopic>();
-        logger.info("Geo Object IDs \"" + payloadListing + "\"");
-        try {
-            JSONArray geoObjectIdList = new JSONArray(payloadListing);
-            logger.info("Collecting Angebot for " + geoObjectIdList.length() + " Geo Object IDs");
-            for (int i = 0; i < geoObjectIdList.length(); i++) {
-                ResultList<RelatedTopic> assignedAngebote = getGeoObjectAngeboteTopics(geoObjectIdList.getLong(i));
-                results.addAll(assignedAngebote.getItems());
-            }
-        } catch(JSONException jex) {
-            throw new WebApplicationException(jex);
+        String[] ids = payloadListing.split(";");
+        for (String id : ids) {
+            ResultList<RelatedTopic> assignedAngebote = getGeoObjectAngeboteTopics(Long.parseLong(id));
+            results.addAll(assignedAngebote.getItems());
         }
         return results;
     }
@@ -350,10 +342,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/membership")
     public String hasAngeboteWorkspaceMembership() {
-        Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
-        if (!aclService.getUsername().equals("")) {
-            logger.info("Checking Membership for Username=" + aclService.getUsername());
-            return "" + aclService.isMember(aclService.getUsername(), ws.getId());
+        String username = aclService.getUsername();
+        if (!username.equals("")) {
+            Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+            logger.info("Checking Membership for Username=" + username);
+            return "" + aclService.isMember(username, ws.getId());
         }
         return "false";
     }
