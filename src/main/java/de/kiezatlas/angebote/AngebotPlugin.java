@@ -253,7 +253,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Transactional
     public void deleteAngebotsAssignment(@PathParam("id") long assocId) {
         Association result = dms.getAssociation(assocId);
-        AssignmentViewModel dummy = new AssignmentViewModel(result);
         try {
             result.delete();
             logger.info("Succesfully DELETED Angebots Assignment Date, Association: " + assocId);
@@ -295,6 +294,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         }
     }
 
+    /**
+     * Fetches Angebotsinfo Assignments with corresponding Geo Objects.
+     * @param nowDate
+     * @return
+     */
     @GET
     @Path("/filter/{now}")
     @Produces(MediaType.APPLICATION_JSON)

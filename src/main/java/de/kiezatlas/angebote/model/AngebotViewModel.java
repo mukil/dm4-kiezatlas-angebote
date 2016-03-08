@@ -58,7 +58,7 @@ public class AngebotViewModel implements JSONEnabled {
             json.put("beschreibung", getDescription());
             json.put("webpage", getWebpage());
             json.put("kontakt", getKontakt());
-            json.put("geo_object", geoObjectTopic.toJSON());
+            json.put("geo_object", geoObjectTopic);
             json.put("tags", getTags());
             return json;
         } catch (JSONException ex) {

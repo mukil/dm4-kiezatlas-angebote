@@ -22,7 +22,7 @@ public class AssignmentViewModel implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private JSONObject json = new JSONObject();
-    private Association topic = null;
+    private Association assignment = null;
     private GeoObjectView geoObject = null;
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -30,19 +30,15 @@ public class AssignmentViewModel implements JSONEnabled {
 
     public AssignmentViewModel(Association assignment, Topic geoObject, GeomapsService geomapsService,
             AngebotService angebote) {
-        this.topic = assignment.loadChildTopics();
+        this.assignment = assignment.loadChildTopics();
         this.geoObject = new GeoObjectView(geoObject, geomapsService, angebote);
-    }
-
-    public AssignmentViewModel(Association angebot) {
-        this.topic = angebot.loadChildTopics();
     }
 
     @Override
     public JSONObject toJSON() {
         try {
-            json.put("id", topic.getId());
-            json.put("name", geoObject.getName());
+            json.put("id", assignment.getId());
+            json.put("name", getGeoObjectName());
             json.put("von", getStartDate());
             json.put("bis", getEndDate());
             json.put("zusatzinfo", getZusatzInfo());
@@ -55,11 +51,15 @@ public class AssignmentViewModel implements JSONEnabled {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    private String getGeoObjectName() {
+        return (geoObject == null) ? "" : geoObject.getName();
+    }
+
     private Long getStartDate() {
         Long value = new Long(-1);
         try {
-            if (this.topic.hasProperty(AngebotPlugin.ANGEBOT_START_TIME)) {
-                value = (Long) this.topic.getProperty(AngebotPlugin.ANGEBOT_START_TIME);
+            if (this.assignment.hasProperty(AngebotPlugin.ANGEBOT_START_TIME)) {
+                value = (Long) this.assignment.getProperty(AngebotPlugin.ANGEBOT_START_TIME);
             }
             return value;
         } catch (Exception e) {
@@ -70,8 +70,8 @@ public class AssignmentViewModel implements JSONEnabled {
     private Long getEndDate() {
         Long value = new Long(-1);
         try {
-            if (this.topic.hasProperty(AngebotPlugin.ANGEBOT_END_TIME)) {
-                value = (Long) this.topic.getProperty(AngebotPlugin.ANGEBOT_END_TIME);
+            if (this.assignment.hasProperty(AngebotPlugin.ANGEBOT_END_TIME)) {
+                value = (Long) this.assignment.getProperty(AngebotPlugin.ANGEBOT_END_TIME);
             }
             return value;
         } catch (Exception e) {
@@ -82,8 +82,8 @@ public class AssignmentViewModel implements JSONEnabled {
     private String getZusatzKontakt() {
         String value = null;
         try {
-            if (this.topic.getChildTopics().has("ka2.angebot.assignment_kontakt")) {
-                value = this.topic.getChildTopics().getString("ka2.angebot.assignment_kontakt");
+            if (this.assignment.getChildTopics().has("ka2.angebot.assignment_kontakt")) {
+                value = this.assignment.getChildTopics().getString("ka2.angebot.assignment_kontakt");
             }
             return value;
         } catch (Exception e) {
@@ -94,8 +94,8 @@ public class AssignmentViewModel implements JSONEnabled {
     private String getZusatzInfo() {
         String value = null;
         try {
-            if (this.topic.getChildTopics().has("ka2.angebot.assignment_info")) {
-                value = this.topic.getChildTopics().getString("ka2.angebot.assignment_info");
+            if (this.assignment.getChildTopics().has("ka2.angebot.assignment_info")) {
+                value = this.assignment.getChildTopics().getString("ka2.angebot.assignment_info");
             }
             return value;
         } catch (Exception e) {
