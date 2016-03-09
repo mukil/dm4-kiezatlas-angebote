@@ -34,6 +34,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.WebApplicationException;
+import org.deepamehta.plugins.signup.service.SignupPluginService;
 
 
 
@@ -69,6 +70,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Inject private GeomapsService geomapsService;
     @Inject private WorkspacesService workspaceService;
     @Inject private AccessControlService aclService;
+    @Inject private SignupPluginService signupService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -222,6 +224,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             result.setProperty(ANGEBOT_END_TIME, toDate, true);
             logger.info("Succesfully created Kiezatlas Angebots Assignment from " + new Date(fromDate).toGMTString()
                 + " to " + new Date(toDate).toGMTString());
+            notifyAboutAngebotsAssignment(result);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -317,6 +320,38 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         logger.info("Filtered " + result.size() + " items out for " + new Date(nowDate).toGMTString());
         return result;
     }
+
+    // --- Private Utility Methods
+
+    private Topic getAssignedGeoObject(Association assignmentEdge) {
+        Topic geoObject = null;
+        if (assignmentEdge.getPlayer1().getTypeUri().equals(GEO_OBJECT_TYPE)) {
+            geoObject = dms.getTopic(assignmentEdge.getPlayer1().getId());
+        } else if (assignmentEdge.getPlayer2().getTypeUri().equals(GEO_OBJECT_TYPE)) {
+            geoObject = dms.getTopic(assignmentEdge.getPlayer2().getId());
+        }
+        return geoObject;
+    }
+
+    private Topic getAssignmentAngebotsinfos(Association assignmentEdge) {
+        Topic geoObject = null;
+        if (assignmentEdge.getPlayer1().getTypeUri().equals(ANGEBOT_TYPE)) {
+            geoObject = dms.getTopic(assignmentEdge.getPlayer1().getId());
+        } else if (assignmentEdge.getPlayer2().getTypeUri().equals(ANGEBOT_TYPE)) {
+            geoObject = dms.getTopic(assignmentEdge.getPlayer2().getId());
+        }
+        return geoObject;
+    }
+
+    private void notifyAboutAngebotsAssignment(Association result) {
+        Topic geoObject = getAssignedGeoObject(result).loadChildTopics();
+        Topic angebot = getAssignmentAngebotsinfos(result).loadChildTopics();
+        signupService.sendSystemMailboxNotification("Angebotsinfos ihrer Einrichtung zugewiesen",
+            "\nAngebotsinfo: " + angebot.getSimpleValue().toString() +
+            // ### Von + Bis
+            "\n\nEinrichtung: " + geoObject.getSimpleValue().toString() + "\n\n");
+    }
+
 
     private boolean isAssignmentActiveInTime(Association assoc, long timestamp) {
         Long from = (Long) assoc.getProperty(ANGEBOT_START_TIME);
