@@ -26,6 +26,7 @@ function do_save_angebot() {
     }
     // analyze tag input
     var tags = tagging.assembleTags()
+    var topic = undefined
     if (selected_angebot) {
         // Update
         var topic_model = {
@@ -40,7 +41,7 @@ function do_save_angebot() {
             }
         }
         console.log("Upading Angebot Topic", topic_model)
-        restc.update_topic(topic_model)
+        topic = restc.update_topic(topic_model)
     } else {
         // Create
          // ### do not allow for empty name, empty description or empty contact
@@ -58,11 +59,15 @@ function do_save_angebot() {
             }
          }
          console.log("Saving Angebot Topic: " + topic_model)
-         restc.create_topic(topic_model)
+         topic = restc.create_topic(topic_model)
     }
     clear_angebot_form_area()
     // ### display "Eingaben gesichert!"
-    go_to_angebot_listing()
+    go_to_angebot_assignment(topic.id)
+}
+
+function go_to_angebot_assignment(id) {
+    window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + "/" + id)
 }
 
 function go_to_angebot_listing() {
@@ -154,7 +159,7 @@ var fromDate,
     toDate
 
 function init_datepicker() {
-    // set all datepickers to display german text
+    // ### set all datepickers to display german text
     // $.datepicker.setDefaults( $.datepicker.regional["de"] )
     // init our two datepicker fields
     fromDate = $( "#from" ).datepicker({
@@ -417,8 +422,9 @@ function render_user_menu(state) {
 function fetch_angebote_workspace() {
     var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
     $.getJSON('/core/topic/by_value/uri/' + angebote_workspace_uri, function(result){
-        console.log("Loaded Angebote Workspace", result)
         workspace = result
+        document.cookie = "dm4_workspace_id=" + workspace.id + ";"
+        console.log("Set Angebote Workspace Cookie", result)
     })
 }
 
@@ -453,4 +459,3 @@ function logout() {
 // ---- Initialize script
 
 fetch_angebote_workspace()
-// TODO: set workspace cookie
