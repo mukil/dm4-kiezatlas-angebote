@@ -50,6 +50,10 @@ public class AngebotViewModel implements JSONEnabled {
         return this.geoObjectTopic;
     }
 
+    public String getAngebotsName() {
+        return this.topic.getSimpleValue().toString();
+    }
+
     @Override
     public JSONObject toJSON() {
         try {

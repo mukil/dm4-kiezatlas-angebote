@@ -49,6 +49,6 @@ public interface AngebotService {
      * @param query
      * @return
      */
-    List<AngebotViewModel> searchAngebotsinfosByText(String query);
+    List<Topic> searchAngebotsinfosByText(String query);
 
 }

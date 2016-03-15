@@ -17,6 +17,7 @@ import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.plugins.accesscontrol.AccessControlService;
 import de.deepamehta.plugins.workspaces.WorkspacesService;
+import de.kiezatlas.website.model.GeoObjectView;
 import java.io.InputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -116,6 +117,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     @Override
     public ResultList<RelatedTopic> getGeoObjectAngeboteTopics(Topic geoObject) {
+        // ### Just fetch all the Current Angebotsinfos
         return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT_TYPE, 0);
     }
 
@@ -185,8 +187,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         while (iterator.hasNext()) {
             RelatedTopic angebot = iterator.next();
             if (angebot.getId() == topicId) {
-                ResultList<RelatedTopic> geoObjects = angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null,
-                        GEO_OBJECT_TYPE, 0);
+                ResultList<RelatedTopic> geoObjects = getAssignedGeoObjectsByAngebotsinfo(angebot);
                 Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
                 while (geoIterator.hasNext()) {
                     RelatedTopic einrichtung = geoIterator.next();
@@ -268,32 +269,69 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     // ------------------------------------------------------------------------------------------- Angebots Filter API
 
+    @GET
+    @Path("/current")
+    public List<GeoObjectView> getGeoObjectsByCurrentKiezatlasAngebote() {
+        List<AngebotViewModel> offers = getAllAngebotsinfosByNow(new Date().getTime());
+        List<GeoObjectView> results = new ArrayList<GeoObjectView>();
+        for (AngebotViewModel angebote : offers) {
+            results.add(new GeoObjectView(angebote.getGeoObjectTopic(), geomapsService, this));
+        }
+        return results;
+    }
+
+    @GET
+    @Path("/search/geoobjects")
+    public List<GeoObjectView> getGeoObjectsByAngebotsinfoTextSearch(@QueryParam("search") String query) {
+        List<Topic> offers = searchAngebotsinfosByText(query);
+        List<GeoObjectView> results = new ArrayList<GeoObjectView>();
+        for (Topic angebot : offers) {
+            ResultList<RelatedTopic> einrichtungen = getAssignedGeoObjectsByAngebotsinfo(angebot);
+            for (RelatedTopic einrichtung : einrichtungen) {
+                results.add(new GeoObjectView(einrichtung, geomapsService, this));
+            }
+            logger.info(offers.size() +" Angebotsinfos assigned to " + results.size() + " Geo Objects");
+        }
+        return results;
+    }
+
      /**
      * Builds up a list of search results (Geo Objects to be displayed in a map) by text query.
      * @param query
      */
     @GET
     @Path("/search")
-    public List<AngebotViewModel> searchAngebotsinfosByText(@QueryParam("search") String query) {
+    public List<Topic> searchAngebotsinfosByText(@QueryParam("search") String query) {
         // TODO: Maybe it is also desirable that we wrap the users query into quotation marks
         // (to allow users to search for a combination of words)
         try {
             ArrayList<AngebotViewModel> results = new ArrayList<AngebotViewModel>();
             if (query.isEmpty()) {
                 logger.warning("No search term entered, returning empty resultset");
-                return results;
+                return new ArrayList<Topic>();
             }
             List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(query);
             // iterate over merged results
-            logger.info("Start building response for " + angebotsinfos.size() + " OVERALL");
+            /** logger.info("Start building response for " + angebotsinfos.size() + " OVERALL");
             for (Topic topic : angebotsinfos) {
                 // ### and filter out all not currently active
-                results.add(new AngebotViewModel(topic));
-            }
-            logger.info("Build up response " + results.size() + " geo objects across all districts");
-            return results;
+                ResultList<RelatedTopic> einrichtungen = topic.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, GEO_OBJECT_TYPE, 0);
+                for (Topic einrichtung : einrichtungen) {
+                    AngebotViewModel avm = null;
+                    if (einrichtung != null) {
+                        avm = new AngebotViewModel(topic, einrichtung, geomapsService, this);
+                        results.add(avm);
+                        logger.info("Added AngebotViewModel to Response " + avm.toJSON().toString());
+                    } else {
+                        logger.info("Einrichtung for text found Angebot NULL: " + topic.toJSON().toString());
+                    }
+                }
+                if (einrichtungen == null) logger.info("EinrichtungEN for text found Angebot NULL" + topic.toJSON().toString());
+            } **/
+            logger.info("Searched by Text for " + angebotsinfos.size() + " Angebotsinfo Topics ALL DISTRICTS");
+            return angebotsinfos;
         } catch (Exception e) {
-            throw new RuntimeException("Searching geo object topics failed", e);
+            throw new RuntimeException("Searching Angebotsinfos By Text across ALL DISTRICTS failed", e);
         }
     }
 
@@ -390,6 +428,10 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     private Topic getAngebotsinfoParent(Topic entry) {
         return entry.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", "ka2.angebot");
+    }
+
+    private ResultList<RelatedTopic> getAssignedGeoObjectsByAngebotsinfo(Topic angebot) {
+        return angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, GEO_OBJECT_TYPE, 0);
     }
 
 
