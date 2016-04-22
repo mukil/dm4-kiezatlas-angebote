@@ -18,7 +18,7 @@ function do_save_angebot() {
     // .. and webpage / URL input
     var webpage = $('#angebot-webpage').val().trim()
     if (!autocorrect_url(webpage)) {
-        if (webpage == "http://" || webpage == "https://") {
+        if (webpage === "http://" || webpage === "https://") {
             webpage = "" // Delete/Turn webpage entry an empty string
         } else {
             throw new Error("Webpage URL is INVALID")
@@ -29,6 +29,7 @@ function do_save_angebot() {
     var topic = undefined
     if (selected_angebot) {
         // Update
+        topic = selected_angebot
         var topic_model = {
             "id" : selected_angebot.id,
             "type_uri" : "ka2.angebot",
@@ -41,13 +42,14 @@ function do_save_angebot() {
             }
         }
         console.log("Upading Angebot Topic", topic_model)
-        topic = restc.update_topic(topic_model)
+        topic = topic_model
+        restc.update_topic(topic_model)
     } else {
         // Create
-         // ### do not allow for empty name, empty description or empty contact
-         var topic_id = $('.form-area.angebot').attr("id")
+        // ### do not allow for empty name, empty description or empty contact
+        var topic_id = $('.form-area.angebot').attr("id")
              topic_id = -1
-         var topic_model = {
+        var topic_model = {
             "id" : topic_id,
             "type_uri" : "ka2.angebot",
             "childs": {
@@ -57,9 +59,9 @@ function do_save_angebot() {
                 "ka2.angebot.webpage" : webpage,
                 "dm4.tags.tag": tags
             }
-         }
-         console.log("Saving Angebot Topic: " + topic_model)
-         topic = restc.create_topic(topic_model)
+        }
+        console.log("Saving Angebot Topic: " + topic_model)
+        topic = restc.create_topic(topic_model)
     }
     clear_angebot_form_area()
     // ### display "Eingaben gesichert!"
@@ -67,7 +69,13 @@ function do_save_angebot() {
 }
 
 function go_to_angebot_assignment(id) {
-    window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + "/" + id)
+    if (id) {
+        window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
+    } else {
+        setTimeout(function(e) {
+            go_to_angebot_listing()
+        }, 1500)
+    }
 }
 
 function go_to_angebot_listing() {
@@ -191,7 +199,7 @@ function search_objects_by_name(renderer) { // usually calls show_geo_objects
         }
         queryString = encodeURIComponent(queryString, "UTF-8")
         $.ajax({
-            type: "GET", url: "/kiezatlas/by_name?query=" + queryString,
+            type: "GET", url: "/kiezatlas/search/by_name?query=" + queryString,
             success: function(obj) {
                 renderer(obj)
             },
@@ -203,14 +211,10 @@ function search_objects_by_name(renderer) { // usually calls show_geo_objects
 
 function select_geo_object(e) {
     var geo_object = restc.get_topic_by_id(e.target.id)
-    // gui state
+    // update gui state
     selected_geo_object = geo_object
-    // update label
-    $('.einrichtung-name').text(geo_object.value)
-    // update area
-    $('.date-area').removeClass("disabled")
-    $('#do-assign').attr("value", "Speichern")
-    $('#do-delete').addClass("hidden")
+    selected_assignment = undefined
+    render_selected_assignment()
 }
 
 function do_delete_assignment() {
@@ -218,7 +222,7 @@ function do_delete_assignment() {
     // Do Delete
     restc.request("POST", "/kiezatlas/angebot/assignment/" +selected_assignment.id + "/delete")
     selected_assignment = undefined
-    selected_geo_object = undefined // may be empty anway..
+    selected_geo_object = undefined
     // refresh GUI
     clear_assignment_date_area()
     render_assignment_page()
@@ -292,6 +296,7 @@ function load_assignments(renderer) {
 
 function render_angebot_form() {
     console.log("Render Angebot Form", selected_angebot)
+    if (!selected_angebot) throw new Error("No Angebot Selected")
     // Angebotsinfo
     var name = selected_angebot.name
     var contact = selected_angebot.kontakt
@@ -306,13 +311,14 @@ function render_angebot_form() {
 }
 
 function render_angebot_header_info() {
-   console.log("Show Global Angebotinfos for Assignments ", selected_angebot)
+   console.log("Show Angebotinfos", selected_angebot)
+   if (!selected_angebot) throw new Error("No Angebot Selected")
     // Angebotsinfo
     var name = selected_angebot.name
     var contact = selected_angebot.kontakt
     var webpage = selected_angebot.webpage
     var descr = selected_angebot.beschreibung
-    var tags = selected_angebot.tags
+    var tags = selected_angebot.tags // ### render tags
     //
     $('.angebot-name').text(selected_angebot.name)
     $('#navigation li.edit a').attr("href", "/kiezatlas/angebot/edit/" + selected_angebot.id)
@@ -340,34 +346,57 @@ function render_assignments() {
         $('.right-side div.einrichtungen').append($element)
     }
     // equip all buttons with a click handler each (at once)
-    $('.right-side .concrete-assignment').on('click', select_assignment)
+    $('.right-side .einrichtungen').on('click', select_assignment)
 }
 
 function select_assignment(event) {
-    var id = event.currentTarget.id
-    var assignment = get_assignment(id)
-    console.log("Select Assignment Association ID", id, assignment)
-    selected_assignment = assignment
-    show_selected_assignment()
+    var element = event.target
+    var id = (element.localName === "div") ? element.id : ""
+    if (element.localName === "h3" || element.localName === "p" || element.localName === "div") {
+        id = element.parentNode.id
+    } else if (element.localName === "i") {
+        id = element.parentNode.parentNode.id
+    }
+    if (id) {
+        var assignment = get_assignment(id)
+        selected_assignment = assignment
+        render_selected_assignment()
+    } else {
+        console.warn("Could not detect click on Element", element)
+    }
 }
 
-function show_selected_assignment() {
-    $('.concrete-assignment').removeClass('selected')
-    $('#' + selected_assignment.id).addClass('selected')
-    $('.date-area').removeClass("disabled")
-    $('.date-area .einrichtung-name').text(selected_assignment.name)
-    $('#from').datepicker("setDate", new Date(selected_assignment.von))
-    $('#to').datepicker("setDate", new Date(selected_assignment.bis))
-    $('#do-assign').attr("value", "Ändern")
-    $('#do-delete').removeClass("hidden")
+function render_selected_assignment() {
+    if (selected_assignment) {
+        // render new assignment selection
+        $('.concrete-assignment').removeClass('selected')
+        $('#' + selected_assignment.id).addClass('selected')
+        $('.date-area').removeClass("disabled")
+        $('.date-area .einrichtung-name').text(selected_assignment.name) // ### should be geo_name
+        $('#from').datepicker("setDate", new Date(selected_assignment.von))
+        $('#to').datepicker("setDate", new Date(selected_assignment.bis))
+        $('#do-assign').attr("value", "Ändern")
+        $('#do-delete').removeClass("hidden")
+    } else {
+        // clear old assignment rendering
+        $('#from').datepicker("setDate", new Date())
+        $('#to').datepicker("setDate", new Date())
+        // update label
+        $('.einrichtung-name').text(selected_geo_object.value)
+        // update area
+        $('.date-area').removeClass("disabled")
+        $('#do-assign').attr("value", "Speichern")
+        $('#do-delete').addClass("hidden")
+    }
 }
 
 function get_assignment(assocId) {
     if (!geo_assignments) throw new Error("Client was not initialized correctly, assignments undefined");
     for (var e in geo_assignments) {
         var sel = geo_assignments[e]
-        if (sel.id == assocId) return sel
+        if (sel.id == assocId) return sel // compares DOM id (String) with a Number
     }
+    throw new Error("No Assignment for ID: " +  assocId)
 }
 
 function show_geo_objects_assign(results) {
@@ -380,7 +409,7 @@ function show_geo_objects_assign(results) {
         $('.form-area div.einrichtungen').append($element)
     }
     // equip all buttons with a click handler each (at once)
-    $('input[name=group]').on('change', select_geo_object)
+    $('input[name=group]').on('click', select_geo_object)
 }
 
 
@@ -429,7 +458,7 @@ function fetch_angebote_workspace() {
 }
 
 function has_angebote_membership(callback) {
-    var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
+    // var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
     $.getJSON('/kiezatlas/angebot/membership/', function(response) {
         if (!response) {
             $('.task-info h3').html('Entschuldigung! '
