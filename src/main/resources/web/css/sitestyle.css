@@ -22,18 +22,38 @@ h3 {
     color: #002856;
 }
 
+h3.label {
+    color: #a9a9a9;
+}
+
 a {
     color: #002856;
     text-decoration: underline;
     text-decoration-color: #8f1414;
 }
 
-.task-info {
+.list-area,
+.detail-area,
+.listing .task-info,
+.assignments .task-info {
     margin: 15px;
 }
 
-.kiezatlas.angebot .task-info {
+.angebotsinfos.listing .task-info {
     margin-top: 30px;
+    margin-left: 30px;
+}
+
+.angebotsinfos.detail .detail-area {
+    margin: 30px;
+}
+
+.angebotsinfos.listing .read-more {
+    background-color: #e3e3e3;
+    padding: 5px;
+    margin-top: 10px;
+    display: inline-block;
+    text-decoration: none;
 }
 
 .left-side {
@@ -228,12 +248,18 @@ ul.angebote li small {
 
 /** --- Upper Top Menu --- **/
 
+#navigation {
+    position: fixed;
+    margin-left: 30px;
+    z-index: 2001;
+}
+
 #navigation ul {
     margin-top: 0px;
 }
 
 #navigation .logout,
-#navigation .angebote {
+#navigation .angebote-btn {
     display: none;
 }
 

@@ -147,20 +147,14 @@ function load_users_angebote() {
 var selected_angebot,
     selected_assignment,
     selected_geo_object,
-    geo_assignments
+    geo_assignments,
+    angebotsinfos
 
 function render_assignment_page() {
-    load_angebot()
+    load_angebot_by_resource_path()
     init_datepicker()
     render_angebot_header_info()
     load_assignments(render_assignments)
-}
-
-function load_angebot() {
-    var current_url = document.location.pathname
-    var angebot_id = current_url.slice(document.location.pathname.lastIndexOf("/")+1)
-    selected_angebot = JSON.parse($.ajax('/kiezatlas/angebot/' + angebot_id,
-        { async: false, dataType: 'json' }).responseText)
 }
 
 var fromDate,
@@ -337,12 +331,10 @@ function render_assignments() {
     // ### show address or districts, too
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
-        var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.von));
-        var endDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.bis));
+        // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
         var $element = $('<div id="' + obj.id + '" class="concrete-assignment" '
             + ' title="Zum bearbeiten dieses Zeitraums bitte Klicken"><h3>'
-            + obj.name + '</h3><p><i>' + startDate + '</i> &ndash; <i>'
-            + endDate + '</i></p></div>')
+            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div>')
         $('.right-side div.einrichtungen').append($element)
     }
     // equip all buttons with a click handler each (at once)
@@ -373,8 +365,8 @@ function render_selected_assignment() {
         $('#' + selected_assignment.id).addClass('selected')
         $('.date-area').removeClass("disabled")
         $('.date-area .einrichtung-name').text(selected_assignment.name) // ### should be geo_name
-        $('#from').datepicker("setDate", new Date(selected_assignment.von))
-        $('#to').datepicker("setDate", new Date(selected_assignment.bis))
+        $('#from').datepicker("setDate", new Date(selected_assignment.anfang_timestamp))
+        $('#to').datepicker("setDate", new Date(selected_assignment.ende_timestamp))
         $('#do-assign').attr("value", "Ändern")
         $('#do-delete').removeClass("hidden")
     } else {
@@ -412,7 +404,77 @@ function show_geo_objects_assign(results) {
     $('input[name=group]').on('click', select_geo_object)
 }
 
+// -------------------------------- Displaying Angebotsinfos in DETAIL and LIST
 
+function render_angebotsinfo_page() {
+    load_angebot_by_resource_path()
+    render_angebot_detail_area()
+    load_assignments(render_assignments)
+}
+
+function render_angebotslisting_page() {
+    load_current_angebotsinfos()
+    render_current_angebots_listing()
+}
+
+function render_current_angebots_listing() {
+    console.log("Show Angebotinfo Listing", angebotsinfos)
+    var $list = $('.list-area')
+    for (var aidx in angebotsinfos) {
+        var element = angebotsinfos[aidx]
+        var name = element.name
+        var contact = element.kontakt
+        var webpage = element.webpage
+        var descr = element.beschreibung
+        var tags = element.tags
+        var location_count = element.locations.length
+        var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
+        if (!first_assignment) first_assignment = element.locations[0]
+        var html_string = '<a class="read-more" href="/kiezatlas/angebot/'+element.id+'">'
+            + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
+            // html_string += '<p>' + descr + '</p>'
+            html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
+            if (!is_empty(contact)) html_string += 'Kontakt: ' + contact
+            // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
+            html_string += '<span class="read-more">Mehr erfahren..</span>'
+            html_string += '</div></a>'
+        $list.append(html_string)
+    }
+}
+
+function is_empty(stringValue) {
+    return (stringValue === "" || stringValue === " ")
+}
+
+function get_random_int_inclusive(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function render_angebot_detail_area() {
+   console.log("Show Angebotinfo Details Page", selected_angebot)
+   if (!selected_angebot) throw new Error("Angebotsinfo not found")
+    // Angebotsinfo
+    var name = selected_angebot.name
+    var contact = selected_angebot.kontakt
+    var webpage = selected_angebot.webpage
+    var descr = selected_angebot.beschreibung
+    var tags = selected_angebot.tags // ### render tags
+    //
+    $('.angebot-name').text(name)
+    $('.angebot-infos').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
+        + webpage + ">" + webpage + '</a>')
+}
+
+function load_current_angebotsinfos() {
+    angebotsinfos = JSON.parse($.ajax('/kiezatlas/angebot/filter/' + new Date().getTime(),
+        { async: false, dataType: 'json' }).responseText)
+}
+
+function load_angebot_by_resource_path() {
+    var angebot_id = parse_angebots_id()
+    selected_angebot = JSON.parse($.ajax('/kiezatlas/angebot/' + angebot_id,
+        { async: false, dataType: 'json' }).responseText)
+}
 
 // ---- Generic Methods used ACROSS all screens ---- //
 
