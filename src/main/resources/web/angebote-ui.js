@@ -8,6 +8,9 @@ var URL_ANGEBOT_LISTING     = "/kiezatlas/angebot/"
 var URL_ANGEBOT_DETAIL      = "/kiezatlas/angebot/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/kiezatlas/angebot/zuordnen/"
 
+// jQuery UI Datepicker Widget with German Local Dependency
+$.datepicker.setDefaults($.datepicker.regional["de"])
+
 function do_save_angebot() {
     // Read in new values
     var name = $('#angebot-name').val().trim()
@@ -125,14 +128,13 @@ function load_users_angebote() {
         var item = result[el]
         var created_val = new Date(item['childs']['dm4.time.created']['value'])
         var modified_val = new Date(item['childs']['dm4.time.modified']['value'])
-        var created = $.datepicker.formatDate("dd.mm yy", created_val)
-        var modified = $.datepicker.formatDate("dd.mm yy", modified_val)
+        var created = $.datepicker.formatDate("dd. MM yy", created_val)
+        var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
         // console.log("Angebot Item", item, created, modified)
-        $('ul.angebote').append('<li id="'+item.id+'">'
-            +item.value+ '<a href="/kiezatlas/angebot/edit/'
-            +item.id+'">Infos editieren</a><a href="/kiezatlas/angebot/zuordnen/'
-            +item.id+'">Zuordnungen anpassen</a> &nbsp; <small>Erstellt: ' + created + ' Zuletzt bearbeitet: ' +
-            modified + '</small></li>')
+        $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/kiezatlas/angebot/edit/'
+            + item.id + '">Infos editieren</a><a href="/kiezatlas/angebot/zuordnen/'
+            + item.id + '">Zuordnungen anpassen</a><br/><small>Erstellt am '
+            + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
     }
 }
 
@@ -161,8 +163,6 @@ var fromDate,
     toDate
 
 function init_datepicker() {
-    // ### set all datepickers to display german text
-    // $.datepicker.setDefaults( $.datepicker.regional["de"] )
     // init our two datepicker fields
     fromDate = $( "#from" ).datepicker({
         defaultDate: "+1w",
@@ -170,7 +170,7 @@ function init_datepicker() {
         numberOfMonths: 3,
         dateFormat: "DD, d MM, yy",
         onClose: function( selectedDate ) {
-          $( "#to" ).datepicker( "option", "minDate", selectedDate )
+            $( "#to" ).datepicker("option", "minDate", selectedDate )
         }
     })
     toDate = $( "#to" ).datepicker({
@@ -179,7 +179,7 @@ function init_datepicker() {
         numberOfMonths: 3,
         dateFormat: "DD, d MM, yy",
         onClose: function( selectedDate ) {
-          $( "#from" ).datepicker( "option", "maxDate", selectedDate )
+            $( "#from" ).datepicker( "option", "maxDate", selectedDate )
         }
     })
 }
@@ -524,7 +524,8 @@ function has_angebote_membership(callback) {
     $.getJSON('/kiezatlas/angebot/membership/', function(response) {
         if (!response) {
             $('.task-info h3').html('Entschuldigung! '
-                + 'Sie haben keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.')
+                + 'Sie haben noch keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.<br/>Bitte <a href="/sign-up">registrieren</a> sie sich '
+                + 'zuerst unter Angabe einer Email Adresse.')
             $('#do-add').attr("disabled", true)
             throw new Error("Unauthorized")
         } else {

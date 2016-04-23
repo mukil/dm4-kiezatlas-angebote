@@ -39,11 +39,17 @@ a {
     margin: 15px;
 }
 
+.angebotsinfos.start .task-info {
+    margin-top: 45px;
+    margin-left: 40px;
+}
+
 .angebotsinfos.listing .task-info {
     margin-top: 30px;
     margin-left: 30px;
 }
 
+.angebotsinfos.start .angebot-area,
 .angebotsinfos.detail .detail-area {
     margin: 30px;
 }
@@ -242,7 +248,6 @@ div.disabled {
 }
 
 ul.angebote li small {
-    float: right;
     color: #999;
 }
 
@@ -252,6 +257,7 @@ ul.angebote li small {
     position: fixed;
     margin-left: 30px;
     z-index: 2001;
+    top: 0px;
 }
 
 #navigation ul {

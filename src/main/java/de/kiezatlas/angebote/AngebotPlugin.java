@@ -115,7 +115,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Path("/membership")
     public String hasAngeboteWorkspaceMembership() {
         String username = aclService.getUsername();
-        if (!username.equals("")) {
+        if (username != null && !username.equals("")) {
             Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
             logger.info("Checking Membership for Username=" + username);
             return "" + aclService.isMember(username, ws.getId());
