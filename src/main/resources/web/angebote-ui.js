@@ -7,6 +7,7 @@ var workspace   = undefined
 var URL_ANGEBOT_LISTING     = "/kiezatlas/angebot/"
 var URL_ANGEBOT_DETAIL      = "/kiezatlas/angebot/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/kiezatlas/angebot/zuordnen/"
+var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
 // jQuery UI Datepicker Widget with German Local Dependency
 $.datepicker.setDefaults($.datepicker.regional["de"])
@@ -244,7 +245,9 @@ function do_save_assignment(e) {
         // Do Update
         restc.request("POST", "/kiezatlas/angebot/assignment/" +selected_assignment.id + "/" + fromDate + "/" + toDate)
     } else {
-    // Create
+        // Create
+        if (!selected_angebot) throw Error("Saving Assignment Aborted, selected Angebotsinfo NOT SET")
+        if (!selected_geo_object) throw Error("Saving Assignment Abortted, selected Einrichtung NOT SET")
         var assocModel = {
             "type_uri": "ka2.angebot.assignment",
             "role_1": {
@@ -283,7 +286,7 @@ function load_assignments(renderer) {
         },
         error: function(x, s, e) {
             geo_assignments = []
-            console.warn("ERROR", "x: " + x + " s: " + s + " e: " + e)
+            console.warn("ERROR", "x: ",x, " s: ", s," e: ", e)
         }
     })
 }
@@ -305,8 +308,9 @@ function render_angebot_form() {
 }
 
 function render_angebot_header_info() {
-   console.log("Show Angebotinfos", selected_angebot)
-   if (!selected_angebot) throw new Error("No Angebot Selected")
+    if (!selected_angebot || !selected_angebot.hasOwnProperty("id")) {
+       throw Error("No Angebot selected, loaded", selected_angebot)
+    }
     // Angebotsinfo
     var name = selected_angebot.name
     var contact = selected_angebot.kontakt
@@ -514,7 +518,7 @@ function fetch_angebote_workspace() {
     var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
     $.getJSON('/core/topic/by_value/uri/' + angebote_workspace_uri, function(result){
         workspace = result
-        document.cookie = "dm4_workspace_id=" + workspace.id + ";"
+        document.cookie = WORKSPACE_COOKIE_NAME + "=" + workspace.id + "; "
         console.log("Set Angebote Workspace Cookie", result)
     })
 }

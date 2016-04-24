@@ -394,10 +394,15 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     private AngebotsInfo assembleAngebotsinfo(Topic angebot) {
         AngebotsInfo infoModel = new AngebotsInfo();
         try {
+            angebot.loadChildTopics();
             infoModel.setName(angebot.getChildTopics().getString(ANGEBOT_NAME));
             infoModel.setDescription(angebot.getChildTopics().getString(ANGEBOT_BESCHREIBUNG));
-            infoModel.setContact(angebot.getChildTopics().getString(ANGEBOT_KONTAKT));
-            infoModel.setWebpage(angebot.getChildTopics().getString(ANGEBOT_WEBPAGE));
+            if (angebot.getChildTopics().has(ANGEBOT_KONTAKT)) {
+                infoModel.setContact(angebot.getChildTopics().getString(ANGEBOT_KONTAKT));
+            }
+            if (angebot.getChildTopics().has(ANGEBOT_WEBPAGE)) {
+                infoModel.setWebpage(angebot.getChildTopics().getString(ANGEBOT_WEBPAGE));
+            }
             infoModel.setTags(assembleTags(angebot));
             infoModel.setId(angebot.getId());
         } catch (Exception ex) {
