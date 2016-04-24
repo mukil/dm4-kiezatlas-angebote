@@ -224,6 +224,8 @@ function do_delete_assignment() {
 }
 
 function do_save_assignment(e) {
+    // ### fixme: firefox can not parse german localized date strin
+    // ### notify user when an assignment already exists..
     // ### Insert default values to initialize if not specified
     var fromInput = $('input#from').val()
     var toInput = $('input#to').val()
@@ -231,12 +233,15 @@ function do_save_assignment(e) {
     var toDate = -1
     // parse dates
     if (fromInput.length > 0) {
+        // fromDate = $.datepicker.parseDate("dd. MM yy", fromInput)
         fromDate = new Date(fromInput).getTime()
     }
     if (toInput.length > 0) {
+        // toDate = $.datepicker.parseDate("dd. MM yy", toInput)
         toDate = new Date(toInput).getTime() // ### we want to shift this value always about 24hours
     }
     console.log("Datepicker delivered us from, to", fromInput, fromDate, toInput, toDate)
+    // Chromium has no problem to deliver us timestamps from a german locale
     if (!selected_angebot) throw new Error("Assertion failed: An angebot must be loaded before an assignment can be created.")
     // Update
     if (selected_assignment && (fromDate != selected_assignment.von || toDate != selected_assignment.bis)) {
@@ -399,10 +404,14 @@ function show_geo_objects_assign(results) {
     $('.form-area div.einrichtungen').empty()
     for (var i in results) {
         var obj = results[i]
-        var $element = $('<input type="radio" name="group" id="' + obj.id
-                + '" value="geo-'+obj.id+'"><label for="'+obj.id+'">'
-                + obj.name + ' (' + obj.bezirk_name + ')</label><br/>')
-        $('.form-area div.einrichtungen').append($element)
+        if (obj) {
+            var $element = $('<input type="radio" name="group" id="' + obj.id
+                    + '" value="geo-'+obj.id+'"><label for="'+obj.id+'">'
+                    + obj.name + ' (' + obj.bezirk_name + ')</label><br/>')
+            $('.form-area div.einrichtungen').append($element)
+        } else {
+            console.warn("Error during rendering Geo Objects Assignment", obj)
+        }
     }
     // equip all buttons with a click handler each (at once)
     $('input[name=group]').on('click', select_geo_object)
