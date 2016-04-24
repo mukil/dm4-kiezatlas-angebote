@@ -225,15 +225,22 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                                                 @PathParam("from") long fromDate, @PathParam("to") long toDate) {
         Association result = null;
         if (assocModel == null) throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
-        try {
-            result = dms.createAssociation(assocModel);
-            result.setProperty(PROP_ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
-            result.setProperty(PROP_ANGEBOT_END_TIME, toDate, true);
-            logger.info("Succesfully created Kiezatlas Angebots Assignment from " + new Date(fromDate).toGMTString()
-                + " to " + new Date(toDate).toGMTString());
-            notifyAboutAngebotsAssignment(result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        long player1Id = assocModel.getRoleModel1().getPlayerId();
+        long player2Id = assocModel.getRoleModel2().getPlayerId();
+        if (!hasAssignmentAssociation(player1Id, player2Id)) {
+            try {
+                result = dms.createAssociation(assocModel);
+                result.setProperty(PROP_ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
+                result.setProperty(PROP_ANGEBOT_END_TIME, toDate, true);
+                logger.info("Succesfully created Kiezatlas Angebots Assignment from " + new Date(fromDate).toGMTString()
+                    + " to " + new Date(toDate).toGMTString());
+                notifyAboutAngebotsAssignment(result);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            logger.warning("Skipping creating a Kiezatlas Angebots Assignment between from="
+                + player1Id + " to=" + player2Id);
         }
         return result;
     }
@@ -585,9 +592,17 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return geoObject.getChildTopics().getString(GEO_OBJECT_NAME);
     }
 
-    private Association getAssignmentAssociation(Topic angebot, Topic geoObject) {
+    private Association getAssignmentAssociation(Topic angebot, Topic geoObject) throws RuntimeException {
         return dms.getAssociation(ANGEBOT_ASSIGNMENT, angebot.getId(),
                 geoObject.getId(), "dm4.core.parent", "dm4.core.child").loadChildTopics();
+    }
+
+    private boolean hasAssignmentAssociation(long angebotId, long geoObjectId) {
+        Association existFrom = dms.getAssociation(ANGEBOT_ASSIGNMENT, angebotId, geoObjectId,
+            "dm4.core.parent", "dm4.core.child");
+        Association existTo = dms.getAssociation(ANGEBOT_ASSIGNMENT, angebotId, geoObjectId,
+            "dm4.core.child", "dm4.core.parent");
+        return (existFrom != null || existTo != null);
     }
 
 }
