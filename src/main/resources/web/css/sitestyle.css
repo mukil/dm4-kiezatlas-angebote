@@ -54,12 +54,23 @@ a {
     margin: 30px;
 }
 
+.angebotsinfos.listing .contact {
+    padding: 5px;
+    padding-left: 0px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
 .angebotsinfos.listing .read-more {
     background-color: #e3e3e3;
     padding: 5px;
     margin-top: 10px;
     display: inline-block;
     text-decoration: none;
+}
+
+.angebotsinfos.listing a.read-more {
+    margin: 10px;
 }
 
 .left-side {

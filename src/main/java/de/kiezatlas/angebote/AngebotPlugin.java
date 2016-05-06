@@ -290,16 +290,19 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         for (Topic angebot : offers) {
             // 1) assemble basic angebots infos
             AngebotsInfo result = assembleAngebotsinfo(angebot);
-            // 2) assemble locations and start and end time
-            ResultList<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
-            JSONArray locations = new JSONArray();
-            for (RelatedTopic geoObject : geoObjects) {
-                Association assignment = getAssignmentAssociation(angebot, geoObject);
-                locations.put(assembleLocationAssignmentModel(geoObject, assignment).toJSON());
+            // 2) check if angebots info isnt already in our resultset
+            if (!results.contains(result)) {
+                // 3) assemble locations and start and end time
+                ResultList<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
+                JSONArray locations = new JSONArray();
+                for (RelatedTopic geoObject : geoObjects) {
+                    Association assignment = getAssignmentAssociation(angebot, geoObject);
+                    locations.put(assembleLocationAssignmentModel(geoObject, assignment).toJSON());
+                }
+                result.setLocations(locations);
+                logger.info("> Fetched current Angebotsinfo \"" + result.getName());
+                results.add(result);
             }
-            result.setLocations(locations);
-            results.add(result);
-            logger.info("> Fetched current Angebotsinfo \"" + result.getName());
         }
         return results;
     }

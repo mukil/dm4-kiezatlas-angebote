@@ -70,6 +70,15 @@ public class AngebotsInfo implements JSONEnabled {
         }
     }
 
+    public long getId() {
+        try {
+            return json.getLong("id");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
+
     public void setLocations(JSONArray locations) {
         try {
             json.put("locations", locations);
@@ -88,6 +97,22 @@ public class AngebotsInfo implements JSONEnabled {
 
     public JSONObject toJSON() {
         return json;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean equal = false;
+        if (obj instanceof AngebotsInfo) {
+            equal = (this.getId() == ((AngebotsInfo) obj).getId());
+        }
+        return equal;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.json != null ? this.json.hashCode() : 0);
+        return hash;
     }
 
 }

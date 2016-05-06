@@ -9,9 +9,6 @@ var URL_ANGEBOT_DETAIL      = "/kiezatlas/angebot/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/kiezatlas/angebot/zuordnen/"
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
-// jQuery UI Datepicker Widget with German Local Dependency
-$.datepicker.setDefaults($.datepicker.regional["de"])
-
 function do_save_angebot() {
     // Read in new values
     var name = $('#angebot-name').val().trim()
@@ -164,6 +161,8 @@ var fromDate,
     toDate
 
 function init_datepicker() {
+    // jQuery UI Datepicker Widget with German Local Dependency
+    $.datepicker.setDefaults($.datepicker.regional["de"])
     // init our two datepicker fields
     fromDate = $( "#from" ).datepicker({
         defaultDate: "+1w",
@@ -330,9 +329,9 @@ function render_angebot_header_info() {
 }
 
 function render_assignments() {
-    // Display Assignments
+    // Display Assignments on Assignment Page
     $('.right-side div.einrichtungen').empty()
-    if (geo_assignments.length == 0) {
+    if (geo_assignments.length === 0) {
         $('.help').html('Dieses Angebot ist aktuell noch keinen Einrichtungen zugeordnet.')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
@@ -348,6 +347,29 @@ function render_assignments() {
     }
     // equip all buttons with a click handler each (at once)
     $('.right-side .einrichtungen').on('click', select_assignment)
+}
+
+function render_angebot_locations() {
+    // Display Assignments
+    var $einrichtungen = $('.geo-objects-area .einrichtungen')
+        $einrichtungen.empty()
+        // $einrichtungen.html('<b>Hello fucked up World!</b>')
+    if (geo_assignments.length === 0) {
+        $('.help').html('Dieses Angebot ist aktuell noch keinen Einrichtungen zugeordnet.')
+    } else {
+        // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
+    }
+    // ### show address or districts, too
+    for (var i in geo_assignments) {
+        var obj = geo_assignments[i]
+        // console.log("   Render Location", obj)
+        // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
+        var $element = $('<div id="' + obj.id + '" class="concrete-assignment"><h3>'
+            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div>')
+        $einrichtungen.append($element)
+    }
+    // equip all buttons with a click handler each (at once)
+    // $einrichtungen.on('click', select_assignment)
 }
 
 function select_assignment(event) {
@@ -422,7 +444,7 @@ function show_geo_objects_assign(results) {
 function render_angebotsinfo_page() {
     load_angebot_by_resource_path()
     render_angebot_detail_area()
-    load_assignments(render_assignments)
+    load_assignments(render_angebot_locations)
 }
 
 function render_angebotslisting_page() {
@@ -447,9 +469,9 @@ function render_current_angebots_listing() {
             + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
             // html_string += '<p>' + descr + '</p>'
             html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
-            if (!is_empty(contact)) html_string += 'Kontakt: ' + contact
+            if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
             // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
-            html_string += '<span class="read-more">Mehr erfahren..</span>'
+            html_string += '<span class="read-more">Mehr..</span>'
             html_string += '</div></a>'
         $list.append(html_string)
     }
