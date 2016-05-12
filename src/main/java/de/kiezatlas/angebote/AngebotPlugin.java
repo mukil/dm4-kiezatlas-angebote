@@ -178,6 +178,14 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/{topicId}")
     @Override
+    public AngebotsInfo getAngebotsinfoViewModel(@PathParam("topicId") long topicId) {
+        Topic angebotsInfo = dms.getTopic(topicId);
+        return assembleAngebotsinfo(angebotsInfo);
+    }
+
+    @GET
+    @Path("/user/{topicId}")
+    @Override
     public AngebotsInfo getUsersAngebotsinfoViewModel(@PathParam("topicId") long topicId) {
         List<RelatedTopic> angebote = getUsersAngebotsinfoTopics();
         Iterator<RelatedTopic> iterator = angebote.iterator();
@@ -596,8 +604,15 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     private Association getAssignmentAssociation(Topic angebot, Topic geoObject) throws RuntimeException {
-        return dms.getAssociation(ANGEBOT_ASSIGNMENT, angebot.getId(),
+        try {
+            return dms.getAssociation(ANGEBOT_ASSIGNMENT, angebot.getId(),
                 geoObject.getId(), "dm4.core.parent", "dm4.core.child").loadChildTopics();
+        } catch (Exception e) {
+            logger.severe("ERROR fetching Association between Angebot: " + angebot.getId()
+                + ", " + angebot.getSimpleValue() + " and Geo Object: " + geoObject.getSimpleValue()
+                + ": " + e.getMessage());
+        }
+        return null;
     }
 
     private boolean hasAssignmentAssociation(long angebotId, long geoObjectId) {

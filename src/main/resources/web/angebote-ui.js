@@ -84,8 +84,9 @@ function go_to_angebot_listing() {
 }
 
 function autocorrect_url(current_url) {
+    if (current_url.length <= 4) return true
     var PROTOCOL_START = "http"
-    if (!current_url.contains("http") ) {
+    if (!current_url.startsWith("http")) {
         $('#angebot-webpage').val(PROTOCOL_START + '://' + current_url)
         console.log('Wir haben ein HTTP hinzugef&uuml;gt', current_url)
     }
@@ -95,7 +96,7 @@ function autocorrect_url(current_url) {
         var parser = document.createElement('a')
         try {
             parser.href = url
-            return (parser.hostname != "localhost" && !!parser.hostname)
+            return (parser.hostname !== "localhost" && !!parser.hostname)
         } catch (e) {
             return false
         }
@@ -169,6 +170,7 @@ function init_datepicker() {
         changeMonth: true,
         numberOfMonths: 3,
         dateFormat: "DD, d MM, yy",
+        // dateFormat: "d.m yy",
         onClose: function( selectedDate ) {
             $( "#to" ).datepicker("option", "minDate", selectedDate )
         }
@@ -178,6 +180,7 @@ function init_datepicker() {
         changeMonth: true,
         numberOfMonths: 3,
         dateFormat: "DD, d MM, yy",
+        // dateFormat: "d.m yy",
         onClose: function( selectedDate ) {
             $( "#from" ).datepicker( "option", "maxDate", selectedDate )
         }
@@ -465,15 +468,20 @@ function render_current_angebots_listing() {
         var location_count = element.locations.length
         var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
         if (!first_assignment) first_assignment = element.locations[0]
-        var html_string = '<a class="read-more" href="/kiezatlas/angebot/'+element.id+'">'
-            + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
-            // html_string += '<p>' + descr + '</p>'
-            html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
-            if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
-            // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
-            html_string += '<span class="read-more">Mehr..</span>'
-            html_string += '</div></a>'
-        $list.append(html_string)
+        if (first_assignment) {
+            var html_string = '<a class="read-more" href="/kiezatlas/angebot/'+element.id+'">'
+                + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
+                // html_string += '<p>' + descr + '</p>'
+                html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. <b>' + first_assignment.name + '</b><br/>'
+                    + 'Vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>&nbsp;'
+                if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
+                // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
+                html_string += '<span class="read-more">Mehr..</span>'
+                html_string += '</div></a>'
+            $list.append(html_string)
+        } else {
+            console.warn("Could not load assignment for angebotsinfo...", element)
+        }
     }
 }
 

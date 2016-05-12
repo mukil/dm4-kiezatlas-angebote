@@ -1,4 +1,4 @@
-package de.kiezatlas.angebote;
+    package de.kiezatlas.angebote;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -25,6 +25,11 @@ public interface AngebotService {
 
     public static final String PROP_ANGEBOT_START_TIME     = "ka2.angebot.start_time";
     public static final String PROP_ANGEBOT_END_TIME       = "ka2.angebot.end_time";
+
+    /**
+     * @return      Details for a specific "Angebotsinfo" topic Id.
+     */
+    AngebotsInfo getAngebotsinfoViewModel(long angebotsInfoId);
 
     /**
      * @return      Details for a specific "Angebotsinfo" topic ID relating to the requesting user.

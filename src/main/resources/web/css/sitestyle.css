@@ -36,22 +36,27 @@ a {
 .detail-area,
 .listing .task-info,
 .assignments .task-info {
-    margin: 15px;
+    margin: 10px;
+}
+
+.angebotsinfos.edit .task-info {
+    margin-top: 60px;
+    margin-left: 15px;
 }
 
 .angebotsinfos.start .task-info {
-    margin-top: 45px;
+    margin-top: 60px;
     margin-left: 40px;
 }
 
 .angebotsinfos.listing .task-info {
-    margin-top: 30px;
+    margin-top: 60px;
     margin-left: 30px;
 }
 
 .angebotsinfos.start .angebot-area,
 .angebotsinfos.detail .detail-area {
-    margin: 30px;
+    margin-left: 30px;
 }
 
 .angebotsinfos.listing .contact {
@@ -103,6 +108,10 @@ a {
     margin: 5px;
 }
 
+.geo-objects-area .concrete-assignment {
+    margin-left: 0px;
+}
+
 .concrete-assignment h3,
 .concrete-assignment p {
     margin-top: 0px;
@@ -146,7 +155,6 @@ div.ui-datepicker {
 
 .geo-objects-area {
     position: relative;
-    padding-left: 7px;
     overflow-y: auto;
 }
 
@@ -305,7 +313,7 @@ ul.angebote li small {
     padding-left: 10px;
     padding-right: 10px;
     margin-right: 5px;
-    margin-left: 5px;
+    margin-left: 0px;
     margin-top: 0px;
 }
 
