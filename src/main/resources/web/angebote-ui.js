@@ -4,9 +4,10 @@
 var restc       = new RESTClient()
 var workspace   = undefined
 
-var URL_ANGEBOT_LISTING     = "/kiezatlas/angebot/"
-var URL_ANGEBOT_DETAIL      = "/kiezatlas/angebot/edit/"
-var URL_ANGEBOT_ASSIGNMENT  = "/kiezatlas/angebot/zuordnen/"
+var URL_ANGEBOT_LISTING     = "/angebote/"
+var URL_MY_ANGEBOT_LIST     = "/angebote/my"
+var URL_ANGEBOT_DETAIL      = "/angebote/edit/"
+var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
 function do_save_angebot() {
@@ -74,13 +75,13 @@ function go_to_angebot_assignment(id) {
         window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
     } else {
         setTimeout(function(e) {
-            go_to_angebot_listing()
+            go_to_my_angebot_listing()
         }, 1500)
     }
 }
 
-function go_to_angebot_listing() {
-    window.document.location.assign(URL_ANGEBOT_LISTING)
+function go_to_my_angebot_listing() {
+    window.document.location.assign(URL_MY_ANGEBOT_LIST)
 }
 
 function autocorrect_url(current_url) {
@@ -122,7 +123,7 @@ function clear_assignment_date_area() {
 }
 
 function load_users_angebote() {
-    var result = restc.request("GET", "/kiezatlas/angebot/list")
+    var result = restc.request("GET", "/angebote/my")
     for (var el in result) {
         var item = result[el]
         var created_val = new Date(item['childs']['dm4.time.created']['value'])
@@ -130,8 +131,8 @@ function load_users_angebote() {
         var created = $.datepicker.formatDate("dd. MM yy", created_val)
         var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
         // console.log("Angebot Item", item, created, modified)
-        $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/kiezatlas/angebot/edit/'
-            + item.id + '">Infos editieren</a><a href="/kiezatlas/angebot/zuordnen/'
+        $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/angebote/edit/'
+            + item.id + '">Infos editieren</a><a href="/angebote/zuordnen/'
             + item.id + '">Zuordnungen anpassen</a><br/><small>Erstellt am '
             + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
     }
@@ -155,7 +156,7 @@ function render_assignment_page() {
     load_angebot_by_resource_path()
     init_datepicker()
     render_angebot_header_info()
-    load_assignments(render_assignments)
+    load_user_assignments(render_assignments)
 }
 
 var fromDate,
@@ -196,7 +197,7 @@ function search_objects_by_name(renderer) { // usually calls show_geo_objects
         }
         queryString = encodeURIComponent(queryString, "UTF-8")
         $.ajax({
-            type: "GET", url: "/kiezatlas/search/by_name?query=" + queryString,
+            type: "GET", url: "/website/search/by_name?query=" + queryString,
             success: function(obj) {
                 renderer(obj)
             },
@@ -217,7 +218,7 @@ function select_geo_object(e) {
 function do_delete_assignment() {
     console.log("Do Delete Assignment", selected_assignment)
     // Do Delete
-    restc.request("POST", "/kiezatlas/angebot/assignment/" +selected_assignment.id + "/delete")
+    restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
     selected_assignment = undefined
     selected_geo_object = undefined
     // refresh GUI
@@ -250,7 +251,7 @@ function do_save_assignment(e) {
         console.log("Dates Changed - Update Assignment", fromDate, selected_assignment.von,
             "To:", toDate, selected_assignment.bis)
         // Do Update
-        restc.request("POST", "/kiezatlas/angebot/assignment/" +selected_assignment.id + "/" + fromDate + "/" + toDate)
+        restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/" + fromDate + "/" + toDate)
     } else {
         // Create
         if (!selected_angebot) throw Error("Saving Assignment Aborted, selected Angebotsinfo NOT SET")
@@ -268,7 +269,7 @@ function do_save_assignment(e) {
         }
         console.log("Trying to post assignment", assocModel)
         // do create
-        restc.request("POST", "/kiezatlas/angebot/assignment/" + fromDate + "/" + toDate, assocModel)
+        restc.request("POST", "/angebote/assignment/" + fromDate + "/" + toDate, assocModel)
     }
     // refresh GUI
     render_assignment_page()
@@ -278,11 +279,28 @@ function do_save_assignment(e) {
 
 function load_assignments(renderer) {
     $.ajax({
-        type: "GET", url: "/kiezatlas/angebot/list/assignments/" + selected_angebot.id,
+        type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id,
         success: function(response) {
             if (response) {
                 geo_assignments = response
                 console.log("Loaded Angebot Geo Assignments ", geo_assignments)
+                if (renderer) renderer(response)
+            }
+        },
+        error: function(x, s, e) {
+            geo_assignments = []
+            console.warn("ERROR", "x: ",x, " s: ", s," e: ", e)
+        }
+    })
+}
+
+function load_user_assignments(renderer) {
+    $.ajax({
+        type: "GET", url: "/angebote/list/assignments/user/" + selected_angebot.id,
+        success: function(response) {
+            if (response) {
+                geo_assignments = response
+                console.log("Loaded Angebot Geo Assignments For User", geo_assignments)
                 if (renderer) renderer(response)
             } else {
                 $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Zuordnungen zu bearbeiten.')
@@ -326,7 +344,7 @@ function render_angebot_header_info() {
     var tags = selected_angebot.tags // ### render tags
     //
     $('.angebot-name').text(selected_angebot.name)
-    $('#navigation li.edit a').attr("href", "/kiezatlas/angebot/edit/" + selected_angebot.id)
+    $('#navigation li.edit a').attr("href", "/angebote/edit/" + selected_angebot.id)
     $('.angebot-infos').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
         + webpage + ">" + webpage + '</a>')
 }
@@ -469,7 +487,7 @@ function render_current_angebots_listing() {
         var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
         if (!first_assignment) first_assignment = element.locations[0]
         if (first_assignment) {
-            var html_string = '<a class="read-more" href="/kiezatlas/angebot/'+element.id+'">'
+            var html_string = '<a class="read-more" href="/angebote/'+element.id+'">'
                 + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
                 // html_string += '<p>' + descr + '</p>'
                 html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. <b>' + first_assignment.name + '</b><br/>'
@@ -509,13 +527,13 @@ function render_angebot_detail_area() {
 }
 
 function load_current_angebotsinfos() {
-    angebotsinfos = JSON.parse($.ajax('/kiezatlas/angebot/filter/' + new Date().getTime(),
+    angebotsinfos = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
         { async: false, dataType: 'json' }).responseText)
 }
 
 function load_angebot_by_resource_path() {
     var angebot_id = parse_angebots_id()
-    selected_angebot = JSON.parse($.ajax('/kiezatlas/angebot/' + angebot_id,
+    selected_angebot = JSON.parse($.ajax('/angebote/' + angebot_id,
         { async: false, dataType: 'json' }).responseText)
 }
 
@@ -564,7 +582,7 @@ function fetch_angebote_workspace() {
 
 function has_angebote_membership(callback) {
     // var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
-    $.getJSON('/kiezatlas/angebot/membership/', function(response) {
+    $.getJSON('/angebote/membership/', function(response) {
         if (!response) {
             $('.task-info h3').html('Entschuldigung! '
                 + 'Sie haben noch keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.<br/>Bitte <a href="/sign-up">registrieren</a> sie sich '

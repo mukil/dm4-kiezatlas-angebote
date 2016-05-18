@@ -196,6 +196,7 @@ span.angebot-name {
 .angebot-area input[type="submit"],
 .geo-objects-area input[type="radio"],
 .date-area input[type="submit"],
+.date-area input[type="button"],
 .form-area input[type="submit"],
 .form-area input[type="button"],
 .form-area button {

@@ -64,7 +64,7 @@ public interface AngebotService {
     List<RelatedTopic> getAssignmentsByGeoObjectIds(String payloadListing);
 
     /**
-     * Fetches all Angebotsinfos with a _current_ (now > from && now < to) Geo Object Assignment.
+     * Fetches all Angebotsinfos with a _current_ (now gt from && now st to) Geo Object Assignment.
      * @param now
      * @return
      */

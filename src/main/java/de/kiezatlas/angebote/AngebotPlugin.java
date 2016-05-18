@@ -44,7 +44,7 @@ import org.deepamehta.plugins.signup.service.SignupPluginService;
 
 
 
-@Path("/kiezatlas/angebot")
+@Path("/angebote")
 @Consumes("application/json")
 @Produces("application/json")
 public class AngebotPlugin extends PluginActivator implements AngebotService,
@@ -72,19 +72,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     // ------------------------------------------------------------------------------------------------ Public Methods
 
-    /**
-     * Responds with the main HTML (AJAX Single) page for managing Angebote.
-     *
-     * @return
-     */
     @GET
-    @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngeboteView() {
-        return getStaticResource("web/index.html");
-    }
-
-    @GET
-    @Path("/listing")
+    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotListView() {
         return getStaticResource("web/list.html");
@@ -155,7 +144,14 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     // -------------------------------------------------------------------------------- Username Related Angebotsinfos
 
     @GET
-    @Path("/list")
+    @Path("/my")
+    @Produces(MediaType.TEXT_HTML)
+    public InputStream getAngeboteView() {
+        return getStaticResource("web/my.html");
+    }
+
+    @GET
+    @Path("/my")
     @Produces(MediaType.APPLICATION_JSON)
     public List<RelatedTopic> getUsersAngebotsinfoTopics() {
         ResultList<RelatedTopic> all = dms.getTopics(ANGEBOT, 0);
@@ -198,6 +194,22 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     @GET
     @Path("/list/assignments/{angebotId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<AngebotsInfoAssigned> getAngebotsinfoAssignments(@PathParam("angebotId") long topicId) {
+        List<AngebotsInfoAssigned> results = new ArrayList<AngebotsInfoAssigned>();
+        Topic angebot = dms.getTopic(topicId);
+        ResultList<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
+        Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
+        while (geoIterator.hasNext()) {
+            RelatedTopic einrichtung = geoIterator.next();
+            Association assignment = getAssignmentAssociation(angebot, einrichtung);
+            results.add(assembleLocationAssignmentModel(einrichtung, assignment));
+        }
+        return results;
+    }
+
+    @GET
+    @Path("/list/assignments/user/{angebotId}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<AngebotsInfoAssigned> getUsersAngebotsinfoAssignments(@PathParam("angebotId") long topicId) {
         List<RelatedTopic> all = getUsersAngebotsinfoTopics();
@@ -292,7 +304,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     @GET
     @Path("/filter/{now}")
-    public List<AngebotsInfo> getsAngebotsinfoByTimestamp(@PathParam("now") long timestamp) {
+    public List<AngebotsInfo> getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
         List<Topic> offers = getAngebotsinfoTopicsFilteredByTime(timestamp);
         List<AngebotsInfo> results = new ArrayList<AngebotsInfo>();
         for (Topic angebot : offers) {
