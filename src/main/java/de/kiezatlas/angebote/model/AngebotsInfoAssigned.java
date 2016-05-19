@@ -3,6 +3,8 @@ package de.kiezatlas.angebote.model;
 import de.deepamehta.core.JSONEnabled;
 import java.text.DateFormat;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -31,7 +33,23 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             json.put("name", nameValue);
         } catch (JSONException ex) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", ex);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
+    public void setAngebotsName(String nameValue) {
+        try {
+            json.put("angebotsName", nameValue);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
+    public void setAngebotsId(long assocId) {
+        try {
+            json.put("angebotsId", assocId);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
     }
 
@@ -39,7 +57,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             json.put("id", assocId);
         } catch (JSONException ex) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", ex);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
     }
 
@@ -47,52 +65,31 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             json.put("location_id", institutionId);
         } catch (Exception e) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", e);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", e);
         }
     }
-
-    /** public void setDistanceInMeter(String meter) {
-        try {
-            json.put("distanz", meter);
-        } catch (Exception e) {
-            throw new RuntimeException("Constructing a SocialOfferObject failed", e);
-        }
-    }
-
-    public void setGeoCoordinate(GeoCoordinate geoCoord) {
-        try {
-            JSONObject geolocation = new JSONObject();
-            geolocation.put("lon", geoCoord.lon);
-            geolocation.put("lat", geoCoord.lat);
-            //
-            json.put("geolocation", geolocation);
-        } catch (Exception e) {
-            throw new RuntimeException("Constructing a SocialOfferObject failed", e);
-        }
-    }
-
-    public void setAddress(String address) {
-        try {
-            json.put("anschrift", address);
-        } catch (Exception e) {
-            throw new RuntimeException("Constructing a SocialOfferObject failed", e);
-        }
-    }
-    **/
 
     public void setAdditionalInfo(String value) {
         try {
             json.put("zusatzinfo", value);
         } catch (JSONException ex) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", ex);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
     }
 
-    public void setContact(String webpageValue) {
+    public void setAdditionalContact(String webpageValue) {
         try {
-            json.put("kontakt", webpageValue);
+            json.put("zusatzkontakt", webpageValue);
         } catch (JSONException ex) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", ex);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
+    public void setDescription(String webpageValue) {
+        try {
+            json.put("beschreibung", webpageValue);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
     }
 
@@ -101,7 +98,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
             json.put("anfang_timestamp", fromDate);
             json.put("anfang", DateFormat.getDateInstance(DateFormat.LONG, Locale.GERMANY).format(fromDate));
         } catch (JSONException ex) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", ex);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
     }
 
@@ -110,7 +107,81 @@ public class AngebotsInfoAssigned implements JSONEnabled {
             json.put("ende_timestamp", toDate);
             json.put("ende", DateFormat.getDateInstance(DateFormat.LONG, Locale.GERMAN).format(toDate));
         } catch (JSONException ex) {
-            throw new RuntimeException("Constructing a LocationAssignmentModel failed", ex);
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
+    /** ------------------- Public Thymeleaf Getter -------------------- **/
+
+    public String getLocationName() {
+        try {
+            return json.getString("name");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            return "";
+        }
+    }
+
+    public String getAngebotsName() {
+        try {
+            return json.getString("angebotsName");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
+            return "";
+        }
+    }
+
+    public String getAngebotsId() {
+        try {
+            return json.getString("angebotsId");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Id", ex);
+            return "";
+        }
+    }
+
+    public String getStartDate() {
+        try {
+            return json.getString("anfang");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no StartDate", ex);
+            return "";
+        }
+    }
+
+    public String getEndDate() {
+        try {
+            return json.getString("ende");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            return "";
+        }
+    }
+
+    public String getDescription() {
+        try {
+            return json.getString("beschreibung");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            return "";
+        }
+    }
+
+    public String getAdditionalInfo() {
+        try {
+            return json.getString("zusatzinfo");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            return "";
+        }
+    }
+
+    public String getAdditionalContact() {
+        try {
+            return json.getString("zusatzkontakt");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            return "";
         }
     }
 

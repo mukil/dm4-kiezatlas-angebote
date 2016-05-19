@@ -203,7 +203,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         while (geoIterator.hasNext()) {
             RelatedTopic einrichtung = geoIterator.next();
             Association assignment = getAssignmentAssociation(angebot, einrichtung);
-            results.add(assembleLocationAssignmentModel(einrichtung, assignment));
+            results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
         }
         return results;
     }
@@ -223,7 +223,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 while (geoIterator.hasNext()) {
                     RelatedTopic einrichtung = geoIterator.next();
                     Association assignment = getAssignmentAssociation(angebot, einrichtung);
-                    results.add(assembleLocationAssignmentModel(einrichtung, assignment));
+                    results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
                 }
             } else {
                 logger.info("Angebot \"" + angebot.getSimpleValue() + "\" is not assigned to Geo Object ");
@@ -317,7 +317,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 JSONArray locations = new JSONArray();
                 for (RelatedTopic geoObject : geoObjects) {
                     Association assignment = getAssignmentAssociation(angebot, geoObject);
-                    locations.put(assembleLocationAssignmentModel(geoObject, assignment).toJSON());
+                    locations.put(assembleLocationAssignmentModel(geoObject, angebot, assignment).toJSON());
                 }
                 result.setLocations(locations);
                 logger.info("> Fetched current Angebotsinfo \"" + result.getName());
@@ -441,18 +441,20 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return infoModel;
     }
 
-    private AngebotsInfoAssigned assembleLocationAssignmentModel(Topic geoObject, Association assignment) {
+    private AngebotsInfoAssigned assembleLocationAssignmentModel(Topic geoObject, Topic angebotTopic, Association assignment) {
         AngebotsInfoAssigned assignedAngebot = new AngebotsInfoAssigned();
         assignedAngebot.setLocationName(getGeoObjectName(geoObject));
+        assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
+        assignedAngebot.setAngebotsId(angebotTopic.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
         assignedAngebot.setStartDate((Long) assignment.getProperty(AngebotPlugin.PROP_ANGEBOT_START_TIME));
         assignedAngebot.setEndDate((Long) assignment.getProperty(AngebotPlugin.PROP_ANGEBOT_END_TIME));
         // Overrides
         if (assignment.getChildTopics().has(ASSIGNMENT_KONTAKT)) {
-            assignedAngebot.setContact(assignment.getChildTopics().getString(ASSIGNMENT_KONTAKT));
+            assignedAngebot.setAdditionalContact(assignment.getChildTopics().getString(ASSIGNMENT_KONTAKT));
         }
         if (assignment.getChildTopics().has(ASSIGNMENT_BESCHREIBUNG)) {
-            assignedAngebot.setContact(assignment.getChildTopics().getString(ASSIGNMENT_BESCHREIBUNG));
+            assignedAngebot.setDescription(assignment.getChildTopics().getString(ASSIGNMENT_BESCHREIBUNG));
         }
         return assignedAngebot;
     }
@@ -600,6 +602,17 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Override
     public ResultList<RelatedTopic> getAngeboteTopicsByGeoObject(Topic geoObject) {
         return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT, 0);
+    }
+
+    @Override
+    public List<AngebotsInfoAssigned> getAngebotsInfosAssigned(Topic geoObject) {
+        ResultList<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
+        List<AngebotsInfoAssigned> angebotsinfos = new ArrayList<AngebotsInfoAssigned>();
+        for (RelatedTopic angebotTopic : angeboteTopics) {
+            Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
+            angebotsinfos.add(assembleLocationAssignmentModel(geoObject, angebotTopic, assignment));
+        }
+        return angebotsinfos;
     }
 
     @Override

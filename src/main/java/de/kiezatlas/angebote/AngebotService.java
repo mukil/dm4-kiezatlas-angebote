@@ -4,6 +4,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ResultList;
 import de.kiezatlas.angebote.model.AngebotsInfo;
+import de.kiezatlas.angebote.model.AngebotsInfoAssigned;
 import java.util.List;
 
 
@@ -51,6 +52,11 @@ public interface AngebotService {
      * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
      */
     ResultList<RelatedTopic> getAngeboteTopicsByGeoObject(Topic geoObject);
+
+    /**
+     * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
+     */
+    List<AngebotsInfoAssigned> getAngebotsInfosAssigned(Topic geoObject);
 
     /**
      * @return      List of all "Geo Object" topics related to the given Angebot (typeUri="ka2.angebot").
