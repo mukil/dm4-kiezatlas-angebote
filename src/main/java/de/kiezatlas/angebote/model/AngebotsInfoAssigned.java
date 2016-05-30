@@ -37,6 +37,15 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         }
     }
 
+    public void setLocationCoordinates(double latitude, double longitude) {
+        try {
+            json.put("latitude", latitude);
+            json.put("longitude", longitude);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setAngebotsName(String nameValue) {
         try {
             json.put("angebotsName", nameValue);
@@ -118,6 +127,24 @@ public class AngebotsInfoAssigned implements JSONEnabled {
             return json.getString("name");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            return "";
+        }
+    }
+
+    public String getLocationLatitude() {
+        try {
+            return json.getString("latitude");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Latitude", ex);
+            return "";
+        }
+    }
+
+    public String getLocationLongitude() {
+        try {
+            return json.getString("longitude");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Longitude", ex);
             return "";
         }
     }

@@ -57,6 +57,7 @@ a {
 .angebotsinfos.start .angebot-area,
 .angebotsinfos.detail .detail-area {
     margin-left: 30px;
+    margin-top: 60px;
 }
 
 .angebotsinfos.listing .contact {
@@ -286,9 +287,9 @@ ul.angebote li small {
     margin-top: 0px;
 }
 
-#navigation .logout,
-#navigation .angebote-btn {
+#navigation .logout {
     display: none;
+    margin-left: 30px;
 }
 
 /** ---- Lower main menu ---- */

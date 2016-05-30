@@ -15,7 +15,9 @@ import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.plugins.accesscontrol.AccessControlService;
+import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.workspaces.WorkspacesService;
+import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT_NAME;
 import de.kiezatlas.angebote.model.AngebotsInfo;
@@ -65,6 +67,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     @Inject private GeomapsService geomapsService;
     @Inject private WorkspacesService workspaceService;
+    @Inject private KiezatlasService kiezService;
     @Inject private AccessControlService aclService;
     @Inject private SignupPluginService signupService;
 
@@ -444,6 +447,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     private AngebotsInfoAssigned assembleLocationAssignmentModel(Topic geoObject, Topic angebotTopic, Association assignment) {
         AngebotsInfoAssigned assignedAngebot = new AngebotsInfoAssigned();
         assignedAngebot.setLocationName(getGeoObjectName(geoObject));
+        GeoCoordinate coordinates = kiezService.getGeoCoordinateByGeoObject(geoObject);
+        assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
         assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
         assignedAngebot.setAngebotsId(angebotTopic.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
