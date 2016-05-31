@@ -562,7 +562,7 @@ function render_user_menu(state) {
     console.log("Rendering User Menu (Angebote UI)", state)
     if (state) {
         $('li.login').hide()
-        $('li.einrichtungen-new').attr("href", "/website/topic/create")
+        $('li.einrichtungen-new a').attr("href", "/website/topic/create")
         $('li.angebote').attr('style', 'display: inline-block;')
         $('li.logout').attr('style', 'display: inline-block;')
     } else {
