@@ -132,7 +132,7 @@ function load_users_angebote() {
         var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
         // console.log("Angebot Item", item, created, modified)
         $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/angebote/edit/'
-            + item.id + '">Infos editieren</a><a href="/angebote/zuordnen/'
+            + item.id + '">Bearbeiten</a><a href="/angebote/zuordnen/'
             + item.id + '">Zuordnungen anpassen</a><br/><small>Erstellt am '
             + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
     }
@@ -164,7 +164,7 @@ var fromDate,
 
 function init_datepicker() {
     // jQuery UI Datepicker Widget with German Local Dependency
-    $.datepicker.setDefaults($.datepicker.regional["de"])
+    // $.datepicker.setDefaults($.datepicker.regional["de"])
     // init our two datepicker fields
     fromDate = $( "#from" ).datepicker({
         defaultDate: "+1w",
@@ -190,12 +190,20 @@ function init_datepicker() {
 
 // ---- Create Assignments for selected_angebot to Geo Objects -----
 
-function search_objects_by_name(renderer) { // usually calls show_geo_objects
+function handle_name_search_input(e) {
+    if (e.keyCode === 13) {
+        search_geo_objects_by_name(show_geo_object_search_results)
+    }
+}
+
+function search_geo_objects_by_name(renderer) { // usually calls show_geo_objects
     var queryString = $("#name-search").val()
         if (queryString.indexOf("*") === -1) {
             queryString += "*"
         }
         queryString = encodeURIComponent(queryString, "UTF-8")
+        // ### hacking message display
+        $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
         $.ajax({
             type: "GET", url: "/website/search/by_name?query=" + queryString,
             success: function(obj) {
@@ -345,7 +353,7 @@ function render_angebot_header_info() {
     //
     $('.angebot-name').text(selected_angebot.name)
     $('#navigation li.edit a').attr("href", "/angebote/edit/" + selected_angebot.id)
-    $('.angebot-infos').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
+    $('.angebot-infos p.body').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
         + webpage + ">" + webpage + '</a>')
 }
 
@@ -353,9 +361,13 @@ function render_assignments() {
     // Display Assignments on Assignment Page
     $('.right-side div.einrichtungen').empty()
     if (geo_assignments.length === 0) {
-        $('.help').html('Dieses Angebot ist aktuell noch keinen Einrichtungen zugeordnet.')
+        $('.right-side .help').html('Hinweis:<br/>Diesen Angebotsinformationen sind terminlich noch keine Einrichtungen zugewiesen. Zur Zuweisung w&auml;hlen Sie '
+            + 'bitte eine Einrichtung (unter 1.) und dann (unter 2.) einen Angebotszeitraum.Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
+            + ' an dieser Stelle nachtr&auml;glich wieder bearbeiten.<br/><br/>Bitte nehmen Sie auch zur Kenntnis das bei einer terminlichen Zuweisung von '
+            + 'Angebotsinfos die Inhaber_innen des Einrichtungsdatensatzes automatisch &uuml;ber das neue Angebot benachrichtigt werden.')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
+        $('.right-side .help').empty()
     }
     // ### show address or districts, too
     for (var i in geo_assignments) {
@@ -376,7 +388,7 @@ function render_angebot_locations() {
         $einrichtungen.empty()
         // $einrichtungen.html('<b>Hello fucked up World!</b>')
     if (geo_assignments.length === 0) {
-        $('.help').html('Dieses Angebot ist aktuell noch keinen Einrichtungen zugeordnet.')
+        $('.help').html('Diesen Angebotsinfos sind aktuell noch keine Angebotszeitr&auml;ume in Einrichtungen zugewiesen.')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
     }
@@ -419,7 +431,7 @@ function render_selected_assignment() {
         $('.date-area .einrichtung-name').text(selected_assignment.name) // ### should be geo_name
         $('#from').datepicker("setDate", new Date(selected_assignment.anfang_timestamp))
         $('#to').datepicker("setDate", new Date(selected_assignment.ende_timestamp))
-        $('#do-assign').attr("value", "Ändern")
+        $('#do-assign').attr("value", "Zeitraum ändern")
         $('#do-delete').removeClass("hidden")
     } else {
         // clear old assignment rendering
@@ -443,13 +455,13 @@ function get_assignment(assocId) {
     throw new Error("No Assignment for ID: " +  assocId)
 }
 
-function show_geo_objects_assign(results) {
+function show_geo_object_search_results(results) {
     $('.form-area div.einrichtungen').empty()
     for (var i in results) {
         var obj = results[i]
         if (obj) {
-            var $element = $('<input type="radio" name="group" id="' + obj.id
-                    + '" value="geo-'+obj.id+'"><label for="'+obj.id+'">'
+            var $element = $('<input type="radio" title="Klicken um diese Einrichtung auszuwählen ..." name="group" id="' + obj.id
+                    + '" value="geo-'+obj.id+'"><label title="Klicken um diese Einrichtung auszuwählen ..." for="'+obj.id+'">'
                     + obj.name + ' (' + obj.bezirk_name + ')</label><br/>')
             $('.form-area div.einrichtungen').append($element)
         } else {
@@ -466,6 +478,7 @@ function render_angebotsinfo_page() {
     load_angebot_by_resource_path()
     render_angebot_detail_area()
     load_assignments(render_angebot_locations)
+    load_username(render_user_menu)
 }
 
 function render_angebotslisting_page() {
@@ -477,6 +490,12 @@ function render_angebotslisting_page() {
 function render_current_angebots_listing() {
     console.log("Show Angebotinfo Listing", angebotsinfos)
     var $list = $('.list-area')
+    if (angebotsinfos.length === 0) {
+        $list.append("<p>F&uuml;r das heutige Datum liegen uns keine Informationen zu Angeboten in Einrichtungen vor.</p>")
+        $list.append("<p>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "
+            + "uns helfen neue oder aktuelle Angebote in die <a href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</p>")
+        // ("+new Date().toLocaleDateString()+")
+    }
     for (var aidx in angebotsinfos) {
         var element = angebotsinfos[aidx]
         var name = element.name
@@ -523,7 +542,7 @@ function render_angebot_detail_area() {
     var tags = selected_angebot.tags // ### render tags
     //
     $('.angebot-name').text(name)
-    $('.angebot-infos').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
+    $('.angebot-infos p.body').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
         + webpage + ">" + webpage + '</a>')
 }
 

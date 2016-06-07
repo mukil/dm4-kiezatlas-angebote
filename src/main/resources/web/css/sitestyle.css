@@ -39,9 +39,13 @@ a {
     margin: 10px;
 }
 
+.assignment .angebots-infos {
+    color: #333;
+}
+
 .angebotsinfos.edit .task-info {
     margin-top: 60px;
-    margin-left: 15px;
+    margin-left: 30px;
 }
 
 .angebotsinfos.start .task-info {
@@ -49,12 +53,23 @@ a {
     margin-left: 40px;
 }
 
+.angebotsinfos.listing .list-area p {
+    margin-left: 20px;
+}
+
+.angebotsinfos.listing .list-area .read-more p {
+    margin-left: 0px;
+}
+
 .angebotsinfos.listing .task-info {
     margin-top: 60px;
     margin-left: 30px;
 }
 
-.angebotsinfos.start .angebot-area,
+.angebotsinfos.start .angebot-area {
+    margin-left: 30px;
+    margin-top: 0px;
+}
 .angebotsinfos.detail .detail-area {
     margin-left: 30px;
     margin-top: 60px;
@@ -133,7 +148,7 @@ a {
 }
 
 div.help {
-    margin: 15px;
+    color: #333;
 }
 
 #user {
@@ -170,15 +185,33 @@ div.ui-datepicker {
     padding: 10px;
 }
 
-.form-area, 
-.date-area {
+.form-area {
     position: relative;
-    padding: 15px;
+    padding: 30px;
+}
+
+.assignment .form-area {
+    padding: 5px;
+}
+
+.date-area {
+    margin-top: 30px;
+    margin-left: 5px;
 }
 
 span.einrichtung-name,
 span.angebot-name {
     font-style: italic;
+}
+
+.assignment .task-info {
+    margin-top: 60px;
+    margin-left: 5px;
+}
+
+.angebotsinfos.edit .task-info h3 {
+    margin: 0px;
+    margin-left: 5px;
 }
 
 .assignment .task-info h3,

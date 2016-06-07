@@ -11,16 +11,14 @@
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
-        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery.ui.datepicker-de.js"></script>
+        <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery.ui.datepicker-de.js"></script-->
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
 
         <script type="text/javascript">
 
             $(document).ready(function(e) {
-                $("#name-search").on("change", function (c) {
-                    console.log("name-search onchange:", c)
-                })
+                $("#name-search").on("keyup", handle_name_search_input)
                 load_username(render_user_menu)
                 render_assignment_page()
             })
@@ -46,7 +44,7 @@
             </div>
 
             <div class="form-area assignment">
-                <form action="javascript:search_objects_by_name(show_geo_objects_assign)" id="name-search-form" accept-charset="UTF-8">
+                <form action="javascript:search_geo_objects_by_name(show_geo_object_search_results)" id="name-search-form" accept-charset="UTF-8">
                     <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
                     <input id="do-search" type="submit" class="btn" value="Einrichtung suchen"></input>
                 </form>
@@ -69,13 +67,11 @@
             </div>
         </div>
         <div class="right-side">
-            <div class="task-info">
-                <h3>
-                    Die Angebotsinfo<br/><br/><span class="angebot-name">dieses Angebot</span>
-                </h3>
-                <p class="angebot-infos"></p>
-                <h3>wird in Kiezatlas-Einrichtungen &uuml;ber folgende Zeitr&auml;ume angezeigt</h3>
+            <h3 class="angebot-name">Die Angebotsinfo</h3>
+            <div class="angebot-infos">
+                <p class="body"></p>
             </div>
+            <h3>wird in Kiezatlas-Einrichtungen &uuml;ber folgende Zeitr&auml;ume angezeigt</h3>
             <div class="einrichtungen"></div>
             <div class="help"></div>
         </div>
@@ -84,7 +80,7 @@
             <div class="menu">
                 <ul>
                     <li>
-                        <a href="/kiezatlas/angebot" title="Zurück zur Übersicht">Zur&uuml;ck</a>
+                        <a href="/angebote/my" title="Zurück zur Übersicht">Zur&uuml;ck</a>
                     </li>
                 </ul>
             </div>

@@ -21,7 +21,6 @@ import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT_NAME;
 import de.kiezatlas.angebote.model.AngebotsInfo;
-import de.kiezatlas.website.model.GeoObjectView;
 import java.io.InputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -330,7 +329,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }
 
-    /** TODO: Revise according to our new DTOs. **/
+    /** TODO: Revise according to our new DTOs.
     @GET
     @Path("/locations")
     public List<GeoObjectView> getGeoObjectsByCurrentKiezatlasAngebote() {
@@ -360,7 +359,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             logger.info(offers.size() +" Angebotsinfos assigned to " + results.size() + " Geo Objects");
         }
         return results;
-    }
+    }**/
 
      /**
      * Builds up a list of search results (Geo Objects to be displayed in a map) by text query.
