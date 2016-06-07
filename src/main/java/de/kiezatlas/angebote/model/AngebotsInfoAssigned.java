@@ -37,6 +37,22 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         }
     }
 
+    public void setLocationId(long id) {
+        try {
+            json.put("locationId", id);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
+    public void setLocationAddress(String addressString) {
+        try {
+            json.put("address", addressString);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setLocationCoordinates(double latitude, double longitude) {
         try {
             json.put("latitude", latitude);
@@ -102,6 +118,14 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         }
     }
 
+    public void setWebpage(String webpageValue) {
+        try {
+            json.put("webpage", webpageValue);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setStartDate(long fromDate) {
         try {
             json.put("anfang_timestamp", fromDate);
@@ -131,6 +155,24 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         }
     }
 
+    public long getLocationId() {
+        try {
+            return json.getLong("locationId");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            return -1;
+        }
+    }
+
+    public String getLocationAddress() {
+        try {
+            return json.getString("address");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            return "";
+        }
+    }
+
     public String getLocationLatitude() {
         try {
             return json.getString("latitude");
@@ -152,6 +194,15 @@ public class AngebotsInfoAssigned implements JSONEnabled {
     public String getAngebotsName() {
         try {
             return json.getString("angebotsName");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
+            return "";
+        }
+    }
+
+    public String getWebpage() {
+        try {
+            return json.getString("webpage");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
             return "";

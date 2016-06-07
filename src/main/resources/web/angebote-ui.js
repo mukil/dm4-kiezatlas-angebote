@@ -395,10 +395,10 @@ function render_angebot_locations() {
     // ### show address or districts, too
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
-        // console.log("   Render Location", obj)
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
-        var $element = $('<div id="' + obj.id + '" class="concrete-assignment"><h3>'
-            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div>')
+        var $element = $('<a class="read-more" href="/website/topic/'+obj.locationId // ### adjust url for deployment
+                +'"><div id="' + obj.id + '" class="concrete-assignment"><h3>'
+                + obj.name + '</h3><p>'+obj.address+'<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>')
         $einrichtungen.append($element)
     }
     // equip all buttons with a click handler each (at once)
@@ -534,16 +534,22 @@ function get_random_int_inclusive(min, max) {
 function render_angebot_detail_area() {
    console.log("Show Angebotinfo Details Page", selected_angebot)
    if (!selected_angebot) throw new Error("Angebotsinfo not found")
-    // Angebotsinfo
+    // assemble Angebotsinfo
     var name = selected_angebot.name
     var contact = selected_angebot.kontakt
     var webpage = selected_angebot.webpage
     var descr = selected_angebot.beschreibung
-    var tags = selected_angebot.tags // ### render tags
-    //
+    var tags = "" // ### render tags
+    for (var t in selected_angebot.tags) {
+        tags += selected_angebot.tags[t].label
+        if (t < selected_angebot.tags.length - 1) tags += ", "
+    }
+    // append to DOM
     $('.angebot-name').text(name)
-    $('.angebot-infos p.body').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
-        + webpage + ">" + webpage + '</a>')
+    $('.angebot-infos p.body').html('<span class="label">Angebotsinfos</span><br/>'
+            + descr + '<br/><span class="label">Kontakt</span><br/>' + contact
+            + '<br/><br/><span class="label">Webseite</span><br/><a href="' + webpage + '">'
+            + webpage + '</a><br/><br/><span class="label">Stichworte</span><br/><i>' + tags + '</i>')
 }
 
 function load_current_angebotsinfos() {

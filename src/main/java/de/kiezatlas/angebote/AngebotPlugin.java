@@ -322,7 +322,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                     locations.put(assembleLocationAssignmentModel(geoObject, angebot, assignment).toJSON());
                 }
                 result.setLocations(locations);
-                logger.info("> Fetched current Angebotsinfo \"" + result.getName());
+                logger.fine("> Fetch current Angebotsinfo \"" + result.getName()+ "\"");
                 results.add(result);
             }
         }
@@ -446,9 +446,12 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     private AngebotsInfoAssigned assembleLocationAssignmentModel(Topic geoObject, Topic angebotTopic, Association assignment) {
         AngebotsInfoAssigned assignedAngebot = new AngebotsInfoAssigned();
         assignedAngebot.setLocationName(getGeoObjectName(geoObject));
+        assignedAngebot.setLocationId(geoObject.getId());
         GeoCoordinate coordinates = kiezService.getGeoCoordinateByGeoObject(geoObject);
         assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
+        assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address").getSimpleValue().toString());
         assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
+        assignedAngebot.setWebpage(angebotTopic.getChildTopics().getString(ANGEBOT_WEBPAGE));
         assignedAngebot.setAngebotsId(angebotTopic.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
         assignedAngebot.setStartDate((Long) assignment.getProperty(AngebotPlugin.PROP_ANGEBOT_START_TIME));
