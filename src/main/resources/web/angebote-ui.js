@@ -600,9 +600,9 @@ function render_user_menu(state) {
 function fetch_angebote_workspace() {
     var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
     $.getJSON('/core/topic/by_value/uri/' + angebote_workspace_uri, function(result){
-        workspace = result
-        document.cookie = WORKSPACE_COOKIE_NAME + "=" + workspace.id + "; "
-        console.log("Set Angebote Workspace Cookie", result)
+        js.remove_cookie(WORKSPACE_COOKIE_NAME)
+        js.set_cookie(WORKSPACE_COOKIE_NAME, result.id)
+        console.log("Set Angebote Workspace Cookie", result.id)
     })
 }
 
