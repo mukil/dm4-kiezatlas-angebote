@@ -611,8 +611,10 @@ function has_angebote_membership(callback) {
     $.getJSON('/angebote/membership/', function(response) {
         if (!response) {
             $('.task-info h3').html('Entschuldigung! '
-                + 'Sie haben noch keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.<br/>Bitte <a href="/sign-up">registrieren</a> sie sich '
-                + 'zuerst unter Angabe einer Email Adresse.')
+                + 'Sie haben noch keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.<br/>'
+                + 'Bitte kontaktieren Sie uns unter <a href="mailto:support@kiezatlas.de">support@kiezatlas.de</a> und '
+                + 'unter Angabe ihres Benutzernamens mit Bezug auf diese Fehlermeldung.<br/>'
+                + '<br/>Entschuldigung!')
             $('#do-add').attr("disabled", true)
             throw new Error("Unauthorized")
         } else {
