@@ -1,6 +1,6 @@
 package de.kiezatlas.angebote;
 
-import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
+import de.deepamehta.geomaps.model.GeoCoordinate;
 
 
 

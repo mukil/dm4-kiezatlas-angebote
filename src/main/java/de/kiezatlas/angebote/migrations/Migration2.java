@@ -6,8 +6,8 @@ import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.plugins.workspaces.WorkspacesService;
-import de.deepamehta.plugins.accesscontrol.AccessControlService;
+import de.deepamehta.workspaces.WorkspacesService;
+import de.deepamehta.accesscontrol.AccessControlService;
 import java.util.logging.Logger;
 
 
@@ -25,7 +25,7 @@ public class Migration2 extends Migration {
     @Override
     public void run() {
 
-        TopicType tagType = dms.getTopicType("ka2.geo_object");
+        TopicType tagType = dm4.getTopicType("ka2.geo_object");
         ViewConfiguration viewConfig = tagType.getViewConfig();
         //
         viewConfig.addSetting("dm4.webclient.view_config",
