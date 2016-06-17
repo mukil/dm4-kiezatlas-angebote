@@ -71,7 +71,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     // ------------------------------------------------------------------------------------------------ Public Methods
 
     @GET
-    @Path("/all")
+    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotListView() {
         return getStaticResource("web/list.html");
