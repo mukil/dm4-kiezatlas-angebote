@@ -14,6 +14,7 @@ import de.deepamehta.accesscontrol.AccessControlService;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.geomaps.model.GeoCoordinate;
+import de.deepamehta.plugins.geospatial.GeospatialService;
 import de.deepamehta.workspaces.WorkspacesService;
 import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
@@ -65,6 +66,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Inject private WorkspacesService workspaceService;
     @Inject private KiezatlasService kiezService;
     @Inject private AccessControlService aclService;
+    @Inject private GeospatialService spatialService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -284,10 +286,12 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                                                     @PathParam("to") long toDate) {
         Association result = dm4.getAssociation(assocId);
         try {
-            result.setProperty(PROP_ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
-            result.setProperty(PROP_ANGEBOT_END_TIME, toDate, true);
-            logger.info("Succesfully updated Angebots Assignment Dates from " + new Date(fromDate).toGMTString()
-                    + " to " + new Date(toDate).toGMTString());
+            if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
+                result.setProperty(PROP_ANGEBOT_START_TIME, fromDate, true); // ### is this long value really UTC?
+                result.setProperty(PROP_ANGEBOT_END_TIME, toDate, true);
+                logger.info("Succesfully updated Angebots Assignment Dates from " + new Date(fromDate).toGMTString()
+                        + " to " + new Date(toDate).toGMTString());
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -301,8 +305,10 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public void deleteAngebotsAssignment(@PathParam("id") long assocId) {
         Association result = dm4.getAssociation(assocId);
         try {
-            result.delete();
-            logger.info("Succesfully DELETED Angebots Assignment Date, Association: " + assocId);
+            if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
+                result.delete();
+                logger.info("Succesfully DELETED Angebots Assignment Date, Association: " + assocId);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -328,27 +334,30 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Path("/search")
     @Override
     public List<Angebotsinfos> searchAngebotsinfosByText(@QueryParam("query") String query,
-            @QueryParam("location") String location, @QueryParam("datetime") long timestamp) {
+            @QueryParam("location") String location, @QueryParam("radius") String radius,
+            @QueryParam("datetime") long timestamp) {
         try {
+            logger.info("Fulltext Query \"" + query + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
             List<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
-            if (query.isEmpty()) {
-                logger.warning("No search term entered, returning empty resultset");
-                return new ArrayList<Angebotsinfos>();
-            }
-            // Prep lucene query
-            query = query + "*";
-            logger.info("Angebote Search Query String: " + query + ", Nearby: \"" + location + "\" At: " + timestamp);
             // Spatial Query
-            if (!location.isEmpty()) {
-                double longitude = Double.parseDouble(location.split(",")[0]);
-                double latitude = Double.parseDouble(location.split(",")[1]);
-                logger.info("Spatial Search Possible, Fetch geo objects near " + longitude + "," + latitude);
+            if (!location.isEmpty() && location.contains(",")) {
+                double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
+                // double longitude = Double.parseDouble(location.split(",")[0]);
+                // double latitude = Double.parseDouble(location.split(",")[1]);
+                GeoCoordinate point = new GeoCoordinate(location.trim());
+                logger.info("> Spatial Resultset Point " + point.toString() + " Radius " + r + " Service " + spatialService);
+                List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(point, r);
+                logger.info("> Spatial Resultset Size " + geoCoordinateTopics.size() + " Geo Coordinates");
+                // ### unfinished business
             }
-            // Fulltext search
-            List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(query);
-            logger.info("Start building response for " + angebotsinfos.size() + " OVERALL");
-            results = prepareAngebotsInfoResults(angebotsinfos);
-            logger.info("Processed " + results.size() + " Angebotsinfos across ALL DISTRICTS");
+            // ### merge results
+            if (!query.isEmpty()) {
+                // Prep lucene query for fulltext search
+                query = query + "*";
+                List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(query);
+                logger.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
+                results.addAll(prepareAngebotsInfoResults(angebotsinfos));
+            }
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Searching Angebotsinfos across ALL DISTRICTS failed", e);
@@ -562,7 +571,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 uniqueResults.put(geoObject.getId(), geoObject);
             }
         }
-        logger.info("searchResultLength=" + (beschreibungen.size()) + ", " + "uniqueResultLength=" + uniqueResults.size());
         return new ArrayList(uniqueResults.values());
     }
 

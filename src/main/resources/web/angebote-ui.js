@@ -8,7 +8,9 @@ var workspace   = undefined
 
 var location_input = undefined
 var location_coords = undefined
+var location_radius = 0
 var search_input = undefined
+var street_coordinates = []
 
 // --- Angeboute UI Routes
 
@@ -26,21 +28,30 @@ function do_search_angebote() {
         // console.log("No spatial parameter added to fulltext search.. \"", queryString, "\"", dateNow)
     } else if (locationString !== "" && queryString !== "") {
         // console.log("Fulltext search parameter", queryString, "with spatial parameter", locationString, dateNow)
-        location_input = locationString.trim()
+        location_input = locationString
     } else if (locationString !== "" && queryString === "") {
         // console.log("Just a spatial search for angebote", locationString, dateNow)
-        location_input = locationString.trim()
+        location_input = locationString
     } else {
         // console.log("No query terms entered into search form..")
     }
     if (location_coords) { // existing geo-coodinates values have a higher priority
-        locationString = encodeURIComponent(location_coords.longitude + ","+ location_coords.latitude)
+        locationString = encodeURIComponent(location_coords.longitude.toFixed(4) + ","+ location_coords.latitude.toFixed(4))
     }
     search_input = queryString.trim()
     render_query_parameter()
-    $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationString + '&datetime=' + dateNow.getTime(), function(results) {
+    $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationString + '&radius='
+            + location_radius + '&datetime=' + dateNow.getTime(), function(results) {
         console.log("Fetched fulltext search results", results)
         render_current_angebots_listing(results)
+    })
+}
+
+function do_search_streetcoordinates() {
+    var locationString = $('#nearby').val().trim()
+    $.getJSON('/website/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
+        console.log("Loaded Street Coordinates", results)
+        street_coordinates = results
     })
 }
 
@@ -96,12 +107,16 @@ function remove_location_parameter() {
 
 function remove_loc_input_parameter() {
     location_input = undefined
+    $('#nearby').val("")
     render_query_parameter()
 }
 
 function remove_text_parameter() {
     search_input = undefined
+    $('#query').val("")
     render_query_parameter()
+    $('.filter-area').hide("fast")
+    render_current_angebots_listing()
 }
 
 function do_save_angebot() {
@@ -591,7 +606,8 @@ function render_current_angebots_listing(items) {
     } else {
         $('.headline.list h2').show()
     }
-    console.log("Show Angebotinfo Listing", angebotsinfos)
+    $list.empty()
+    console.log("Show Angebotinfo Listing", items_to_render)
     if (items_to_render.length === 0) {
         $list.append("<p>F&uuml;r das heutige Datum liegen uns keine Informationen zu Angeboten in Einrichtungen vor.</p>")
         $list.append("<p>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "

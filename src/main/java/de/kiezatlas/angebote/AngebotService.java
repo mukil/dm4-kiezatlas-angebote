@@ -80,6 +80,6 @@ public interface AngebotService {
      * @param query
      * @return
      */
-    List<Angebotsinfos> searchAngebotsinfosByText(String query, String location, long datetime);
+    List<Angebotsinfos> searchAngebotsinfosByText(String query, String location, String radius, long datetime);
 
 }

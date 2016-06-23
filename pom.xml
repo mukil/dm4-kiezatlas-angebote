@@ -36,6 +36,16 @@
             <artifactId>dm48-kiezatlas</artifactId>
             <version>2.1.8-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-geomaps</artifactId>
+            <version>4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>dm48-geospatial</artifactId>
+            <version>0.2.2-SNAPSHOT</version>
+        </dependency>
         <!---dependency>
             <groupId>de.kiezatlas</groupId>
             <artifactId>dm48-kiezatlas-website</artifactId>
