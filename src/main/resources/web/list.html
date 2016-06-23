@@ -11,6 +11,7 @@
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script src="/de.kiezatlas.website/ka-locating.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
 
         <script type="text/javascript">
@@ -40,7 +41,12 @@
                 <input id="query" name="search" type="text" placeholder="" />
                 <input id="do-save" name="location" type="submit" class="btn" value="Ok" />
                 <input id="nearby" type="text" placeholder=".. in der Nähe von" />
+                <input id="do-locating" onclick="javascript:do_browser_location()" name="location" type="button" class="btn" value="Aktueller Standort" />
             </form>
+            <div class="filter-area">
+                <h4>Filter dieser Suchanfrage</h4>
+                <div class="query-parameter"></div>
+            </div>
         </div>
 
         <div class="headline list"><h2>Auflistung <em>aktueller</em> Angebote</h2></div>

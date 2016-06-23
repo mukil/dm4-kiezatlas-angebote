@@ -4,6 +4,14 @@
 var restc       = new RESTClient()
 var workspace   = undefined
 
+// --- Angebote Search UI Model -- Client State ---
+
+var location_input = undefined
+var location_coords = undefined
+var search_input = undefined
+
+// --- Angeboute UI Routes
+
 var URL_ANGEBOT_LISTING     = "/angebote/"
 var URL_MY_ANGEBOT_LIST     = "/angebote/my"
 var URL_ANGEBOT_DETAIL      = "/angebote/edit/"
@@ -18,15 +26,82 @@ function do_search_angebote() {
         // console.log("No spatial parameter added to fulltext search.. \"", queryString, "\"", dateNow)
     } else if (locationString !== "" && queryString !== "") {
         // console.log("Fulltext search parameter", queryString, "with spatial parameter", locationString, dateNow)
+        location_input = locationString.trim()
     } else if (locationString !== "" && queryString === "") {
         // console.log("Just a spatial search for angebote", locationString, dateNow)
+        location_input = locationString.trim()
     } else {
         // console.log("No query terms entered into search form..")
     }
+    if (location_coords) { // existing geo-coodinates values have a higher priority
+        locationString = encodeURIComponent(location_coords.longitude + ","+ location_coords.latitude)
+    }
+    search_input = queryString.trim()
+    render_query_parameter()
     $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationString + '&datetime=' + dateNow.getTime(), function(results) {
         console.log("Fetched fulltext search results", results)
         render_current_angebots_listing(results)
     })
+}
+
+function do_browser_location() {
+    var $loc_status = $('.geo-locating')
+    // gui
+    if ($loc_status.length === 0) {
+        $loc_status = $('<div class="geo-locating">Standortermittlung angefragt ...</div>')
+        $('#angebot-form').append($loc_status)
+    } else {
+        $loc_status.html('Standortermittlung angefragt...')
+    }
+    // functionality
+    locating.get_browser_location(function(ok) {
+        console.info("Standort OK", ok)
+        location_coords = ok.coords
+        $loc_status.empty()
+        render_query_parameter()
+    }, function(error) {
+        $loc_status.html("Wir konnten deinen aktuellen Standort leider nicht automatisch ermitteln.")
+        console.warn("Standortermittlung fehlerhaft", error)
+        location_coords = undefined
+    }, {
+        enableHighAccuracy: false, timeout: 13000
+    })
+}
+
+function render_query_parameter() {
+    // clear and setup gui
+    $('.filter-area').show("inline")
+    var $filter_area = $('.query-parameter')
+        $filter_area.empty()
+    // render parameter
+    if (location_coords) {
+       $filter_area.append('<div class="parameter location"><a class="close" href="javascript:remove_location_parameter()">x</a>'
+        + 'Dein Standort in L&auml;ngen- und Breitengrad (' + location_coords.longitude.toFixed(3)
+        + ', ' + location_coords.latitude.toFixed(3) + ')</div>')
+    }
+    if (location_input) {
+       $filter_area.append('<div class="parameter street-location"><a class="close" href="javascript:remove_loc_input_parameter()">x</a>'
+        + 'In der N&auml;he von \"' + location_input + '\"</div>')
+    }
+    if (search_input) {
+       $filter_area.append('<div class="parameter text"><a class="close" href="javascript:remove_text_parameter()">x</a>'
+        + 'Suche nach \"' + search_input + '\"</div>')
+    }
+}
+
+function remove_location_parameter() {
+    location_coords = undefined
+    render_query_parameter()
+}
+
+function remove_loc_input_parameter() {
+    location_input = undefined
+    render_query_parameter()
+}
+
+function remove_text_parameter() {
+    search_input = undefined
+    render_query_parameter()
 }
 
 function do_save_angebot() {

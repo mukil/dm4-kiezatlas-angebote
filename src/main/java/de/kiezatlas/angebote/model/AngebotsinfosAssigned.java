@@ -14,11 +14,11 @@ import org.codehaus.jettison.json.JSONObject;
  * A data transfer object as returned by the Kiezatlas Angebots service.
  * ### Free us of the "dm4-kiezatlas-website" dependency.
  */
-public class AngebotsInfoAssigned implements JSONEnabled {
+public class AngebotsinfosAssigned implements JSONEnabled {
 
     private JSONObject json = null;
 
-    public AngebotsInfoAssigned() {
+    public AngebotsinfosAssigned() {
         json = new JSONObject();
     }
 
@@ -158,7 +158,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("name");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
             return "";
         }
     }
@@ -167,7 +167,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getLong("locationId");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
             return -1;
         }
     }
@@ -176,7 +176,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("address");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
             return "";
         }
     }
@@ -185,7 +185,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("latitude");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Latitude", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Latitude", ex);
             return "";
         }
     }
@@ -194,7 +194,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("longitude");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Longitude", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Longitude", ex);
             return "";
         }
     }
@@ -203,7 +203,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("angebotsName");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
             return "";
         }
     }
@@ -212,7 +212,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("webpage");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
             return "";
         }
     }
@@ -221,7 +221,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("angebotsId");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Id", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Id", ex);
             return "";
         }
     }
@@ -230,7 +230,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("anfang");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no StartDate", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no StartDate", ex);
             return "";
         }
     }
@@ -239,7 +239,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("ende");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
             return "";
         }
     }
@@ -248,7 +248,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("beschreibung");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
             return "";
         }
     }
@@ -257,7 +257,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("kontakt");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Kontakt", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Kontakt", ex);
             return "";
         }
     }
@@ -266,7 +266,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("zusatzinfo");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
             return "";
         }
     }
@@ -275,7 +275,7 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         try {
             return json.getString("zusatzkontakt");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
             return "";
         }
     }

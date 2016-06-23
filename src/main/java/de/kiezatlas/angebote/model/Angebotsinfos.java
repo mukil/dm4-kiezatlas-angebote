@@ -12,12 +12,12 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author malted
  */
-public class AngebotsInfo implements JSONEnabled {
+public class Angebotsinfos implements JSONEnabled {
     
     public JSONObject json = null;
     // DateFormat df = new SimpleDateFormat("DD.MM.YYYY");
 
-    public AngebotsInfo() {
+    public Angebotsinfos() {
         json = new JSONObject();
     }
 
@@ -25,7 +25,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             return json.getString("name");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -34,7 +34,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             json.put("name", nameValue);
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -42,7 +42,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             json.put("kontakt", kontaktValue);
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -50,7 +50,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             json.put("webpage", webpageValue);
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -58,7 +58,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             json.put("beschreibung", descriptionValue);
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -66,7 +66,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             json.put("id", id);
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -74,7 +74,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             json.put("locations", locations);
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -93,8 +93,8 @@ public class AngebotsInfo implements JSONEnabled {
     @Override
     public boolean equals(Object obj) {
         boolean equal = false;
-        if (obj instanceof AngebotsInfo) {
-            equal = (this.getId() == ((AngebotsInfo) obj).getId());
+        if (obj instanceof Angebotsinfos) {
+            equal = (this.getId() == ((Angebotsinfos) obj).getId());
         }
         return equal;
     }
@@ -112,7 +112,7 @@ public class AngebotsInfo implements JSONEnabled {
         try {
             return json.getLong("id");
         } catch (JSONException ex) {
-            Logger.getLogger(AngebotsInfo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
         }
         return -1;
     }

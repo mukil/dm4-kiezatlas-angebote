@@ -2,8 +2,8 @@ package de.kiezatlas.angebote;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.kiezatlas.angebote.model.AngebotsInfo;
-import de.kiezatlas.angebote.model.AngebotsInfoAssigned;
+import de.kiezatlas.angebote.model.Angebotsinfos;
+import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
 import java.util.List;
 
 
@@ -29,12 +29,12 @@ public interface AngebotService {
     /**
      * @return      Details for a specific "Angebotsinfo" topic Id.
      */
-    AngebotsInfo getAngebotsinfoViewModel(long angebotsInfoId);
+    Angebotsinfos getAngebotsinfoViewModel(long angebotsInfoId);
 
     /**
      * @return      Details for a specific "Angebotsinfo" topic ID relating to the requesting user.
      */
-    AngebotsInfo getUsersAngebotsinfoViewModel(long angebotsInfoId);
+    Angebotsinfos getUsersAngebotsinfoViewModel(long angebotsInfoId);
 
     /**
      * 
@@ -55,7 +55,7 @@ public interface AngebotService {
     /**
      * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
      */
-    List<AngebotsInfoAssigned> getAngebotsInfosAssigned(Topic geoObject);
+    List<AngebotsinfosAssigned> getAngebotsInfosAssigned(Topic geoObject);
 
     /**
      * @return      List of all "Geo Object" topics related to the given Angebot (typeUri="ka2.angebot").
@@ -80,6 +80,6 @@ public interface AngebotService {
      * @param query
      * @return
      */
-    List<AngebotsInfo> searchAngebotsinfosByText(String query, String location, long datetime);
+    List<Angebotsinfos> searchAngebotsinfosByText(String query, String location, long datetime);
 
 }
