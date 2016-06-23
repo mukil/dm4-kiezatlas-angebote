@@ -94,6 +94,14 @@ public class AngebotsInfoAssigned implements JSONEnabled {
         }
     }
 
+    public void setKontakt(String nameValue) {
+        try {
+            json.put("kontakt", nameValue);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setAdditionalInfo(String value) {
         try {
             json.put("zusatzinfo", value);
@@ -241,6 +249,15 @@ public class AngebotsInfoAssigned implements JSONEnabled {
             return json.getString("beschreibung");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            return "";
+        }
+    }
+
+    public String getKontakt() {
+        try {
+            return json.getString("kontakt");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsInfoAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Kontakt", ex);
             return "";
         }
     }

@@ -37,25 +37,34 @@ a {
 .detail-area,
 .listing .task-info,
 .assignments .task-info {
-    margin: 10px;
+    margin: 0.7em;
 }
 
 .assignment .angebots-infos {
     color: #333;
 }
 
+.angebotsinfos.listing .headline {
+    margin-left: 2em;
+}
+
+.angebotsinfos.listing .headline h2,
+.angebotsinfos.listing .headline h3 {
+    margin: 1em auto 0em;
+}
+
 .angebotsinfos.edit .task-info {
-    margin-top: 60px;
-    margin-left: 30px;
+    margin-top: 3em;
+    margin-left: 2em;
 }
 
 .angebotsinfos.start .task-info {
-    margin-top: 60px;
-    margin-left: 40px;
+    margin-top: 3em;
+    margin-left: 2em;
 }
 
 .angebotsinfos.listing .list-area p {
-    margin-left: 20px;
+    margin-left: 1em;
 }
 
 .angebotsinfos.listing .list-area .read-more p {
@@ -63,17 +72,17 @@ a {
 }
 
 .angebotsinfos.listing .task-info {
-    margin-top: 60px;
-    margin-left: 30px;
+    margin-top: 3em;
+    margin-left: 2em;
 }
 
 .angebotsinfos.start .angebot-area {
-    margin-left: 30px;
-    margin-top: 0px;
+    margin-left: 2em;
+    margin-top: 0em;
 }
 .angebotsinfos.detail .detail-area {
-    margin-left: 30px;
-    margin-top: 60px;
+    margin-left: 2em;
+    margin-top: 3em;
 }
 
 .angebotsinfos.listing .contact {
@@ -100,15 +109,15 @@ a {
     width: 45%;
     display: inline-block;
     margin-right: 5%;
-    margin-left: 30px;
-    margin-top: 30px;
+    margin-left: 2em;
+    margin-top: 2em;
 }
 
 .right-side {
     width: 45%;
     display: inline-block;
     vertical-align: top;
-    margin-top: 30px;
+    margin-top: 2em;
 }
 
 .right-side h3.linked a {
@@ -122,7 +131,7 @@ a {
 
 .concrete-assignment {
     background: #fff;
-    padding: 15px;
+    padding: 1em;
     border: 1px solid #002856;
     cursor: pointer;
     margin: 5px;
@@ -154,7 +163,7 @@ div.help {
 }
 
 #user {
-    margin: 15px;
+    margin: 1em;
     color: #8f1414; /** #0078A8; **/
 }
 
@@ -189,7 +198,7 @@ div.ui-datepicker {
 
 .form-area {
     position: relative;
-    padding: 30px;
+    padding: 1em 1em 0em 2em;
 }
 
 .assignment .form-area {
@@ -197,7 +206,7 @@ div.ui-datepicker {
 }
 
 .date-area {
-    margin-top: 30px;
+    margin-top: 2em;
     margin-left: 5px;
 }
 
@@ -267,7 +276,7 @@ span.angebot-name {
     padding: 5px;
     padding-left: 7px;
     font-size: 1em;
-    margin: 0px 5px 15px 0px;
+    margin: 0px 5px 1em 0px;
 }
 
 .form-area textarea {
@@ -283,7 +292,7 @@ div.disabled {
 .angebot-area ul.angebote {
     padding-left: 0px;
     list-style-type: none;
-    margin-bottom: 30px;
+    margin-bottom: 2em;
 }
 
 .angebot-area li {
@@ -312,8 +321,8 @@ ul.angebote li small {
 /** --- Upper Top Menu --- **/
 
 #navigation {
-    position: fixed;
-    margin-left: 30px;
+    /** position: fixed; */
+    margin-left: 2em;
     z-index: 2001;
     top: 0px;
 }
@@ -324,7 +333,7 @@ ul.angebote li small {
 
 #navigation .logout {
     display: none;
-    margin-left: 30px;
+    margin-left: 2em;
 }
 
 /** ---- Lower main menu ---- */
@@ -333,7 +342,7 @@ ul.angebote li small {
     position: relative;
     width: 90%;
     margin: auto;
-    padding: 15px;
+    padding: 1em;
     text-align: center;
 }
 
@@ -364,7 +373,7 @@ ul.angebote li small {
     padding-right: 10px;
     margin-right: 5px;
     margin-left: 5px;
-    margin-top: 15px;
+    margin-top: 1em;
 }
 
 #navigation ul li a,
@@ -382,10 +391,10 @@ ul.angebote li small {
 
 #bottom {
     position: relative;
-    top: 30px;
+    top: 2em;
     font-size: 1.2em;
     text-align: center;
-    padding: 15px;
+    padding: 1em;
     background-color: #fff;
 }
 

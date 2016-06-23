@@ -33,10 +33,17 @@
             </ul>
         </div>
 
-        <div class="task-info">
-            <h3>Informationen zu aktuellen Angeboten</h3>
+        <div class="headline search"><h2><label for="query">Volltextsuche in allen Angebotsinformationen</label></h2></div>
+
+        <div class="form-area angebot">
+            <form action="javascript:do_search_angebote()" id="angebot-form" accept-charset="UTF-8">
+                <input id="query" name="search" type="text" placeholder="" />
+                <input id="do-save" name="location" type="submit" class="btn" value="Ok" />
+                <input id="nearby" type="text" placeholder=".. in der Nähe von" />
+            </form>
         </div>
 
+        <div class="headline list"><h2>Auflistung <em>aktueller</em> Angebote</h2></div>
         <div class="list-area">
         </div>
 
@@ -49,7 +56,7 @@
                 </ul>
             </div>
             <br/>
-            <img src="/de.kiezatlas.website/images/kiezatlas-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
         </div>
 
     </body>

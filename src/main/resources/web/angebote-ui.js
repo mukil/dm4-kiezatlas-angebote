@@ -10,6 +10,25 @@ var URL_ANGEBOT_DETAIL      = "/angebote/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
+function do_search_angebote() {
+    var queryString = $('#query').val()
+    var locationString = $('#nearby').val()
+    var dateNow = new Date()
+    if (locationString === "" && queryString !== "") {
+        // console.log("No spatial parameter added to fulltext search.. \"", queryString, "\"", dateNow)
+    } else if (locationString !== "" && queryString !== "") {
+        // console.log("Fulltext search parameter", queryString, "with spatial parameter", locationString, dateNow)
+    } else if (locationString !== "" && queryString === "") {
+        // console.log("Just a spatial search for angebote", locationString, dateNow)
+    } else {
+        // console.log("No query terms entered into search form..")
+    }
+    $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationString + '&datetime=' + dateNow.getTime(), function(results) {
+        console.log("Fetched fulltext search results", results)
+        render_current_angebots_listing(results)
+    })
+}
+
 function do_save_angebot() {
     // Read in new values
     var name = $('#angebot-name').val().trim()
@@ -362,8 +381,8 @@ function render_assignments() {
     $('.right-side div.einrichtungen').empty()
     if (geo_assignments.length === 0) {
         $('.right-side .help').html('Hinweis:<br/>Diesen Angebotsinformationen sind terminlich noch keine Einrichtungen zugewiesen. Zur Zuweisung w&auml;hlen Sie '
-            + 'bitte eine Einrichtung (unter 1.) und dann (unter 2.) einen Angebotszeitraum.Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
-            + ' an dieser Stelle nachtr&auml;glich wieder bearbeiten.<br/><br/>Bitte nehmen Sie auch zur Kenntnis das bei einer terminlichen Zuweisung von '
+            + 'bitte <b>1.</b> eine <b>Einrichtung</b> und <b>2.</b> einen <b>Angebotszeitraum</b> (linke Seite). Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
+            + ' &auml;glich jederzeit wieder bearbeiten.<br/><br/>Bitte nehmen Sie zur Kenntnis das bei ihrer terminlichen Zuweisung von '
             + 'Angebotsinfos die Inhaber_innen des Einrichtungsdatensatzes automatisch &uuml;ber das neue Angebot benachrichtigt werden.')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
@@ -487,22 +506,30 @@ function render_angebotslisting_page() {
     load_username(render_user_menu)
 }
 
-function render_current_angebots_listing() {
-    console.log("Show Angebotinfo Listing", angebotsinfos)
+function render_current_angebots_listing(items) {
     var $list = $('.list-area')
-    if (angebotsinfos.length === 0) {
+    var items_to_render = angebotsinfos
+    if (items) {
+        items_to_render = items
+        $('.headline.list h2').hide()
+        $list.empty()
+    } else {
+        $('.headline.list h2').show()
+    }
+    console.log("Show Angebotinfo Listing", angebotsinfos)
+    if (items_to_render.length === 0) {
         $list.append("<p>F&uuml;r das heutige Datum liegen uns keine Informationen zu Angeboten in Einrichtungen vor.</p>")
         $list.append("<p>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "
             + "uns helfen neue oder aktuelle Angebote in die <a href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</p>")
         // ("+new Date().toLocaleDateString()+")
     }
-    for (var aidx in angebotsinfos) {
-        var element = angebotsinfos[aidx]
+    for (var aidx in items_to_render) {
+        var element = items_to_render[aidx]
         var name = element.name
         var contact = element.kontakt
-        var webpage = element.webpage
-        var descr = element.beschreibung
-        var tags = element.tags
+        // var webpage = element.webpage
+        // var descr = element.beschreibung
+        // var tags = element.tags
         var location_count = element.locations.length
         var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
         if (!first_assignment) first_assignment = element.locations[0]
