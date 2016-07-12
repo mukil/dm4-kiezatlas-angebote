@@ -49,7 +49,7 @@ function do_search_angebote() {
 
 function do_search_streetcoordinates() {
     var locationString = $('#nearby').val().trim()
-    $.getJSON('/website/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
+    $.getJSON('/geoobject/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
         console.log("Loaded Street Coordinates", results)
         street_coordinates = results
     })
@@ -314,7 +314,7 @@ function search_geo_objects_by_name(renderer) { // usually calls show_geo_object
         // ### hacking message display
         $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
         $.ajax({
-            type: "GET", url: "/website/search/by_name?query=" + queryString,
+            type: "GET", url: "/geoobject/search/by_name?query=" + queryString,
             success: function(obj) {
                 renderer(obj)
             },
@@ -505,7 +505,7 @@ function render_angebot_locations() {
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
-        var $element = $('<a class="read-more" href="/website/topic/'+obj.locationId // ### adjust url for deployment
+        var $element = $('<a class="read-more" href="/geoobject/'+obj.locationId // ### adjust url for deployment
                 +'"><div id="' + obj.id + '" class="concrete-assignment"><h3>'
                 + obj.name + '</h3><p>'+obj.address+'<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>')
         $einrichtungen.append($element)
@@ -705,7 +705,7 @@ function render_user_menu(state) {
     console.log("Rendering User Menu (Angebote UI)", state)
     if (state) {
         $('li.login').hide()
-        $('li.einrichtungen-new a').attr("href", "/website/topic/create")
+        $('li.einrichtungen-new a').attr("href", "/geoobject/create")
         $('li.angebote').attr('style', 'display: inline-block;')
         $('li.logout').attr('style', 'display: inline-block;')
     } else {
