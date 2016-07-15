@@ -24,22 +24,37 @@
     </head>
     <body class="kiezatlas angebotsinfos listing">
 
-        <div id="navigation">
-            <ul>
-                <li class="login"><a href="/sign-up/login">Login</a></li>
-                <li class="my-angebote"><a href="/angebote/my">Meine Angebote</a></li>
-                <li class="einrichtungen-btn"><a href="/">Einrichtungen</a></li>
-                <li class="einrichtungen-new"><a href="/sign-up/login">Neueintrag</a></li>
-                <li class="logout"><a href="/#logout/" onclick="javascript:logout()">Abmelden</a></li>
-            </ul>
+        <div class="ui container fluid">
+            <div class="ui menu">
+                <a href="/sign-up/login" class="item">Login</a>
+                <a class="item" href="/geoobject/create">Neue Einrichtung</a>
+                <a class="item" href="/">Gesamtstadtplan</a>
+                <a href="/angebote/my" class="item">Meine Angebote</a>
+                <a href="/angebote" class="active item">Angebote</a>
+                <a href="/sign-up/" class="item">Registrieren</a>
+                <a href="/sign-up/login" class="item">Logout</a>
+                <div class="right menu">
+                    <div class="ui simple dropdown item">
+                        <i class="setting icon"></i>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" href="/geoobject/confirmation/">Freischalten</a>
+                            <a href="/site/administration/" class="item">Listenansicht</a>
+                            <a href="/geoobject/site/" class="item">Site-Infos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="headline search"><h2><label for="query">Volltextsuche in allen Angebotsinformationen</label></h2></div>
 
         <div class="form-area angebot">
             <form action="javascript:do_search_angebote()" id="angebot-form" accept-charset="UTF-8">
-                <input id="query" name="search" type="text" placeholder="" />
-                <input id="do-save" name="location" type="submit" class="btn" value="Suchen" />
+                <div class="ui input focus" style="display: inline-block;">
+                    <input id="query" name="search" placeholder="Angebotsinfo..." type="text"/>
+                </div>
+                <input id="do-save" name="location" type="submit" value="Suchen"/>
                 <!--input id="nearby" type="text" placeholder=".. in der Nähe von" />
                 <input id="do-locating" onclick="javascript:do_search_streetcoordinates()" name="streets" type="button" class="btn" value="Suchen" />
                 <input id="do-locating" onclick="javascript:do_browser_location()" name="location" type="button" class="btn" value="Aktueller Standort" /-->

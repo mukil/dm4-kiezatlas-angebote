@@ -8,30 +8,44 @@
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
-        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script type="text/javascript" src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script type="text/javascript" src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script type="text/javascript" src="/de.kiezatlas.angebote/angebote-ui.js"></script>
 
         <script type="text/javascript">
 
             $(document).ready(function(e) {
+                console.warn("Reader Angebots Detail Page")
                 render_angebotsinfo_page()
+                console.warn("Called Render Angebotsinfos...")
             })
 
         </script>
     </head>
     <body class="kiezatlas angebotsinfos detail">
 
-        <div id="navigation">
-            <ul>
-                <li class="login"><a href="/sign-up/login">Login</a></li>
-                <li class="my-angebote"><a href="/angebote/my">Meine Angebote</a></li>
-                <li class="angebote-list"><a href="/angebote">Angebote</a></li>
-                <li class="einrichtungen-btn"><a href="/">Einrichtungen</a></li>
-                <li class="einrichtungen-new"><a href="/sign-up/login">Neue Einrichtung</a></li>
-                <li class="logout"><a href="/#logout/" onclick="javascript:logout()">Abmelden</a></li>
-            </ul>
+        <div class="ui container fluid">
+            <div class="ui menu">
+                <a href="/sign-up/login" class="item">Login</a>
+                <a class="item" href="/geoobject/create">Neue Einrichtung</a>
+                <a class="item" href="/">Gesamtstadtplan</a>
+                <a href="/angebote/my" class="item">Meine Angebote</a>
+                <a href="/angebote" class="active item">Angebote</a>
+                <a href="/sign-up/" class="item">Registrieren</a>
+                <a href="/sign-up/login" class="item">Logout</a>
+                <div class="right menu">
+                    <div class="ui simple dropdown item">
+                        <i class="setting icon"></i>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" href="/geoobject/confirmation/">Freischalten</a>
+                            <a href="/site/administration/" class="item">Listenansicht</a>
+                            <a href="/geoobject/site/" class="item">Site-Infos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="task-info">
