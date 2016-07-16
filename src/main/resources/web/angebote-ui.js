@@ -132,7 +132,7 @@ function do_save_angebot() {
         if (webpage === "http://" || webpage === "https://") {
             webpage = "" // Delete/Turn webpage entry an empty string
         } else {
-            throw new Error("Webpage URL is INVALID")
+            console.warn("Webpage URL is INVALID")
         }
     }
     // analyze tag input
@@ -677,8 +677,13 @@ function load_current_angebotsinfos() {
 
 function load_angebot_by_resource_path() {
     var angebot_id = parse_angebots_id()
-    selected_angebot = JSON.parse($.ajax('/angebote/' + angebot_id,
-        { async: false, dataType: 'json' }).responseText)
+    var angebotsinfoText = $.ajax('/angebote/' + angebot_id, { async: false, dataType: 'json' }).responseText
+    try {
+        selected_angebot = JSON.parse(angebotsinfoText)
+    } catch (e) {
+        console.warn("Could not load angebotsinfo details...", e, "using", angebotsinfoText)
+        selected_angebot = angebotsinfoText
+    }
 }
 
 // ---- Generic Methods used ACROSS all screens ---- //
@@ -687,13 +692,7 @@ function load_username(renderer) {
     $.ajax({
         type: "GET", url: "/accesscontrol/user",
         success: function(obj) {
-            if (obj) {
-                if (renderer) renderer(obj)
-            } else {
-                $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Angebote zu bearbeiten.')
-                $('.task-info').addClass('disabled')
-                $('div.angebot-area').addClass('disabled')
-            }
+            if (renderer) renderer(obj)
         },
         error: function(x, s, e) {
             console.warn("ERROR", "x: " + x + " s: " + s + " e: " + e)
@@ -703,15 +702,23 @@ function load_username(renderer) {
 
 function render_user_menu(state) {
     console.log("Rendering User Menu (Angebote UI)", state)
+    // ### Show Administration Menu for "Confirmation" WS Members
+    // $('.menu.administration').attr('style', 'display: inline-block;')
     if (state) {
-        $('li.login').hide()
-        $('li.einrichtungen-new a').attr("href", "/geoobject/create")
-        $('li.angebote').attr('style', 'display: inline-block;')
-        $('li.logout').attr('style', 'display: inline-block;')
+        $('.menu .login.item').hide()
+        $('.menu .register.item').hide()
+        $('.menu .angebote.item').attr('style', 'display: inline-block;')
+        $('.menu .create.item').attr('style', 'display: inline-block;')
+        $('.menu .logout.item').attr('style', 'display: inline-block;')
     } else {
-        $('li.login').show()
-        $('li.angebote').hide()
-        $('li.logout').hide()
+        $('.menu .login.item').show()
+        $('.menu .create.item').hide()
+        $('.menu.administration').hide()
+        $('.menu .angebote.item').hide()
+        $('.menu .logout.item').hide()
+        $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Angebote zu bearbeiten.')
+        $('.task-info').addClass('disabled')
+        $('div.angebot-area').addClass('disabled')
     }
 }
 

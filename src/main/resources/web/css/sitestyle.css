@@ -61,6 +61,7 @@ a {
 .angebotsinfos.listing .headline h2,
 .angebotsinfos.listing .headline h3 {
     margin: 1em auto 0em;
+    color: #002856;
 }
 
 .angebotsinfos.edit .task-info {
