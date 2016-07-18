@@ -305,7 +305,7 @@ function handle_name_search_input(e) {
     }
 }
 
-function search_geo_objects_by_name(renderer) { // usually calls show_geo_objects
+function search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
     var queryString = $("#name-search").val()
         if (queryString.indexOf("*") === -1) {
             queryString += "*"
@@ -333,7 +333,6 @@ function select_geo_object(e) {
 }
 
 function do_delete_assignment() {
-    console.log("Do Delete Assignment", selected_assignment)
     // Do Delete
     restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
     selected_assignment = undefined
@@ -384,11 +383,14 @@ function do_save_assignment(e) {
                 "role_type_uri":"dm4.core.child"
             }
         }
-        console.log("Trying to post assignment", assocModel)
         // do create
         restc.request("POST", "/angebote/assignment/" + fromDate + "/" + toDate, assocModel)
     }
     // refresh GUI
+    selected_assignment = undefined
+    selected_geo_object = undefined
+    // refresh GUI
+    clear_assignment_date_area()
     render_assignment_page()
 }
 
@@ -454,16 +456,31 @@ function render_angebot_header_info() {
        throw Error("No Angebot selected, loaded", selected_angebot)
     }
     // Angebotsinfo
-    var name = selected_angebot.name
+    // var name = selected_angebot.name
     var contact = selected_angebot.kontakt
     var webpage = selected_angebot.webpage
     var descr = selected_angebot.beschreibung
     var tags = selected_angebot.tags // ### render tags
+    console.log(tags, webpage)
     //
     $('.angebot-name').text(selected_angebot.name)
     $('#navigation li.edit a').attr("href", "/angebote/edit/" + selected_angebot.id)
-    $('.angebot-infos p.body').html(descr + '<br/><br/>Kontakt: ' + contact + '<br/>Webseite: <a href="'
-        + webpage + ">" + webpage + '</a>')
+    var html_string = '<span class="label">Angebotsbeschreibung</span><br/>' + descr + '<br/><span class="label">Kontakt:</span> ' + contact
+        if (webpage) html_string += '<br/><span class="label">Webseite:</span> <a href="' + webpage + '">' + webpage + '</a><br/>'
+        if (tags) {
+            if (tags.length > 0) {
+                html_string += '<br/><span class="label">Stichworte</span>&nbsp;<br/>'
+                var count = 1
+                for (var t in tags) {
+                    var tag = tags[t]
+                    html_string += '<em>' + tag.label + '</em>'
+                    if (tags.length > count) html_string += ", "
+                    count++
+                }
+            }
+        }
+        html_string += '<br/><a href="/angebote/edit/' + selected_angebot.id + '" class="read-more offer-edit">Bearbeiten</a>'
+    $('.angebot-infos p.body').html(html_string)
 }
 
 function render_assignments() {
@@ -517,8 +534,10 @@ function render_angebot_locations() {
 function select_assignment(event) {
     var element = event.target
     var id = (element.localName === "div") ? element.id : ""
-    if (element.localName === "h3" || element.localName === "p" || element.localName === "div") {
+    if (element.localName === "h3" || element.localName === "p") {
         id = element.parentNode.id
+    } else if (element.localName === "div") {
+        id = element.id
     } else if (element.localName === "i") {
         id = element.parentNode.parentNode.id
     }
@@ -569,13 +588,21 @@ function show_geo_object_search_results(results) {
     for (var i in results) {
         var obj = results[i]
         if (obj) {
-            var $element = $('<input type="radio" title="Klicken um diese Einrichtung auszuwählen ..." name="group" id="' + obj.id
-                    + '" value="geo-'+obj.id+'"><label title="Klicken um diese Einrichtung auszuwählen ..." for="'+obj.id+'">'
-                    + obj.name + ' (' + obj.bezirk_name + ')</label><br/>')
+            var $element = $('<input type="radio" title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id
+                    + '" value="geo-'+obj.id+'"><label title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
+                    + obj.name + ', <span class="label">' + obj.anschrift + '</span></label><br/>')
             $('.form-area div.einrichtungen').append($element)
         } else {
             console.warn("Error during rendering Geo Objects Assignment", obj)
         }
+    }
+    if (results.length === 0) {
+        $('.form-area div.einrichtungen').append('<div>Haben Sie die gew&uuml;nschte Einrichtung nicht finden k&ouml;nnen? Dann k&ouml;nnen '
+            + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
+            + 'einen Ort <a href="/geoobject/create">neu im Kiezatlas eintragen</a>. Alternativ k&ouml;nnen wir Ihnen noch anbieten den Namen des Einrichtungsdatensatz '
+        + 'erst noch einmal &uuml;ber die Umkreis- bzw. Volltextsuche des <a href="/" target="_blank">Gesamtstadtplan</a> abzufragen.</div>')
+    } else {
+        $('.form-area .search-info').text(results.length + ' Ergebnisse')
     }
     // equip all buttons with a click handler each (at once)
     $('input[name=group]').on('click', select_geo_object)

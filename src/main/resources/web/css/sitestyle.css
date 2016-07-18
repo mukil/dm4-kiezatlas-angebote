@@ -131,6 +131,19 @@ a {
     margin-top: 2em;
 }
 
+.right-side .offer-area {
+    background-color: #fff;
+    padding: 1em;
+}
+
+.mobile-logo {
+    display: none;
+}
+
+a.offer-edit {
+    float: right;
+}
+
 .right-side h3.linked a {
     font-size: .9em;
     float: right;
@@ -145,7 +158,7 @@ a {
     padding: 1em;
     border: 1px solid #002856;
     cursor: pointer;
-    margin: 5px;
+    margin-top: 1em;
 }
 
 .geo-objects-area .concrete-assignment {
@@ -198,13 +211,16 @@ div.ui-datepicker {
     overflow-y: auto;
 }
 
+.geo-objects-area .label {
+    color: #777;
+}
+
 .form-area .geo-objects-area {
     max-height: 220px;
 }
 
 .angebot-area {
     position: relative;
-    padding: 10px;
 }
 
 .form-area {
@@ -255,7 +271,7 @@ span.angebot-name {
 }
 
 .assignment .task-info {
-    margin-top: 60px;
+    /** margin-top: 60px; **/
     margin-left: 5px;
 }
 
@@ -267,6 +283,7 @@ span.angebot-name {
 .assignment .task-info h3,
 .assignment .date-area h3 {
     font-weight: normal;
+    margin-top: 0px;
 }
 
 .assignment .task-info .angebot-name,
@@ -435,6 +452,26 @@ ul.angebote li small {
     text-align: center;
     padding: 1em;
     background-color: #fff;
+}
+
+@media (max-width:767px) {
+    .top-menu .ui.menu .angebote.item,
+    .top-menu .ui.menu .create.item,
+    .top-menu .ui.menu .logout.item,
+    .top-menu .ui.menu .login.item {
+        display: none !important;
+    }
+    .top-menu.ui.container {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+    .mobile-logo {
+        display: inline-block;
+        padding: 5px;
+        padding-left: 1em;
+        padding-right: 1em;
+        border-left: 0px solid transparent;
+    }
 }
 
 

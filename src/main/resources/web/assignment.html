@@ -28,13 +28,13 @@
     </head>
     <body class="kiezatlas angebotsinfos assignment">
 
-        <div class="ui container fluid">
+        <div class="top-menu ui container fluid">
             <div class="ui menu">
                 <a href="/sign-up/login" class="login item">Login</a>
                 <a class="create item" style="display: none;" href="/geoobject/create">Neue Einrichtung</a>
                 <a class="item" href="/">Gesamtstadtplan</a>
-                <a href="/angebote/my" style="display: none;" class="angebote item">Meine Angebote</a>
-                <a href="/angebote" class="all-angebote active item">Angebote</a>
+                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Angebote</a>
+                <a href="/angebote" class="all-angebote item">Angebote</a>
                 <a href="/sign-up/" class="register item">Registrieren</a>
                 <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
                 <div class="right menu administration" style="display: none;">
@@ -54,13 +54,15 @@
         <div class="left-side">
             <div class="task-info">
                 <h3>1. Zuordnung der Angebotsinfo <span class="angebot-name">dieser Angebotsinfo</span> zu einer Einrichtung</h3>
-                <p>Bitte geben Sie im folgenden Eingabefeld den Namen einer Einrichtung im Kiezatlas ein <span class="help">?<span></p>
+                <p>Bitte geben Sie im folgenden Eingabefeld den Namen einer Einrichtung im Kiezatlas ein <!--span class="help">?<span--></p>
+                <!-- GeoObjectTopic.lookupInstitution(alias, as) -->
             </div>
 
             <div class="form-area assignment">
                 <form action="javascript:search_geo_objects_by_name(show_geo_object_search_results)" id="name-search-form" accept-charset="UTF-8">
-                    <input id="name-search" type="text" placeholder="Einrichtungsname"></input>
+                    <input id="name-search" class="ui input focus" type="text" placeholder="Einrichtungsname"></input>
                     <input id="do-search" type="submit" class="btn" value="Einrichtung suchen"></input>
+                    <span class="search-info"></span>
                 </form>
                 <div class="geo-objects-area">
                     <div class="einrichtungen"></div>
@@ -81,9 +83,11 @@
             </div>
         </div>
         <div class="right-side">
-            <h3 class="angebot-name">Die Angebotsinfo</h3>
-            <div class="angebot-infos">
-                <p class="body"></p>
+            <div class="offer-area">
+                <h3 class="angebot-name">Die Angebotsinfo</h3>
+                <div class="angebot-infos">
+                    <p class="body"></p>
+                </div>
             </div>
             <h3>wird in Kiezatlas-Einrichtungen &uuml;ber folgende Zeitr&auml;ume angezeigt</h3>
             <div class="einrichtungen"></div>

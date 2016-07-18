@@ -29,12 +29,12 @@ public interface AngebotService {
     /**
      * @return      Details for a specific "Angebotsinfo" topic Id.
      */
-    Angebotsinfos getAngebotsinfoViewModel(long angebotsInfoId);
+    Angebotsinfos getAngebotsinfo(long angebotsInfoId);
 
     /**
      * @return      Details for a specific "Angebotsinfo" topic ID relating to the requesting user.
      */
-    Angebotsinfos getUsersAngebotsinfoViewModel(long angebotsInfoId);
+    Angebotsinfos getUsersAngebotsinfos(long angebotsInfoId);
 
     /**
      * 
@@ -50,12 +50,23 @@ public interface AngebotService {
     /**
      * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
      */
+    List<RelatedTopic> getAngeboteTopicsByUri(String topicId);
+
+    /**
+     * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
+     */
     List<RelatedTopic> getAngeboteTopicsByGeoObject(Topic geoObject);
 
     /**
      * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
      */
-    List<AngebotsinfosAssigned> getAngebotsInfosAssigned(Topic geoObject);
+    List<AngebotsinfosAssigned> getAngebotsinfosAssigned(Topic geoObject);
+
+    /**
+     * @return      List of "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object")
+     * AND wich are CURERNT (Start < NOW && End > NOW).
+     */
+    List<AngebotsinfosAssigned> getCurrentAngebotsinfosAssigned(Topic geoObject);
 
     /**
      * @return      List of all "Geo Object" topics related to the given Angebot (typeUri="ka2.angebot").
@@ -73,7 +84,7 @@ public interface AngebotService {
      * @param now
      * @return
      */
-    List<Topic> getAngebotsinfoTopicsFilteredByTime(long now);
+    List<Topic> getAllAngebotsinfoTopicsFilteredByTime(long now);
 
     /**
      * Fetches all Angebotsinfos by searching four child types: Name, Beschreibung, Kontakt und Tags.

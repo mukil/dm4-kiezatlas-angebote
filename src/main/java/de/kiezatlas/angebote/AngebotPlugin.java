@@ -37,6 +37,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -100,18 +101,26 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return getStaticResource("web/detail.html");
     }
 
+    /**
+     * Custom authorization utility method checking membership of requesting user to "Angebote" workspace.
+     */
     @GET
     @Path("/membership")
     public String hasAngeboteWorkspaceMembership() {
         String username = aclService.getUsername();
         if (username != null && !username.equals("")) {
             Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
-            logger.info("Checking Membership for Username=" + username);
+            logger.info("Checking \"Angebote\" membership for Username=" + username);
             return "" + aclService.isMember(username, ws.getId());
         }
         return "false";
     }
 
+    /**
+     * Fetches all assigned angebotsinfo topics by geo object id.
+     * @param long  geoObjectId
+     * @return A list of ALL angebotsinfo topics assigned to geo object.
+     */
     @GET
     @Path("/list/{geoObjectId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -119,6 +128,23 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public List<RelatedTopic> getAngeboteTopics(@PathParam("geoObjectId") long geoObjectId) {
         Topic geoObject = dm4.getTopic(geoObjectId);
         return getAngeboteTopicsByGeoObject(geoObject);
+    }
+
+    /**
+     * Fetches all assigned angebotsinfo topics by topic uri (through passing the kiezatlas 1 topic id).
+     * @param String    topicId
+     * @return A list of ALL angebotsinfo topics assigned to geo object.
+     */
+    @GET
+    @Path("/list/uri/{topicId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Override
+    public List<RelatedTopic> getAngeboteTopicsByUri(@PathParam("topicId") String topicId) {
+        String topicUri = KA2_GEO_OBJECT_URI_PREFIX + topicId;
+        Topic geoObject = dm4.getTopicByUri(topicUri);
+        if (geoObject != null) return getAngeboteTopicsByGeoObject(geoObject);
+        logger.warning("Could not find ANY angebote topics related to topicUri=" + topicUri);
+        return new ArrayList<RelatedTopic>();
     }
 
     /**
@@ -186,7 +212,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/{topicId}")
     @Override
-    public Angebotsinfos getAngebotsinfoViewModel(@PathParam("topicId") long topicId) {
+    public Angebotsinfos getAngebotsinfo(@PathParam("topicId") long topicId) {
         Topic angebotsInfo = dm4.getTopic(topicId);
         return assembleAngebotsinfo(angebotsInfo);
     }
@@ -194,7 +220,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/user/{topicId}")
     @Override
-    public Angebotsinfos getUsersAngebotsinfoViewModel(@PathParam("topicId") long topicId) {
+    public Angebotsinfos getUsersAngebotsinfos(@PathParam("topicId") long topicId) {
         List<Topic> angebote = getUsersAngebotsinfoTopics();
         Iterator<Topic> iterator = angebote.iterator();
         while (iterator.hasNext()) {
@@ -256,7 +282,10 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public Association createAngebotsAssignment(AssociationModel assocModel,
                                                 @PathParam("from") long fromDate, @PathParam("to") long toDate) {
         Association result = null;
-        if (assocModel == null) throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
+        if (assocModel == null) {
+            throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
+        }
+        checkAuthorization(); // throws "401" if not
         long player1Id = assocModel.getRoleModel1().getPlayerId();
         long player2Id = assocModel.getRoleModel2().getPlayerId();
         if (!hasAssignmentAssociation(player1Id, player2Id)) {
@@ -272,7 +301,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             }
         } else {
             logger.warning("Skipping creating a Kiezatlas Angebots Assignment between from="
-                + player1Id + " to=" + player2Id);
+                + player1Id + " to=" + player2Id + " Angebotsinfos ALREADY ASSIGNED");
         }
         return result;
     }
@@ -284,6 +313,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Transactional
     public Association updateAngebotsAssignmentDate(@PathParam("id") long assocId, @PathParam("from") long fromDate,
                                                     @PathParam("to") long toDate) {
+        checkAuthorization(); // throws "401" if not
         Association result = dm4.getAssociation(assocId);
         try {
             if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
@@ -303,6 +333,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Path("/assignment/{id}/delete")
     @Transactional
     public void deleteAngebotsAssignment(@PathParam("id") long assocId) {
+        checkAuthorization(); // throws "401" if not
         Association result = dm4.getAssociation(assocId);
         try {
             if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
@@ -314,14 +345,12 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         }
     }
 
-
-
     // ----------------------------------------------------------------------------------- Angebots Search & Filter API
 
     @GET
     @Path("/filter/{now}")
     public List<Angebotsinfos> getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
-        List<Topic> offers = getAngebotsinfoTopicsFilteredByTime(timestamp);
+        List<Topic> offers = getAllAngebotsinfoTopicsFilteredByTime(timestamp);
         return prepareAngebotsInfoResults(offers);
     }
 
@@ -365,7 +394,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @Override
-    public List<Topic> getAngebotsinfoTopicsFilteredByTime(@PathParam("now") long nowDate) {
+    public List<Topic> getAllAngebotsinfoTopicsFilteredByTime(@PathParam("now") long nowDate) {
         List<Association> assocs = dm4.getAssociationsByType(ANGEBOT_ASSIGNMENT);
         List<Topic> result = new ArrayList<Topic>();
         Iterator<Association> iterator = assocs.iterator();
@@ -415,8 +444,28 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }**/
 
+    // ------------------------------------------------------------------------ Private Utility Methods
 
-    // --- Private Utility Methods
+    private void checkAuthorization() {
+        String username = aclService.getUsername();
+        if (!isAuthenticated() || !isAngeboteWorkspaceMember(username)) {
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
+    }
+
+    private boolean isAngeboteWorkspaceMember(String username) {
+        if (username != null && !username.equals("")) {
+            Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+            logger.info("Checking \"Angebote\" membership for Username=" + username);
+            return aclService.isMember(username, ws.getId());
+        }
+        return false;
+    }
+
+    private boolean isAuthenticated() {
+        String username = aclService.getUsername();
+        return (username != null && !username.equals(""));
+    }
 
     /** TODO: Add parameter allowing us to filer out all angbote currently not active. */
     private List<Angebotsinfos> prepareAngebotsInfoResults(List<Topic> angebotsinfos) {
@@ -539,7 +588,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         dm4.fireEvent(ANGEBOT_ASSIGNED_LISTENER, angebot, geoObject);
     }
 
-
     private boolean isAssignmentActiveInTime(Association assoc, long timestamp) {
         Long from = (Long) assoc.getProperty(PROP_ANGEBOT_START_TIME);
         Long to = (Long) assoc.getProperty(PROP_ANGEBOT_END_TIME);
@@ -552,7 +600,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         HashMap<Long, Topic> uniqueResults = new HashMap<Long, Topic>();
         List<Topic> namen = dm4.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
         List<Topic> beschreibungen = dm4.searchTopics(query, "ka2.angebot.beschreibung");
-        List<Topic> stichwoerter = dm4.searchTopics(query, "dm4.tags.tag"); // Todo: check index modes
+        List<Topic> stichwoerter = dm4.searchTopics(query, "dm4.tags.label"); // Todo: check index modes
         List<Topic> ansprechpartner = dm4.searchTopics(query, "ka2.angebot.kontakt"); // Todo: check index modes
         // List<Topic> sonstigesResults = dm4.searchTopics(query, "ka2.sonstiges");
         // List<Topic> traegerNameResults = dm4.searchTopics(query, "ka2.traeger.name");
@@ -560,7 +608,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             + ", " + ansprechpartner.size() + " results in four types for query=\"" + query + "\" in ANGEBOTSINFOS");
         // merge all four types in search results
         beschreibungen.addAll(namen);
-        beschreibungen.addAll(stichwoerter);
+        beschreibungen.addAll(getParentTagTopics(stichwoerter));
         beschreibungen.addAll(ansprechpartner);
         // make search results only contain unique geo object topics
         Iterator<Topic> iterator = beschreibungen.iterator();
@@ -625,7 +673,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
      * Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed.
      */
     public void postCreateTopic(Topic topic) {
-        if (topic.getTypeUri().equals(ANGEBOT)) {
+        if (topic.getTypeUri().equals(ANGEBOT) && isAuthenticated()) {
             Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
             dm4.createAssociation(mf.newAssociationModel("dm4.core.association",
                 mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
@@ -641,7 +689,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @Override
-    public List<AngebotsinfosAssigned> getAngebotsInfosAssigned(Topic geoObject) {
+    public List<AngebotsinfosAssigned> getAngebotsinfosAssigned(Topic geoObject) {
         List<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
         List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
         for (Topic angebotTopic : angeboteTopics) {
@@ -652,8 +700,33 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @Override
+    public List<AngebotsinfosAssigned> getCurrentAngebotsinfosAssigned(Topic geoObject) {
+        List<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
+        List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
+        for (Topic angebotTopic : angeboteTopics) {
+            Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
+            if (isAssignmentActiveInTime(assignment, new Date().getTime())) {
+                Topic geoObjectTopic = assignment.getTopic("dm4.core.child");
+                if (angebotTopic != null && geoObjectTopic != null) {
+                    angebotsinfos.add(assembleLocationAssignmentModel(geoObject, angebotTopic, assignment));
+                }
+            }
+
+        }
+        return angebotsinfos;
+    }
+
+    @Override
     public List<RelatedTopic> getGeoObjectTopicsByAngebot(Topic angebot) {
         return angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, "dm4.core.parent", "dm4.core.child", GEO_OBJECT);
+    }
+
+    private List<Topic> getParentTagTopics(List<Topic> labels) {
+        List<Topic> results = new ArrayList<Topic>();
+        for (Topic tagLabel : labels) {
+            results.add(tagLabel.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", "dm4.tags.tag"));
+        }
+        return results;
     }
 
     private Topic getParentAngebotTopic(Topic entry) {
