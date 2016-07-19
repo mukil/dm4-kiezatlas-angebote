@@ -254,7 +254,7 @@ function load_users_angebote() {
         // console.log("Angebot Item", item, created, modified)
         $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/angebote/edit/'
             + item.id + '">Bearbeiten</a><a href="/angebote/zuordnen/'
-            + item.id + '">Zuordnungen anpassen</a><br/><small>Erstellt am '
+            + item.id + '">Termine anpassen</a><br/><small>Erstellt am '
             + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
     }
 }
@@ -277,7 +277,7 @@ function render_assignment_page() {
     load_angebot_by_resource_path()
     init_datepicker()
     render_angebot_header_info()
-    load_user_assignments(render_assignments)
+    load_assignments(render_assignments)
 }
 
 var fromDate,
@@ -369,7 +369,7 @@ function do_save_assignment(e) {
     }
     if (toInput.length > 0) {
         // toDate = $.datepicker.parseDate("dd. MM yy", toInput)
-        toDate = new Date(toInput).getTime() // ### we want to shift this value always about 24hours
+        toDate = (new Date(toInput).getTime() + 86400000) // we want to shift this value always about 24hours
     }
     console.log("Datepicker delivered us from, to", fromInput, fromDate, toInput, toDate)
     // Chromium has no problem to deliver us timestamps from a german locale
@@ -425,9 +425,9 @@ function load_assignments(renderer) {
     })
 }
 
-function load_user_assignments(renderer) {
+function load_assignments(renderer) {
     $.ajax({
-        type: "GET", url: "/angebote/list/assignments/user/" + selected_angebot.id,
+        type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id,
         success: function(response) {
             if (response) {
                 geo_assignments = response
@@ -455,7 +455,7 @@ function render_angebot_form() {
     var contact = selected_angebot.kontakt
     var webpage = selected_angebot.webpage
     var descr = selected_angebot.beschreibung
-    var tags = selected_angebot.tags
+    // tagging.init() does this var tags = selected_angebot.tags
     //
     $('#angebot-name').val(name)
     $('#angebot-kontakt').val(contact)
@@ -491,7 +491,7 @@ function render_angebot_header_info() {
                 }
             }
         }
-        html_string += '<br/><a href="/angebote/edit/' + selected_angebot.id + '" class="read-more offer-edit">Bearbeiten</a>'
+        html_string += '<br/><a href="/angebote/edit/' + selected_angebot.id + '" class="read-more offer-edit">Angebot bearbeiten</a>'
     $('.angebot-infos p.body').html(html_string)
 }
 
@@ -820,15 +820,9 @@ function has_angebote_membership(callback) {
     // var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
     $.getJSON('/angebote/membership/', function(response) {
         if (!response) {
-            $('.task-info h3').html('Entschuldigung! '
-                + 'Sie haben noch keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.<br/>'
-                + 'Bitte kontaktieren Sie uns unter <a href="mailto:support@kiezatlas.de">support@kiezatlas.de</a> und '
-                + 'unter Angabe ihres Benutzernamens mit Bezug auf diese Fehlermeldung.<br/>'
-                + '<br/>Entschuldigung!')
-            $('#do-add').attr("disabled", true)
-            throw new Error("Unauthorized")
+            if (callback) callback(false)
         } else {
-            callback()
+            if (callback) callback(true)
         }
     })
 }

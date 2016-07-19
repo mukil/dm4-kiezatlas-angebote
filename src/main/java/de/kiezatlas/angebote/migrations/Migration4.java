@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * Creates a new "angebote-ui" user and make it member of the "Angebote" workspace.
  *
  */
-public class Migration5 extends Migration {
+public class Migration4 extends Migration {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

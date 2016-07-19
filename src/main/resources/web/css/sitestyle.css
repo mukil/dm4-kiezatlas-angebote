@@ -311,7 +311,8 @@ span.angebot-name {
 .form-area #angebot-tags,
 .form-area #angebot-kontakt,
 .form-area #angebot-webpage {
-    width: 420px;
+    min-width: 240px;
+    max-width: 420px;
     margin-top: 5px;
 }
 

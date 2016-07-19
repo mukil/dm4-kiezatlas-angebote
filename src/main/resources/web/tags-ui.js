@@ -14,13 +14,16 @@ var tagging = new function() {
     var DEL_PREFIX = "del_id:"  // duplicate of webclient.js // dm4c
 
     this.fetchAllTagTopics = function() {
-        return restc.get_topics("dm4.tags.tag", false, false, 0).items
+        var tags = restc.get_topics("dm4.tags.tag", false, false)
+        // console.log("Load all available topics", tags)
+        return tags
     }
 
     /** Make sure, selected_angebot is initialized */
     this.init = function() {
         // load all tags (user has read access too)
         allReadableTags = _.fetchAllTagTopics()
+        console.log("Initialized all available Tags", allReadableTags)
         // check and render existing tags
         if (!selected_angebot) throw new Error("Angebot is not yet initialized, can not introduce tags!")
         if (!selected_angebot.hasOwnProperty("tags")) {

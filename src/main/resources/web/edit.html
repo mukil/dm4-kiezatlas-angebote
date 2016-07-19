@@ -22,17 +22,23 @@
 
             $(document).ready(function(e) {
                 load_username(render_user_menu)
-                has_angebote_membership(function() {
-                    // parse topic id from path
-                    var id = parse_angebots_id()
-                    if (id != 0) {
-                        // Update Angebotsinfos
-                        load_angebot_by_resource_path()
-                        tagging.init()
-                        render_angebot_form()
+                has_angebote_membership(function(state) {
+                    if (state) {
+                        // parse topic id from path
+                        var id = parse_angebots_id()
+                        if (id != 0) {
+                            // Update Angebotsinfos
+                            load_angebot_by_resource_path()
+                            tagging.init()
+                            render_angebot_form()
+                        }
+                        $('#angebot-name').focus()
                     } else {
-                        // Create Angebotsinfos
-                        // init_datepicker()
+                        $('.form-area.angebot').remove()
+                        $('.task-info h3').html('Entschuldigung! '
+                            + 'Sie haben noch keine Berechtigung eigene Angebotsinfos im Kiezatlas zu verwalten.<br/>'
+                            + 'Bitte kontaktieren Sie uns unter <a href="mailto:support@kiezatlas.de">support@kiezatlas.de</a> und '
+                            + 'unter Angabe ihres Benutzernamens mit Bezug auf diese Fehlermeldung.<br/>')
                     }
                 })
                 // ckEditor
@@ -58,8 +64,8 @@
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <a class="item" href="/geoobject/confirmation/">Freischalten</a>
-                            <a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/geoobject/site/" class="item">Site-Infos</a>
+                            <!--a href="/site/administration/" class="item">Listenansicht</a>
+                            <a href="/geoobject/site/" class="item">Site-Infos</a-->
                         </div>
                     </div>
                 </div>
