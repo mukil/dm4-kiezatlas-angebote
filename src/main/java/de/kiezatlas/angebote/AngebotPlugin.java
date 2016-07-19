@@ -88,6 +88,21 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @GET
+    @Path("/revise/{secret}/{offerId}")
+    @Produces(MediaType.TEXT_HTML)
+    public InputStream getAngebotRevisionView(@PathParam("offerId") long assignmentId, @PathParam("secret") String key) {
+        Association assoc = dm4.getAssociation(assignmentId);
+        if (assoc.getTypeUri().equals(ASSIGNMENT_EDGE)) {
+            logger.info("Loaded Assignment Edge, checking Revision Key");
+            String revisionKey = (String) assoc.getProperty("revision_key");
+            if (!revisionKey.equals(key)) {
+                throw new WebApplicationException(new RuntimeException("Sorry, you are not authorized to revise this offer"), Response.Status.UNAUTHORIZED);
+            }
+        }
+        return getStaticResource("web/revise.html");
+    }
+
+    @GET
     @Path("/edit/{topicId}")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotEditView(@PathParam("topicId") String id) {
@@ -175,11 +190,17 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     static DeepaMehtaEvent ANGEBOT_ASSIGNED_LISTENER = new DeepaMehtaEvent(AngebotAssignedListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((AngebotAssignedListener) listener).angebotsInfoAssigned((Topic) params[0], (Topic) params[1]);
+            ((AngebotAssignedListener) listener).angebotsInfoAssigned((Topic) params[0], (Topic) params[1], (Association) params[2]);
         }
     };
 
     // -------------------------------------------------------------------------------- Username Related Angebotsinfos
+
+    @Override
+    public RelatedTopic getAngebotsinfoCreator(Topic angebot) {
+        // ### use ka2.angebot.creator
+        return angebot.getRelatedTopic("dm4.core.association", null, null, "dm4.accesscontrol.username");
+    }
 
     @GET
     @Path("/my")
@@ -198,12 +219,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         String usernameAlias = aclService.getUsername();
         while (iterator.hasNext()) {
             Topic angebot = iterator.next();
-            RelatedTopic usernameTopic = angebot.getRelatedTopic("dm4.core.association", null, null,
-                    "dm4.accesscontrol.username");
+            RelatedTopic usernameTopic = getAngebotsinfoCreator(angebot);
             if (usernameTopic != null && (usernameTopic.getSimpleValue().toString().equals(usernameAlias))) {
                 my.add(angebot);
             } else { // ### To be removed after next clean install / DB reset
-                logger.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
+                logger.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen validen Username assoziiert (username=" + usernameTopic + ")");
             }
         }
         return my;
@@ -236,12 +256,14 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public List<AngebotsinfosAssigned> getAngebotsinfoAssignments(@PathParam("angebotId") long topicId) {
         List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
         Topic angebot = dm4.getTopic(topicId);
-        List<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
-        Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
-        while (geoIterator.hasNext()) {
-            RelatedTopic einrichtung = geoIterator.next();
-            Association assignment = getAssignmentAssociation(angebot, einrichtung);
-            results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
+        if (angebot.getTypeUri().equals(ANGEBOT)) {
+            List<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
+            Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
+            while (geoIterator.hasNext()) {
+                RelatedTopic einrichtung = geoIterator.next();
+                Association assignment = getAssignmentAssociation(angebot, einrichtung);
+                results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
+            }
         }
         return results;
     }
@@ -270,7 +292,30 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }
 
-
+    /** Deletes an association of type "ka2.angebot.assignment" with two properties (timestamp "from" and "to"). */
+    @GET
+    @Path("/assignment/{id}")
+    @Transactional
+    public AngebotsinfosAssigned getAngebotsAssignment(@PathParam("id") long assocId) {
+        Association result = dm4.getAssociation(assocId);
+        AngebotsinfosAssigned model = null;
+        try {
+            if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
+                logger.info("Succesfully Fetched Angebots Assignment Date, Association: " + assocId);
+                Topic player1 = dm4.getTopic(result.getPlayer1().getId());
+                Topic player2 = dm4.getTopic(result.getPlayer2().getId());
+                if (player1.getTypeUri().equals(ANGEBOT) && player2.getTypeUri().equals(GEO_OBJECT)) {
+                    model = assembleLocationAssignmentModel(player2, player1, result);
+                } else if (player2.getTypeUri().equals(ANGEBOT) && player1.getTypeUri().equals(GEO_OBJECT)) {
+                    model = assembleLocationAssignmentModel(player1, player2, result);
+                }
+                return model;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return model;
+    }
 
     // ------------------------------------------------------------------------------------- CRUD Angebots-Assignments
 
@@ -412,6 +457,16 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return result;
     }
 
+    @Override
+    public long getAssignmentStartTime(Association assignmentEdge) {
+        return (Long) assignmentEdge.getProperty(AngebotPlugin.PROP_ANGEBOT_START_TIME);
+    }
+
+    @Override
+    public long getAssignmentEndTime(Association assignmentEdge) {
+        return (Long) assignmentEdge.getProperty(AngebotPlugin.PROP_ANGEBOT_END_TIME);
+    }
+
     /** TODO: Revise according to our new DTOs.
     @GET
     @Path("/locations")
@@ -523,8 +578,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
         assignedAngebot.setAngebotsId(angebotTopic.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
-        assignedAngebot.setStartDate((Long) assignment.getProperty(AngebotPlugin.PROP_ANGEBOT_START_TIME));
-        assignedAngebot.setEndDate((Long) assignment.getProperty(AngebotPlugin.PROP_ANGEBOT_END_TIME));
+        // assignedAngebot.setAngebotsinfoCreator(getAngebotsinfoCreator(angebotTopic).getSimpleValue().toString());
+        assignedAngebot.setStartDate(getAssignmentStartTime(assignment));
+        assignedAngebot.setEndDate(getAssignmentEndTime(assignment));
         // Stuff that could be Null
         // ### Angebotsinfos Standard Contacts and Tags Missing
         String standardKontakt = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
@@ -582,10 +638,10 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     /** Move this to website service */
-    private void notifyAboutAngebotsAssignment(Association result) {
-        Topic geoObject = getAssignedGeoObjectTopic(result).loadChildTopics();
-        Topic angebot = getAssignedAngebotsinfoTopic(result).loadChildTopics();
-        dm4.fireEvent(ANGEBOT_ASSIGNED_LISTENER, angebot, geoObject);
+    private void notifyAboutAngebotsAssignment(Association assignmentEdge) {
+        Topic geoObject = getAssignedGeoObjectTopic(assignmentEdge).loadChildTopics();
+        Topic angebot = getAssignedAngebotsinfoTopic(assignmentEdge).loadChildTopics();
+        dm4.fireEvent(ANGEBOT_ASSIGNED_LISTENER, angebot, geoObject, assignmentEdge);
     }
 
     private boolean isAssignmentActiveInTime(Association assoc, long timestamp) {
@@ -675,7 +731,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public void postCreateTopic(Topic topic) {
         if (topic.getTypeUri().equals(ANGEBOT) && isAuthenticated()) {
             Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
-            dm4.createAssociation(mf.newAssociationModel("dm4.core.association",
+            dm4.createAssociation(mf.newAssociationModel("dm4.core.association", // ### ka2.angebot.creator
                 mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
                 mf.newTopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
         }

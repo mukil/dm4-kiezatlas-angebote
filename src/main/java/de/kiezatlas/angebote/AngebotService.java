@@ -1,5 +1,6 @@
 package de.kiezatlas.angebote;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.kiezatlas.angebote.model.Angebotsinfos;
@@ -35,6 +36,11 @@ public interface AngebotService {
      * @return      Details for a specific "Angebotsinfo" topic ID relating to the requesting user.
      */
     Angebotsinfos getUsersAngebotsinfos(long angebotsInfoId);
+
+    /**
+     * @return      The username of the creator of the angebotsinfo topic.
+     */
+    RelatedTopic getAngebotsinfoCreator(Topic angebot);
 
     /**
      * 
@@ -78,6 +84,10 @@ public interface AngebotService {
      * (given a JSON Array with Topic IDs).
      */
     List<RelatedTopic> getAssignmentsByGeoObjectIds(String payloadListing);
+
+    long getAssignmentStartTime(Association assignmentEdge);
+
+    long getAssignmentEndTime(Association assignmentEdge);
 
     /**
      * Fetches all Angebotsinfos with a _current_ (now gt from && now st to) Geo Object Assignment.

@@ -134,6 +134,14 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         }
     }
 
+    public void setAngebotsinfoCreator(String username) {
+        try {
+            json.put("creator", username);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setStartDate(long fromDate) {
         try {
             json.put("anfang_timestamp", fromDate);
@@ -151,6 +159,8 @@ public class AngebotsinfosAssigned implements JSONEnabled {
             throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
     }
+
+    /** setAssignedUsername, setLastModified **/
 
     /** ------------------- Public Thymeleaf Getter -------------------- **/
 
@@ -195,6 +205,15 @@ public class AngebotsinfosAssigned implements JSONEnabled {
             return json.getString("longitude");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Longitude", ex);
+            return "";
+        }
+    }
+
+    public String getAngebotsinfoCreator() {
+        try {
+            return json.getString("creator");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Angebotsinfo Creator", ex);
             return "";
         }
     }
