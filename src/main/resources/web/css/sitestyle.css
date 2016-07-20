@@ -134,6 +134,7 @@ a {
 .right-side .offer-area {
     background-color: #fff;
     padding: 1em;
+    border: 1px solid #aaa;
 }
 
 .mobile-logo {
@@ -153,12 +154,16 @@ a.offer-edit {
 
 /** Geo Objects in Angebots Listing */
 
+.angebotsinfos .angebote li,
 .concrete-assignment {
     background: #fff;
     padding: 1em;
     border: 1px solid #002856;
-    cursor: pointer;
     margin-top: 1em;
+}
+
+.concrete-assignment {
+    cursor: pointer;
 }
 
 .geo-objects-area .concrete-assignment {
@@ -320,6 +325,13 @@ span.angebot-name {
     width: 300px;
 }
 
+.kiezatlas.revise .commands button {
+    margin: 0px;
+    margin-right: 1em;
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
 .date-area textarea,
 .form-area textarea {
     min-width: 420px;
@@ -350,6 +362,7 @@ div.disabled {
     padding-left: 0px;
     list-style-type: none;
     margin-bottom: 2em;
+    margin-right: 2em;
 }
 
 .angebot-area li {
@@ -361,14 +374,22 @@ div.disabled {
 
 .angebot-area li a {
     margin: 0px 0px 0px 10px;
-    text-decoration: none;
     font-size: 0.9em;
+    background-color: #efefef;
+    padding: .4em;
+    padding-left: .5em;
+    padding-right: .5em;
+    float: right;
+    border: 1px solid transparent;
+    text-decoration: underline;
+    text-decoration-color: #8f1414;
 }
 
 .right-side h3.linked a:hover,
 .angebot-area li a:hover {
-    text-decoration: underline;
-    text-decoration-color: #8f1414;
+    text-decoration: none;
+    background-color: #fff;
+    border: 1px solid rgba(0, 40, 86, 0.43);
 }
 
 ul.angebote li small {
@@ -456,11 +477,16 @@ ul.angebote li small {
 }
 
 @media (max-width:767px) {
+    .top-menu .ui.menu .gesamt.item,
+    .top-menu .ui.menu .all-angebote.item,
     .top-menu .ui.menu .angebote.item,
     .top-menu .ui.menu .create.item,
     .top-menu .ui.menu .logout.item,
     .top-menu .ui.menu .login.item {
         display: none !important;
+    }
+    .top-menu .ui.menu a img {
+        border: none;
     }
     .top-menu.ui.container {
         margin-left: 0px !important;

@@ -253,7 +253,7 @@ function load_users_angebote() {
         var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
         // console.log("Angebot Item", item, created, modified)
         $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/angebote/edit/'
-            + item.id + '">Bearbeiten</a><a href="/angebote/zuordnen/'
+            + item.id + '">Infos bearbeiten</a><a href="/angebote/zuordnen/'
             + item.id + '">Termine anpassen</a><br/><small>Erstellt am '
             + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
     }
@@ -627,7 +627,6 @@ var selected_assignment = undefined
 function render_angebotsrevise_page() {
     var assocId = parse_angebots_id()
     selected_assignment = JSON.parse($.ajax('/angebote/assignment/' + assocId, { async: false, dataType: 'json' }).responseText)
-    console.log("Assignment to Revise", assocId, selected_assignment)
     $('.einrichtungs-name').text(selected_assignment.name)
     $('.angebots-name').text(selected_assignment.angebotsName)
     $('.von').text(selected_assignment.anfang)
@@ -651,7 +650,9 @@ function do_revise_assignment() {
     }
 
     function do_revise_call() {
-        restc.request('POST', '/angebote/assignment/' + selected_assignment.id + "/delete")
+        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment.id + "/delete")
+        console.log("Do Revise Call", result)
+        $('.label.hint').text("OK, die Zuweisung dieses Angebots wurde erfolgreich aufgehoben.")
     }
 
     function do_privileged_revise_call() {
@@ -659,12 +660,12 @@ function do_revise_assignment() {
         username = restc.get_username()
         if (username) {
             do_revise_call()
+            restc.logout()
+            window.document.location.assign("/")
+            go_to_frontpage()
         } else {
-            alert("Entschuldigung, bei der Aufhebung der Zuweisung ist ein Fehler aufgetreten.")
+            $('.label.hint').text("Entschuldigung, bei der Aufhebung der Zuweisung ist ein Fehler aufgetreten.")
         }
-        restc.logout()
-        alert("Zuweisung erfolgreich aufgehoben. Sie werden jetzt automatisch auf den Gesamtstadtplan weitergeleitet")
-        window.document.location.assign("/")
     }
 }
 

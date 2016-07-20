@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Kiezatlas - Angebote</name>
     <groupId>de.kiezatlas</groupId>
     <artifactId>dm48-kiezatlas-angebote</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -16,9 +16,10 @@
         <version>4.8</version>
     </parent>
 
-    <!--properties>
+    <properties>
         <dm4.deploy.dir>/home/malted/source/mikro/deepamehta/bundle-deploy</dm4.deploy.dir>
-    </properties-->
+	<!--dm4.deploy.dir>/home/malted/Downloads/deepamehta-4.8.2/bundle-deploy</dm4.deploy.dir-->
+    </properties>
 
     <dependencies>
         <dependency>
