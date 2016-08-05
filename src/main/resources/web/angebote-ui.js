@@ -670,8 +670,14 @@ function do_revise_assignment() {
 }
 
 function render_angebotsinfo_page() {
-    load_angebot_by_resource_path()
-    render_angebot_detail_area()
+    load_angebot_by_resource_path(function(status, selected_angebot) {
+        if (status === "ok") {
+            render_angebot_detail_area()
+        } else if( status === "error") {
+            alert("Error Rendering Selected Angebotsinfo", selected_angebot)
+            // render_angebot_detail_area()
+        }
+    })
     load_assignments(render_angebot_locations)
     load_username(render_user_menu)
 }
@@ -739,10 +745,10 @@ function render_angebot_detail_area() {
    console.log("Show Angebotinfo Details Page", selected_angebot)
    if (!selected_angebot) throw new Error("Angebotsinfo not found")
     // assemble Angebotsinfo
-    var name = selected_angebot.name
-    var contact = selected_angebot.kontakt
-    var webpage = selected_angebot.webpage
-    var descr = selected_angebot.beschreibung
+    var name = (selected_angebot.name) ? selected_angebot.name : "Name des Angebots"
+    var contact = (selected_angebot.kontakt) ? selected_angebot.kontakt : "Kontakt"
+    var webpage = (selected_angebot.webpage) ? selected_angebot.webpage : "Webpage"
+    var descr = (selected_angebot.beschreibung) ? selected_angebot.beschreibung : "Beschreibung"
     var tags = "" // ### render tags
     for (var t in selected_angebot.tags) {
         tags += selected_angebot.tags[t].label
@@ -761,14 +767,16 @@ function load_current_angebotsinfos() {
         { async: false, dataType: 'json' }).responseText)
 }
 
-function load_angebot_by_resource_path() {
+function load_angebot_by_resource_path(callback) {
     var angebot_id = parse_angebots_id()
     var angebotsinfoText = $.ajax('/angebote/' + angebot_id, { async: false, dataType: 'json' }).responseText
     try {
         selected_angebot = JSON.parse(angebotsinfoText)
+        if (callback) callback("ok", selected_angebot)
     } catch (e) {
         console.warn("Could not load angebotsinfo details...", e, "using", angebotsinfoText)
         selected_angebot = angebotsinfoText
+        if (callback) callback("error", selected_angebot)
     }
 }
 

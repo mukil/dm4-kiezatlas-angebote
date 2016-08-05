@@ -212,6 +212,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/my")
     @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public List<Topic> getUsersAngebotsinfoTopics() {
         List<Topic> all = dm4.getTopicsByType(ANGEBOT);
         ArrayList<Topic> my = new ArrayList<Topic>();
@@ -257,7 +258,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
         Topic angebot = dm4.getTopic(topicId);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
-            List<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
+            List<RelatedTopic> geoObjects = getAssginedGeoObjectTopics(angebot);
             Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
             while (geoIterator.hasNext()) {
                 RelatedTopic einrichtung = geoIterator.next();
@@ -268,6 +269,12 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }
 
+    /**
+     * Why respective where do we need this method?
+     * Switched rendering of assignments in angebote-ui to getAngebotsinfoAssignments()
+     * @param topicId
+     * @return A list of assigned angebotinsofs for the logged in user.
+     */
     @GET
     @Path("/list/assignments/user/{angebotId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -278,7 +285,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         while (iterator.hasNext()) {
             Topic angebot = iterator.next();
             if (angebot.getId() == topicId) {
-                List<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
+                List<RelatedTopic> geoObjects = getAssginedGeoObjectTopics(angebot);
                 Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
                 while (geoIterator.hasNext()) {
                     RelatedTopic einrichtung = geoIterator.next();
@@ -286,7 +293,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                     results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
                 }
             } else {
-                logger.info("Angebot \"" + angebot.getSimpleValue() + "\" is not assigned to Geo Object ");
+                logger.info("Angebot \"" + angebot.getSimpleValue() + "\" is not yet assigned to Geo Object ");
             }
         }
         return results;
@@ -400,7 +407,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     /**
-     * Builds up a list of search results (Geo Objects to be displayed in a map) by text query.
+     * Builds up a list of search results (Geo Objects to be displayed in a map) by text query also if these
+     * are not currently active in time.
      * @param query
      * @param location
      */
@@ -531,7 +539,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             // 2) check if angebots info isnt already in our resultset
             if (!results.contains(result)) {
                 // 3) assemble locations and start and end time
-                List<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
+                List<RelatedTopic> geoObjects = getAssginedGeoObjectTopics(angebot);
                 JSONArray locations = new JSONArray();
                 for (RelatedTopic geoObject : geoObjects) {
                     Association assignment = getAssignmentAssociation(angebot, geoObject);
@@ -773,7 +781,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @Override
-    public List<RelatedTopic> getGeoObjectTopicsByAngebot(Topic angebot) {
+    public List<RelatedTopic> getAssginedGeoObjectTopics(Topic angebot) {
         return angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, "dm4.core.parent", "dm4.core.child", GEO_OBJECT);
     }
 

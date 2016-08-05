@@ -77,7 +77,7 @@ public interface AngebotService {
     /**
      * @return      List of all "Geo Object" topics related to the given Angebot (typeUri="ka2.angebot").
      */
-    List<RelatedTopic> getGeoObjectTopicsByAngebot(Topic angebot);
+    List<RelatedTopic> getAssginedGeoObjectTopics(Topic angebot);
 
     /**
      * @return      List of all "Angebotsinfos" related to all the given Geo Objects
