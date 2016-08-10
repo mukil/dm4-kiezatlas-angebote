@@ -34,6 +34,11 @@ var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
 function do_search_angebote() {
     var queryString = $('#query').val()
+    if (queryString.length === 0) {
+        $('#query').attr("placeholder", "Bitte Suchbegriff eingeben")
+        return
+    }
+    queryString = queryString.replace(/,/g, "") // clean up potential tag delimiter
     var locationString = $('#nearby').val()
     var dateNow = new Date()
     if (locationString === "" && queryString !== "") {
@@ -54,8 +59,10 @@ function do_search_angebote() {
     render_query_parameter()
     $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationString + '&radius='
             + location_radius + '&datetime=' + dateNow.getTime(), function(results) {
-        console.log("Fetched fulltext search results", results)
-        render_current_angebots_listing(results)
+        render_angebote_resultset(results)
+        if (results.length > 0) {
+            $('#query').val("")
+        }
     })
 }
 
@@ -128,7 +135,7 @@ function remove_text_parameter() {
     $('#query').val("")
     render_query_parameter()
     $('.filter-area').hide("fast")
-    render_current_angebots_listing()
+    render_angebote_resultset()
 }
 
 function do_save_angebot() {
@@ -684,11 +691,11 @@ function render_angebotsinfo_page() {
 
 function render_angebotslisting_page() {
     load_current_angebotsinfos()
-    render_current_angebots_listing()
+    render_angebote_resultset()
     load_username(render_user_menu)
 }
 
-function render_current_angebots_listing(items) {
+function render_angebote_resultset(items) {
     var $list = $('.list-area')
     var items_to_render = angebotsinfos
     if (items) {
@@ -699,9 +706,8 @@ function render_current_angebots_listing(items) {
         $('.headline.list h2').show()
     }
     $list.empty()
-    console.log("Show Angebotinfo Listing", items_to_render)
     if (items_to_render.length === 0) {
-        $list.append("<p>F&uuml;r das heutige Datum liegen uns keine Informationen zu Angeboten in Einrichtungen vor.</p>")
+        $list.append("<p>F&uuml;r das heutige Datum und dieser Suchanfrage liegen uns keine Informationen vor.</p>")
         $list.append("<p>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "
             + "uns helfen neue oder aktuelle Angebote in die <a href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</p>")
         // ("+new Date().toLocaleDateString()+")

@@ -1,13 +1,19 @@
 
-/** -- New Semantic UI Styles -- **/
-@import url('/de.kiezatlas.website/css/semantic-ui/components/container.min.css');
-@import url('/de.kiezatlas.website/css/semantic-ui/components/dropdown.min.css');
-@import url('/de.kiezatlas.website/css/semantic-ui/components/header.min.css');
-@import url('/de.kiezatlas.website/css/semantic-ui/components/menu.min.css');
-@import url('/de.kiezatlas.website/css/semantic-ui/components/item.min.css');
-@import url('/de.kiezatlas.website/css/semantic-ui/components/input.min.css');
-@import url('/de.kiezatlas.website/css/semantic-ui/components/icon.min.css');
+/** -- New Semantic UI Styles - 2.2 Release -- **/
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/container.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/dropdown.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/header.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/menu.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/item.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/input.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/icon.min.css');
 
+/** jQuery UI Autcomplete Overrides */
+.angebotsinfos.search .ui-state-focus {
+    border: 1px solid #eaca8f;
+    background: #FC3;
+    color: #002856;
+}
 
 @-o-viewport {
     width: device-width;
@@ -43,9 +49,28 @@ a {
     text-decoration-color: #8f1414;
 }
 
+.edit .task-info {
+    margin-top: 3em;
+    margin-left: 2em;
+}
+
+.start .task-info {
+    margin-top: 3em;
+    margin-left: 2em;
+}
+
+.start .angebot-area {
+    margin-left: 2em;
+    margin-top: 0em;
+}
+.detail .detail-area {
+    margin-left: 2em;
+    margin-top: 3em;
+}
+
 .list-area,
 .detail-area,
-.listing .task-info,
+.search .task-info,
 .assignments .task-info {
     margin: 0.7em;
 }
@@ -54,57 +79,54 @@ a {
     color: #333;
 }
 
-.angebotsinfos.listing .headline {
-    margin-left: 2em;
+.search .headline {
+    margin-top: 2em;
 }
 
-.angebotsinfos.listing .headline h2,
-.angebotsinfos.listing .headline h3 {
-    margin: 1em auto 0em;
+.search .slogan {
+    font-size: 2em;
+    margin-top: 0.3em;
+    font-size: bold;
+}
+
+.search #query {
+    width: 340px;
+    margin-left: 1em;
+}
+
+#do-text-search {
+    position: relative;
+    padding: .5em;
+}
+
+.search .headline,
+.search .form-area {
+    text-align: center;
     color: #002856;
 }
 
-.angebotsinfos.edit .task-info {
-    margin-top: 3em;
-    margin-left: 2em;
-}
-
-.angebotsinfos.start .task-info {
-    margin-top: 3em;
-    margin-left: 2em;
-}
-
-.angebotsinfos.listing .list-area p {
+.search .list-area p {
     margin-left: 1.3em;
 }
 
-.angebotsinfos.listing .list-area .read-more p {
+.search .list-area .read-more p {
     margin-left: 0px;
 }
 
-.angebotsinfos.listing .task-info {
+.search .task-info {
     margin-top: 3em;
     margin-left: 2em;
 }
 
-.angebotsinfos.start .angebot-area {
-    margin-left: 2em;
-    margin-top: 0em;
-}
-.angebotsinfos.detail .detail-area {
-    margin-left: 2em;
-    margin-top: 3em;
-}
-
-.angebotsinfos.listing .contact {
+.search .contact {
     padding: 5px;
     padding-left: 0px;
     display: inline-block;
     margin-right: 10px;
 }
 
-.angebotsinfos.detail .read-more,
-.angebotsinfos.listing .read-more {
+.detail .read-more,
+.search .read-more {
     background-color: #e3e3e3;
     padding: 5px;
     margin-top: 10px;
@@ -112,7 +134,7 @@ a {
     text-decoration: none;
 }
 
-.angebotsinfos.listing a.read-more {
+.search  a.read-more {
     margin: 10px;
 }
 
@@ -154,7 +176,7 @@ a.offer-edit {
 
 /** Geo Objects in Angebots Listing */
 
-.angebotsinfos .angebote li,
+.angebote li,
 .concrete-assignment {
     background: #fff;
     padding: 1em;
@@ -485,8 +507,15 @@ ul.angebote li small {
     .top-menu .ui.menu .login.item {
         display: none !important;
     }
+    .search #query {
+        margin-left: 0em;
+        width: 80%;
+    }
     .top-menu .ui.menu a img {
         border: none;
+    }
+    .form-area {
+        padding: 1em 1em 0em 1em;
     }
     .top-menu.ui.container {
         margin-left: 0px !important;

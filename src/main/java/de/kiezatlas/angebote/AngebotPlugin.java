@@ -74,10 +74,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     // ------------------------------------------------------------------------------------------------ Public Methods
 
     @GET
-    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotListView() {
-        return getStaticResource("web/list.html");
+        return getStaticResource("web/search.html");
     }
 
     @GET
@@ -419,7 +418,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             @QueryParam("location") String location, @QueryParam("radius") String radius,
             @QueryParam("datetime") long timestamp) {
         try {
-            logger.info("Fulltext Query \"" + query + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
+            String queryString = prepareLuceneQueryString(query, false, true, false);
+            logger.info("Fulltext Query \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
             List<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
             // Spatial Query
             if (!location.isEmpty() && location.contains(",")) {
@@ -433,10 +433,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 // ### unfinished business
             }
             // ### merge results
-            if (!query.isEmpty()) {
+            if (queryString != null) {
                 // Prep lucene query for fulltext search
-                query = query + "*";
-                List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(query);
+                List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
                 logger.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
                 results.addAll(prepareAngebotsInfoResults(angebotsinfos));
             }
@@ -444,6 +443,14 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         } catch (Exception e) {
             throw new RuntimeException("Searching Angebotsinfos across ALL DISTRICTS failed", e);
         }
+    }
+
+    private String prepareLuceneQueryString(String userQuery, boolean doAndSplit, boolean doWildcard, boolean doFuzzy) {
+        if (userQuery.isEmpty()) return null;
+        String result = new String();
+        result = userQuery.trim();
+        if (doWildcard) result += "*";
+        return result;
     }
 
     @Override
@@ -665,15 +672,15 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         List<Topic> namen = dm4.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
         List<Topic> beschreibungen = dm4.searchTopics(query, "ka2.angebot.beschreibung");
         List<Topic> stichwoerter = dm4.searchTopics(query, "dm4.tags.label"); // Todo: check index modes
-        List<Topic> ansprechpartner = dm4.searchTopics(query, "ka2.angebot.kontakt"); // Todo: check index modes
+        List<Topic> kontakt = dm4.searchTopics(query, "ka2.angebot.kontakt"); // Todo: check index modes
         // List<Topic> sonstigesResults = dm4.searchTopics(query, "ka2.sonstiges");
         // List<Topic> traegerNameResults = dm4.searchTopics(query, "ka2.traeger.name");
         logger.info("> " + namen.size() + ", " + beschreibungen.size() + ", " + stichwoerter.size()
-            + ", " + ansprechpartner.size() + " results in four types for query=\"" + query + "\" in ANGEBOTSINFOS");
+            + ", " + kontakt.size() + " results in four types for query=\"" + query + "\" in ANGEBOTSINFOS");
         // merge all four types in search results
         beschreibungen.addAll(namen);
         beschreibungen.addAll(getParentTagTopics(stichwoerter));
-        beschreibungen.addAll(ansprechpartner);
+        beschreibungen.addAll(kontakt);
         // make search results only contain unique geo object topics
         Iterator<Topic> iterator = beschreibungen.iterator();
         while (iterator.hasNext()) {

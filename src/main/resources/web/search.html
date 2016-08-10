@@ -6,23 +6,28 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
 
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/wautocomplete/jquery-ui-1.9.2.custom.min.js"></script>
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script src="/de.kiezatlas.website/ka-locating.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script src="/de.kiezatlas.angebote/tags-ui.js"></script>
 
         <script type="text/javascript">
 
             $(document).ready(function(e) {
                 render_angebotslisting_page()
+                var tags = tagging.fetchAllTagTopics()
+                tagging.setupJQueryUIAutocompleteField('#query')
             })
 
         </script>
     </head>
-    <body class="kiezatlas angebotsinfos listing">
+    <body class="kiezatlas angebotsinfos search">
 
         <div class="top-menu ui container fluid">
             <div class="ui menu">
@@ -48,14 +53,19 @@
             </div>
         </div>
 
-        <div class="headline search"><h2><label for="query">Suche in <em>allen</em> Angebotsinformationen</label></h2></div>
+        <div class="headline">
+            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            <div class="slogan">Angebotssuche</div>
+        </div>
 
-        <div class="form-area angebot">
+        <div class="form-area">
             <form action="javascript:do_search_angebote()" id="angebot-form" accept-charset="UTF-8">
                 <div class="ui input focus" style="display: inline-block;">
-                    <input id="query" name="search" placeholder="Angebotsinfo..." type="text"/>
+                    <input id="query" name="search" placeholder="Name, Beschreibung, Stichwort des Angebots" type="text"/>
                 </div>
-                <input id="do-save" name="location" type="submit" value="Suchen"/>
+                <button class="ui basic button medium" onclick="do_search_angebote()" id="do-text-search">
+                    <i class="search icon"></i>
+                </button>
                 <!--input id="nearby" type="text" placeholder=".. in der Nähe von" />
                 <input id="do-locating" onclick="javascript:do_search_streetcoordinates()" name="streets" type="button" class="btn" value="Suchen" />
                 <input id="do-locating" onclick="javascript:do_browser_location()" name="location" type="button" class="btn" value="Aktueller Standort" /-->
@@ -66,7 +76,7 @@
             </div>
         </div>
 
-        <div class="headline list"><h2>Angebote <em>Heute</em></h2></div>
+        <div class="headline list"><h2>Heute</h2></div>
         <div class="list-area">
         </div>
 
@@ -78,8 +88,6 @@
                     </li>
                 </ul>
             </div>
-            <br/>
-            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
         </div>
 
     </body>
