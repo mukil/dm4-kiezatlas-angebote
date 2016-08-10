@@ -90,11 +90,11 @@ var tagging = new function() {
     }
 
     this.setupJQueryUIAutocompleteField = function(identifier) {
-        $(identifier).bind("keydown", function( event ) {
+        var $inputfield = $(identifier).bind("keydown", function( event ) {
             if ( event.keyCode === $.ui.keyCode.TAB && $( this ).data( "ui-autocomplete" ).menu.active ) {
                 event.preventDefault()
             } else if (event.keyCode === $.ui.keyCode.ENTER) {
-                // fixme: event.preventDefault()
+                $inputfield.autocomplete("close")
             }
         }).autocomplete({minLength: 0,
             source: function( request, response ) {

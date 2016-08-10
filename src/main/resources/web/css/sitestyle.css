@@ -15,6 +15,10 @@
     color: #002856;
 }
 
+.angebotsinfos.search .ui-menu-item a {
+    color: #002856;
+}
+
 @-o-viewport {
     width: device-width;
     zoom: 1;
@@ -94,9 +98,18 @@ a {
     margin-left: 1em;
 }
 
-#do-text-search {
+.search button {
     position: relative;
     padding: .5em;
+}
+
+.search .nearby-dialog {
+    display: none;
+    margin-top: 1em;
+}
+
+.search .nearby-dialog.iblock {
+    display: inline-block;
 }
 
 .search .headline,

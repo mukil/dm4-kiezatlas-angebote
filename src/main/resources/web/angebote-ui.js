@@ -36,8 +36,9 @@ function do_search_angebote() {
     var queryString = $('#query').val()
     if (queryString.length === 0) {
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben")
-        return
+        return;
     }
+    // if (queryString.trim().length < 3) return;
     queryString = queryString.replace(/,/g, "") // clean up potential tag delimiter
     var locationString = $('#nearby').val()
     var dateNow = new Date()
@@ -66,6 +67,16 @@ function do_search_angebote() {
     })
 }
 
+function form_action(e) {
+    console.log("Supressing Form Action", e)
+}
+
+function show_nearby_dialog() {
+    $('.nearby-dialog').addClass("iblock")
+    // $('#show-locating').hide()
+    do_browser_location()
+}
+
 function do_search_streetcoordinates() {
     var locationString = $('#nearby').val().trim()
     $.getJSON('/geoobject/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
@@ -75,11 +86,11 @@ function do_search_streetcoordinates() {
 }
 
 function do_browser_location() {
-    var $loc_status = $('.geo-locating')
-    // gui
+    var $loc_status = $('.filter-area .parameter.location')
     if ($loc_status.length === 0) {
-        $loc_status = $('<div class="geo-locating">Standortermittlung angefragt ...</div>')
-        $('#angebot-form').append($loc_status)
+        $loc_status = $('<div class="parameter location">Standortermittlung angefragt ...</div>')
+        $('.filter-area .query-parameter').append($loc_status)
+        $('.filter-area').show()
     } else {
         $loc_status.html('Standortermittlung angefragt...')
     }
@@ -90,7 +101,7 @@ function do_browser_location() {
         $loc_status.empty()
         render_query_parameter()
     }, function(error) {
-        $loc_status.html("Wir konnten deinen aktuellen Standort leider nicht automatisch ermitteln.")
+        $loc_status.html('<a class="close" href="javascript:remove_location_parameter()">x</a>Wir konnten deinen aktuellen Standort leider nicht automatisch ermitteln.')
         console.warn("Standortermittlung fehlerhaft", error)
         location_coords = undefined
     }, {
@@ -104,10 +115,11 @@ function render_query_parameter() {
     var $filter_area = $('.query-parameter')
         $filter_area.empty()
     // render parameter
-    if (location_coords) {
-       $filter_area.append('<div class="parameter location"><a class="close" href="javascript:remove_location_parameter()">x</a>'
-        + 'Dein Standort in L&auml;ngen- und Breitengrad (' + location_coords.longitude.toFixed(3)
-        + ', ' + location_coords.latitude.toFixed(3) + ')</div>')
+    var $loc_status = $('.filter-area .parameter.location')
+    if (location_coords && $loc_status.length > 0) {
+       $loc_status.html('<a class="close" href="javascript:remove_location_parameter()">x</a>'
+            + 'Dein Standort in L&auml;ngen- und Breitengrad (' + location_coords.longitude.toFixed(3)
+            + ', ' + location_coords.latitude.toFixed(3) + ')')
     }
     if (location_input) {
        $filter_area.append('<div class="parameter street-location"><a class="close" href="javascript:remove_loc_input_parameter()">x</a>'
@@ -116,6 +128,9 @@ function render_query_parameter() {
     if (search_input) {
        $filter_area.append('<div class="parameter text"><a class="close" href="javascript:remove_text_parameter()">x</a>'
         + 'Suche nach \"' + search_input + '\"</div>')
+    }
+    if (!search_input && !location_input && !location_coords) {
+        $('.filter-area').hide()
     }
 }
 

@@ -21,7 +21,7 @@
 
             $(document).ready(function(e) {
                 render_angebotslisting_page()
-                var tags = tagging.fetchAllTagTopics()
+                tagging.fetchAllTagTopics()
                 tagging.setupJQueryUIAutocompleteField('#query')
             })
 
@@ -59,16 +59,25 @@
         </div>
 
         <div class="form-area">
-            <form action="javascript:do_search_angebote()" id="angebot-form" accept-charset="UTF-8">
+            <form action="javascript:form_action()" id="angebot-form" accept-charset="UTF-8">
                 <div class="ui input focus" style="display: inline-block;">
-                    <input id="query" name="search" placeholder="Name, Beschreibung, Stichwort des Angebots" type="text"/>
+                    <input id="query" name="search" placeholder="Name, Beschreibung, Stichwort des Angebots" type="text"/> <!-- oninput="do_search_angebote()" -->
                 </div>
                 <button class="ui basic button medium" onclick="do_search_angebote()" id="do-text-search">
                     <i class="search icon"></i>
                 </button>
-                <!--input id="nearby" type="text" placeholder=".. in der Nähe von" />
-                <input id="do-locating" onclick="javascript:do_search_streetcoordinates()" name="streets" type="button" class="btn" value="Suchen" />
-                <input id="do-locating" onclick="javascript:do_browser_location()" name="location" type="button" class="btn" value="Aktueller Standort" /-->
+                <button class="ui basic button medium" onclick="show_nearby_dialog()" title="Standort ermitteln.."  id="show-locating">
+                    <i class="street view icon"></i>
+                </button>
+                <!--button id="do-locating" title="Standort ermitteln.." class="ui basic button medium" onclick="javascript:do_browser_location()">
+                    <i class="location arrow icon"></i>
+                </button-->
+                <!--div class="nearby-dialog ui input focus">
+                    <input id="nearby" class="" type="text" placeholder=".. in der Nähe von" />
+                        <button id="do-nearby" title="Standort suchen.." class="ui basic button medium" onclick="javascript:do_search_streetcoordinates()">
+                        <i class="search icon"></i>
+                    </button>
+                </div-->
             </form>
             <div class="filter-area">
                 <h4>Filter dieser Suchanfrage</h4>
