@@ -26,10 +26,14 @@
                     if (state) {
                         // parse topic id from path
                         var id = parse_angebots_id()
-                        if (id != 0) {
+                        if (id !== 0) {
                             // Update Angebotsinfos
-                            load_angebot_by_resource_path()
-                            tagging.init()
+                            load_angebot_by_resource_path(function(res, angebotsinfo) {
+                                tagging.init()
+                                if (angebotsinfo.hasOwnProperty("tags")) {
+                                    tagging.setupTags(angebotsinfo["tags"])
+                                }
+                            })
                             render_angebot_form()
                         }
                         $('#angebot-name').focus()
@@ -79,23 +83,26 @@
         <div class="form-area angebot">
             <form action="javascript:do_save_angebot()" id="angebot-form" accept-charset="UTF-8">
                 <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
-                <input id="angebot-name" type="text" placeholder="Name des Angebots" />
-                <br/>
+                <div class="ui input focus">
+                    <input id="angebot-name" type="text" placeholder="Name des Angebots" />
+                </div>
                 <!--label for="angebot-beschreibung" id="beschreibung-label">Kurzbeschreibung</label-->
                 <textarea id="angebot-beschreibung" contenteditable="true" type="text"
-                          placeholder="Beschreibung des Angebots"></textarea>
+                    placeholder="Beschreibung des Angebots"></textarea>
                 <br/>
-                <label for="angebot-kontakt" id="kontakt-label">Kontakt zum Angebot</label><br/>
-                <input id="angebot-kontakt" type="text" placeholder="Kontakt" />
-                <br/>
-                <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)
-                </label><br/>
-                <input id="angebot-webpage" type="url" onkeyup="autocorrect_url(this.value)"
-                       placeholder="http://www.kiezatlas.de"></input>
-                <br/>
-                <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label><br/>
-                <input id="angebot-tags" type="text" placeholder=".., .." />
-                <br/>
+                <label for="angebot-kontakt" id="kontakt-label">Kontakt zum Angebot</label>
+                <div class="ui input focus">
+                    <input id="angebot-kontakt" type="text" placeholder="Kontakt" />
+                </div>
+                <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)</label>
+                <div class="ui input focus">
+                    <input id="angebot-webpage" type="url" onkeyup="autocorrect_url(this.value)"
+                           placeholder="http://www.kiezatlas.de" />
+                </div>
+                <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label>
+                <div class="ui input focus">
+                    <input id="angebot-tags" type="text" placeholder=".., .." />
+                </div>
                 <input id="do-save" type="submit" class="btn" value="Speichern" />
             </form>
         </div>

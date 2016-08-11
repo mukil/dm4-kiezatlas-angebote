@@ -356,6 +356,16 @@ span.angebot-name {
     margin-top: 5px;
 }
 
+.form-area #angebot-webpage,
+.form-area #angebot-name {
+    min-width: 340px;
+}
+
+.form-area .ui.input {
+    display: block;
+    margin-bottom: 1em;
+}
+
 #name-search {
     width: 300px;
 }
@@ -386,6 +396,10 @@ span.angebot-name {
 .form-area textarea {
     margin: 0px 5px 45px 0px;
     max-width: 460px;
+}
+
+.form-area.angebot .cke_textarea_inline {
+    margin-top: 3em;
 }
 
 div.disabled {

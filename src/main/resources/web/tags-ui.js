@@ -24,25 +24,23 @@ var tagging = new function() {
         // load all tags (user has read access too)
         allReadableTags = _.fetchAllTagTopics()
         console.log("Initialized all available Tags", allReadableTags)
-        // check and render existing tags
-        if (!selected_angebot) throw new Error("Angebot is not yet initialized, can not introduce tags!")
-        if (!selected_angebot.hasOwnProperty("tags")) {
-            console.log("No Tags set yet!")
-        } else { // existing tag topic
-            topicTags = selected_angebot["tags"]
-            var inputFieldValue = ""
-            var commaCount = 1
-            // assemble input line, adding all existing tags into our input-line
-            for (var exist in topicTags) {
-                var element = topicTags[exist]
-                inputFieldValue += element.label
-                if (commaCount < topicTags.length) inputFieldValue += ", "
-                commaCount++
-            }
-            $(nodeId).val(inputFieldValue)
-        }
         // activate third party library
         _.setupJQueryUIAutocompleteField(nodeId)
+    }
+
+    this.setupTags = function(topicTags) {
+        // check and render existing tags
+        var inputFieldValue = ""
+        var commaCount = 0
+        // assemble input line, adding all existing tags into our input-line
+        for (var exist in topicTags) {
+            var element = topicTags[exist]
+            inputFieldValue += element.label
+            if (commaCount < topicTags.length) inputFieldValue += ", "
+            commaCount++
+        }
+        console.log("Setup Tags to Edit", topicTags)
+        $(nodeId).val(inputFieldValue)
     }
 
     // assemble tag topics to be returned
