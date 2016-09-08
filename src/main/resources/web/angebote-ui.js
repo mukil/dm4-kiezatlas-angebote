@@ -16,14 +16,6 @@ restc.get_username = function() {
     // Note: response 204 No Content yields to undefined result
 }
 
-// --- Angebote Search UI Model -- Client State ---
-
-var location_input = undefined
-var location_coords = undefined
-var location_radius = 0
-var search_input = undefined
-var street_coordinates = []
-
 // --- Angeboute UI Routes
 
 var URL_ANGEBOT_LISTING     = "/angebote/"
@@ -32,56 +24,65 @@ var URL_ANGEBOT_DETAIL      = "/angebote/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
+// --- Angebote Search UI Model -- Client State ---
+
+var location_input = undefined
+var location_coords = undefined
+var location_radius = 1.5
+var search_input = undefined
+var street_coordinates = []
+var street_coords_idx = 0
+var time_parameter = undefined
+
+
+// ----------------------------------  Three Major Search UI Operations ----- //
+
 function do_search_angebote() {
     var queryString = $('#query').val()
     if (queryString.length === 0) {
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben")
-        return;
+        return
     }
-    // if (queryString.trim().length < 3) return;
-    queryString = queryString.replace(/,/g, "") // clean up potential tag delimiter
-    var locationString = $('#nearby').val()
-    var dateNow = new Date()
-    if (locationString === "" && queryString !== "") {
-        // console.log("No spatial parameter added to fulltext search.. \"", queryString, "\"", dateNow)
-    } else if (locationString !== "" && queryString !== "") {
-        // console.log("Fulltext search parameter", queryString, "with spatial parameter", locationString, dateNow)
-        location_input = locationString
-    } else if (locationString !== "" && queryString === "") {
-        // console.log("Just a spatial search for angebote", locationString, dateNow)
-        location_input = locationString
-    } else {
-        // console.log("No query terms entered into search form..")
+    $('#search-input-one').addClass('loading')
+    var dateTime = new Date().getTime()
+    if (time_parameter) { // de-activate time parameter display
+        time_parameter = undefined
     }
+    var locationValue = undefined
     if (location_coords) { // existing geo-coodinates values have a higher priority
-        locationString = encodeURIComponent(location_coords.longitude.toFixed(4) + ","+ location_coords.latitude.toFixed(4))
+        locationValue = encodeURIComponent(location_coords.longitude.toFixed(4) + ","+ location_coords.latitude.toFixed(4))
     }
+    // New text search parameter
+    // if (queryString.trim().length < 3) return
+    queryString = queryString.replace(/,/g, "") // clean up potential tag delimiter
     search_input = queryString.trim()
+    // Existing text search parameter
+    var $existingSearchInputParameter = $('.parameter.text .search-value')
+    if ($existingSearchInputParameter.length > 0) {
+        for (var el in $existingSearchInputParameter) {
+            if ($existingSearchInputParameter[el].localName === "span") {
+                console.log("Adding Existing Text Search Paramter", $existingSearchInputParameter[el].innerText)
+                queryString += "," + $existingSearchInputParameter[el].innerText
+            }
+        }
+    }
     render_query_parameter()
-    $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationString + '&radius='
-            + location_radius + '&datetime=' + dateNow.getTime(), function(results) {
-        render_angebote_resultset(results)
+    console.log("Search Query", queryString, "Location", locationValue, "Radius", location_radius, "DateTime", dateTime)
+    $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationValue + '&radius='
+            + location_radius + '&datetime=' + dateTime, function(results) {
+        render_search_results(results)
         if (results.length > 0) {
             $('#query').val("")
         }
+        $('#search-input-one').removeClass('loading')
     })
-}
-
-function form_action(e) {
-    console.log("Supressing Form Action", e)
-}
-
-function show_nearby_dialog() {
-    $('.nearby-dialog').addClass("iblock")
-    // $('#show-locating').hide()
-    do_browser_location()
 }
 
 function do_search_streetcoordinates() {
     var locationString = $('#nearby').val().trim()
     $.getJSON('/geoobject/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
-        console.log("Loaded Street Coordinates", results)
         street_coordinates = results
+        if (results) select_locationsearch_parameter()
     })
 }
 
@@ -90,48 +91,194 @@ function do_browser_location() {
     if ($loc_status.length === 0) {
         $loc_status = $('<div class="parameter location">Standortermittlung angefragt ...</div>')
         $('.filter-area .query-parameter').append($loc_status)
-        $('.filter-area').show()
     } else {
         $loc_status.html('Standortermittlung angefragt...')
     }
-    // functionality
+    // functionality provided by ka-locating.js script (dm4-kiezatlas-website)
     locating.get_browser_location(function(ok) {
         console.info("Standort OK", ok)
         location_coords = ok.coords
         $loc_status.empty()
         render_query_parameter()
     }, function(error) {
-        $loc_status.html('<a class="close" href="javascript:remove_location_parameter()">x</a>Wir konnten deinen aktuellen Standort leider nicht automatisch ermitteln.')
-        console.warn("Standortermittlung fehlerhaft", error)
+        var reason = "Position unavailable"
+        if (error.code === 1) {
+            reason = "Permission denied"
+            $loc_status.html('<a class="close" href="javascript:remove_location_parameter()">x</a>Wir konnten deinen '
+                + 'aktuellen Standort leider nicht automatisch ermitteln (' + reason + ')')
+        } else if (error.code === 2) {
+            $loc_status.html('<a class="close" href="javascript:remove_location_parameter()">x</a>Wir konnten deinen '
+                + 'aktuellen Standort leider nicht automatisch ermitteln (' + reason + ')')
+        } else if (error.code === 3) {
+            reason = "Timeout"
+        } else {
+            console.warn("Standortermittlung fehlerhaft", error, reason)
+        }
         location_coords = undefined
     }, {
-        enableHighAccuracy: false, timeout: 13000
+        enableHighAccuracy: true, timeout: 7000, maximumAge: 0
     })
 }
 
-function render_query_parameter() {
-    // clear and setup gui
-    $('.filter-area').show("inline")
-    var $filter_area = $('.query-parameter')
-        $filter_area.empty()
-    // render parameter
-    var $loc_status = $('.filter-area .parameter.location')
-    if (location_coords && $loc_status.length > 0) {
-       $loc_status.html('<a class="close" href="javascript:remove_location_parameter()">x</a>'
-            + 'Dein Standort in L&auml;ngen- und Breitengrad (' + location_coords.longitude.toFixed(3)
-            + ', ' + location_coords.latitude.toFixed(3) + ')')
+function load_current_angebotsinfos() {
+    angebotsinfos = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
+        { async: false, dataType: 'json' }).responseText)
+}
+
+// --------------------------- GUI methods for rendering all Search UI elements ------------ //
+
+function show_angebote_frontpage() {
+    load_current_angebotsinfos()
+    time_parameter = "Heute"
+    location_coords = undefined
+    search_input = undefined
+    render_query_parameter()
+    render_search_results()
+    load_username(render_user_menu)
+}
+
+function render_search_results(items) {
+    var $listing = $('.list-area .results')
+    // var $list = $('.search-results .list')
+    var items_to_render = angebotsinfos
+    if (items) {
+        items_to_render = items
+        $listing.empty()
     }
-    if (location_input) {
-       $filter_area.append('<div class="parameter street-location"><a class="close" href="javascript:remove_loc_input_parameter()">x</a>'
-        + 'In der N&auml;he von \"' + location_input + '\"</div>')
+    $listing.empty()
+    if (items_to_render.length === 0) {
+        $listing.append("<li>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "
+            + "uns helfen neue oder aktuelle Angebote in die <a href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>")
+        // ("+new Date().toLocaleDateString()+")
     }
+    for (var el in items_to_render) {
+        var element = items_to_render[el]
+        render_classical_list_item(element, $listing)
+    }
+    var message = (items_to_render.length === 1) ? "1 Angebot" : items_to_render.length + " Angebote"
+        if (items_to_render.length === 0) message = "F&uuml;r diese Suchanfrage liegen uns keine Informationen vor"
+    $('.list-area .status').text(message)
+}
+
+function render_classical_list_item(element, $list) {
+    var name = element.name
+    var contact = element.kontakt
+    // var webpage = element.webpage
+    // var descr = element.beschreibung
+    // var tags = element.tags
+    var location_count = element.locations.length
+    var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
+    if (!first_assignment) first_assignment = element.locations[0]
+    if (first_assignment) {
+        var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
+            + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
+            // html_string += '<p>' + descr + '</p>'
+            html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. <b>' + first_assignment.name + '</b><br/>'
+                + 'Vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>&nbsp;'
+            if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
+            // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
+            html_string += '<span class="read-more">Mehr..</span>'
+            html_string += '</div></a></li>'
+        $list.append(html_string)
+    } else {
+        console.warn("Could not load assignment for angebotsinfo...", element)
+    }
+}
+
+// -------------------------------------- Search UI Helper and Utility Methods ------------------- //
+
+function select_locationsearch_parameter(idx) {
+    if (street_coordinates.length > 0 && !idx) {
+        location_coords = street_coordinates[0]
+    } else if (street_coordinates.length > 0 && idx) {
+        location_coords = street_coordinates[idx]
+        street_coords_idx = idx
+    } else {
+        location_coords = undefined
+        console.log("Clear Location Search Parameter")
+    }
+    time_parameter = undefined // clear "Heute"
+    render_query_parameter()
+}
+
+function select_prev_locationsearch_result() {
+    prev_idx = street_coords_idx - 1
+    if (street_coords_idx === 0) {
+        prev_idx = street_coordinates.length - 1
+    }
+    select_locationsearch_parameter(prev_idx)
+}
+
+function select_next_locationsearch_result() {
+    next_idx = street_coords_idx + 1
+    if (street_coords_idx === street_coordinates.length - 1) {
+        next_idx = 0
+    }
+    select_locationsearch_parameter(next_idx)
+}
+
+function toggle_location_parameter_display($filter_area) {
+    if (location_coords) {
+        var $locationParameter = $('.filter-area .parameter.location')
+        var parameterHTML = '<a class="close" title="Standortfilter entfernen" href="javascript:remove_location_parameter()">x</a>'
+                + '<select id="nearby-radius" onchange="handle_location_form()" title="Entfernungsangabe für die Umkreissuche">'
+                    + '<option value="0.5">0.5km</option><option value="1.0">1km</option>'
+                    + '<option value="1.5" selected>1.5km</option><option value="2.5">2.5km</option>'
+                    + '<option value="5">5km</option><option value="10">10km</option>'
+                    + '<option value="15">15km</option>'
+                + '</select>N&auml;he \"'+ location_coords.name + '\" <span class="coord-values">(' + location_coords.longitude.toFixed(3)
+                + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
+        if (street_coordinates.length > 0) {
+            parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
+                + '<a class="next close" title="Alternatives Ergebnis der Standortsuche" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
+                + '<span class="alt-count">('+street_coordinates.length +' Standorte gefunden)</span>'
+        }
+        if ($locationParameter.length === 0) {
+            $filter_area.append('<div class="parameter location" title="Standort-Suchfilter">' + parameterHTML + '</div>')
+        } else {
+            $locationParameter.html(parameterHTML)
+        }
+    } else {
+        $('.filter-area .parameter.location').remove()
+    }
+}
+
+function toggle_time_parameter_display($filter_area) {
+    if (time_parameter) {
+        var $timeParameter = $('.filter-area .parameter.time')
+        var parameterHTML = '<a class="close" title="Datumsfilter entfernen" href="javascript:remove_time_parameter()">x</a>Heute'
+        if ($timeParameter.length === 0) {
+            $filter_area.append('<div class="parameter time" title="Zeitfilter der Anfrage">'+parameterHTML+'</div>')
+        } else {
+            $timeParameter.html(parameterHTML)
+        }
+    } else {
+        $('.filter-area .parameter.time').remove()
+    }
+}
+
+function toggle_text_parameter_display($filter_area) {
     if (search_input) {
-       $filter_area.append('<div class="parameter text"><a class="close" href="javascript:remove_text_parameter()">x</a>'
-        + 'Suche nach \"' + search_input + '\"</div>')
+        var className = search_input
+        var $parameterExists = $('.filter-area .parameter.text.' + className)
+        if ($parameterExists.length === 0) { // dont add the same query term twice)
+            $filter_area.append('<div class="parameter text ' + className + '" title="Text Suchfilter">'
+                + '<a class="close" title="Textfilter entfernen" onclick="javascript:remove_text_parameter()" href="#">x</a>'
+                + 'Suche nach \"<span class="search-value">' + search_input + '</span>\"</div>')
+        }
+    } else {
+        $('.filter-area .parameter.text').remove()
     }
-    if (!search_input && !location_input && !location_coords) {
-        $('.filter-area').hide()
-    }
+}
+
+function render_query_parameter() {
+    var $filter_area = $('.query-parameter')
+    //
+    toggle_location_parameter_display($filter_area)
+    //
+    toggle_time_parameter_display($filter_area)
+    //
+    toggle_text_parameter_display($filter_area)
 }
 
 function remove_location_parameter() {
@@ -139,19 +286,32 @@ function remove_location_parameter() {
     render_query_parameter()
 }
 
-function remove_loc_input_parameter() {
-    location_input = undefined
-    $('#nearby').val("")
+function remove_time_parameter() {
+    time_parameter = undefined
     render_query_parameter()
+    render_search_results([])
 }
 
-function remove_text_parameter() {
+function remove_text_parameter(e) {
     search_input = undefined
     $('#query').val("")
     render_query_parameter()
-    $('.filter-area').hide("fast")
-    render_angebote_resultset()
+    // render_search_results()
 }
+
+function handle_fulltext_form(e) {
+    console.log("Supressing Fulltext Search Action", e)
+}
+
+function handle_location_form(e) {
+    var radiusSelection = document.getElementById("nearby-radius");
+    if (radiusSelection) {
+        location_radius = radiusSelection.options[radiusSelection.selectedIndex].value;
+        console.log("Updated Location Search Radius", location_radius)
+    }
+}
+
+// -------------------------------------- Custom Angebote JS Client (Edit, Show, Assign) --------------- //
 
 function do_save_angebot() {
     // Read in new values
@@ -211,40 +371,6 @@ function do_save_angebot() {
     clear_angebot_form_area()
     // ### display "Eingaben gesichert!"
     go_to_angebot_assignment(topic.id)
-}
-
-function go_to_angebot_assignment(id) {
-    if (id) {
-        window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
-    } else {
-        setTimeout(function(e) {
-            go_to_my_angebot_listing()
-        }, 1500)
-    }
-}
-
-function go_to_my_angebot_listing() {
-    window.document.location.assign(URL_MY_ANGEBOT_LIST)
-}
-
-function autocorrect_url(current_url) {
-    if (current_url.length <= 4) return true
-    var PROTOCOL_START = "http"
-    if (!current_url.startsWith("http")) {
-        $('#angebot-webpage').val(PROTOCOL_START + '://' + current_url)
-        console.log('Wir haben ein HTTP hinzugef&uuml;gt', current_url)
-    }
-    return is_valid_url(current_url)
-
-    function is_valid_url(url) {
-        var parser = document.createElement('a')
-        try {
-            parser.href = url
-            return (parser.hostname !== "localhost" && !!parser.hostname)
-        } catch (e) {
-            return false
-        }
-    }
 }
 
 function clear_angebot_form_area() {
@@ -333,39 +459,6 @@ function init_datepicker() {
 
 // ---- Create Assignments for selected_angebot to Geo Objects -----
 
-function handle_name_search_input(e) {
-    if (e.keyCode === 13) {
-        search_geo_objects_by_name(show_geo_object_search_results)
-    }
-}
-
-function search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
-    var queryString = $("#name-search").val()
-        if (queryString.indexOf("*") === -1) {
-            queryString += "*"
-        }
-        queryString = encodeURIComponent(queryString, "UTF-8")
-        // ### hacking message display
-        $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
-        $.ajax({
-            type: "GET", url: "/geoobject/search/by_name?query=" + queryString,
-            success: function(obj) {
-                renderer(obj)
-            },
-            error: function(x, s, e) {
-                throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
-            }
-        })
-}
-
-function select_geo_object(e) {
-    var geo_object = restc.get_topic_by_id(e.target.id)
-    // update gui state
-    selected_geo_object = geo_object
-    selected_assignment = undefined
-    render_selected_assignment()
-}
-
 function do_delete_assignment() {
     // Do Delete
     restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
@@ -430,6 +523,7 @@ function do_save_assignment(e) {
 
 // ----- List and Edit existing Assignments (of Angebote to Geo Objects) -----
 
+
 function load_assignments(renderer) {
     $.ajax({
         type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id,
@@ -469,9 +563,10 @@ function load_assignments(renderer) {
     })
 }
 
+// -------------------------- GUI Methods for Angebote Assignment and Editing ------------------- //
+
 function render_angebot_form() {
-    console.log("Render Angebot Form", selected_angebot)
-    if (!selected_angebot) throw new Error("No Angebot Selected")
+    if (!selected_angebot) return
     // Angebotsinfo
     var name = selected_angebot.name
     var contact = selected_angebot.kontakt
@@ -487,15 +582,14 @@ function render_angebot_form() {
 
 function render_angebot_header_info() {
     if (!selected_angebot || !selected_angebot.hasOwnProperty("id")) {
-       throw Error("No Angebot selected, loaded", selected_angebot)
+       console.log("No Angebot (With ID) selected, loaded", selected_angebot)
+       return
     }
     // Angebotsinfo
-    // var name = selected_angebot.name
     var contact = selected_angebot.kontakt
     var webpage = selected_angebot.webpage
     var descr = selected_angebot.beschreibung
-    var tags = selected_angebot.tags // ### render tags
-    console.log(tags, webpage)
+    var tags = selected_angebot.tags
     //
     $('.angebot-name').text(selected_angebot.name)
     $('#navigation li.edit a').attr("href", "/angebote/edit/" + selected_angebot.id)
@@ -542,6 +636,30 @@ function render_assignments() {
     $('.right-side .einrichtungen').on('click', select_assignment)
 }
 
+function render_selected_assignment() {
+    if (selected_assignment) {
+        // render new assignment selection
+        $('.concrete-assignment').removeClass('selected')
+        $('#' + selected_assignment.id).addClass('selected')
+        $('.date-area').removeClass("disabled")
+        $('.date-area .einrichtung-name').text(selected_assignment.name) // ### should be geo_name
+        $('#from').datepicker("setDate", new Date(selected_assignment.anfang_timestamp))
+        $('#to').datepicker("setDate", new Date(selected_assignment.ende_timestamp))
+        $('#do-assign').attr("value", "Zeitraum ändern")
+        $('#do-delete').removeClass("hidden")
+    } else {
+        // clear old assignment rendering
+        $('#from').datepicker("setDate", new Date())
+        $('#to').datepicker("setDate", new Date())
+        // update label
+        $('.einrichtung-name').text(selected_geo_object.value)
+        // update area
+        $('.date-area').removeClass("disabled")
+        $('#do-assign').attr("value", "Speichern")
+        $('#do-delete').addClass("hidden")
+    }
+}
+
 function render_angebot_locations() {
     // Display Assignments
     var $einrichtungen = $('.geo-objects-area .einrichtungen')
@@ -565,6 +683,39 @@ function render_angebot_locations() {
     // $einrichtungen.on('click', select_assignment)
 }
 
+function handle_name_search_input(e) {
+    if (e.keyCode === 13) {
+        search_geo_objects_by_name(show_geo_object_search_results)
+    }
+}
+
+function search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
+    var queryString = $("#name-search").val()
+        if (queryString.indexOf("*") === -1) {
+            queryString += "*"
+        }
+        queryString = encodeURIComponent(queryString, "UTF-8")
+        // ### hacking message display
+        $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
+        $.ajax({
+            type: "GET", url: "/geoobject/search/by_name?query=" + queryString,
+            success: function(obj) {
+                renderer(obj)
+            },
+            error: function(x, s, e) {
+                throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
+            }
+        })
+}
+
+function select_geo_object(e) {
+    var geo_object = restc.get_topic_by_id(e.target.id)
+    // update gui state
+    selected_geo_object = geo_object
+    selected_assignment = undefined
+    render_selected_assignment()
+}
+
 function select_assignment(event) {
     var element = event.target
     var id = (element.localName === "div") ? element.id : ""
@@ -581,30 +732,6 @@ function select_assignment(event) {
         render_selected_assignment()
     } else {
         console.warn("Could not detect click on Element", element)
-    }
-}
-
-function render_selected_assignment() {
-    if (selected_assignment) {
-        // render new assignment selection
-        $('.concrete-assignment').removeClass('selected')
-        $('#' + selected_assignment.id).addClass('selected')
-        $('.date-area').removeClass("disabled")
-        $('.date-area .einrichtung-name').text(selected_assignment.name) // ### should be geo_name
-        $('#from').datepicker("setDate", new Date(selected_assignment.anfang_timestamp))
-        $('#to').datepicker("setDate", new Date(selected_assignment.ende_timestamp))
-        $('#do-assign').attr("value", "Zeitraum ändern")
-        $('#do-delete').removeClass("hidden")
-    } else {
-        // clear old assignment rendering
-        $('#from').datepicker("setDate", new Date())
-        $('#to').datepicker("setDate", new Date())
-        // update label
-        $('.einrichtung-name').text(selected_geo_object.value)
-        // update area
-        $('.date-area').removeClass("disabled")
-        $('#do-assign').attr("value", "Speichern")
-        $('#do-delete').addClass("hidden")
     }
 }
 
@@ -646,18 +773,6 @@ function show_geo_object_search_results(results) {
 
 var selected_assignment = undefined
 
-function render_angebotsrevise_page() {
-    var assocId = parse_angebots_id()
-    selected_assignment = JSON.parse($.ajax('/angebote/assignment/' + assocId, { async: false, dataType: 'json' }).responseText)
-    $('.einrichtungs-name').text(selected_assignment.name)
-    $('.angebots-name').text(selected_assignment.angebotsName)
-    $('.von').text(selected_assignment.anfang)
-    $('.bis').text(selected_assignment.ende)
-    $('.angebots-beschreibung').html(selected_assignment.beschreibung)
-    $('.kontakt').html(selected_assignment.kontakt)
-    $('.webpage').attr("href", selected_assignment.webpage).text(selected_assignment.webpage)
-}
-
 function do_revise_assignment() {
     var username = restc.get_username()
     if (username) {
@@ -691,6 +806,18 @@ function do_revise_assignment() {
     }
 }
 
+function render_angebotsrevise_page() {
+    var assocId = parse_angebots_id()
+    selected_assignment = JSON.parse($.ajax('/angebote/assignment/' + assocId, { async: false, dataType: 'json' }).responseText)
+    $('.einrichtungs-name').text(selected_assignment.name)
+    $('.angebots-name').text(selected_assignment.angebotsName)
+    $('.von').text(selected_assignment.anfang)
+    $('.bis').text(selected_assignment.ende)
+    $('.angebots-beschreibung').html(selected_assignment.beschreibung)
+    $('.kontakt').html(selected_assignment.kontakt)
+    $('.webpage').attr("href", selected_assignment.webpage).text(selected_assignment.webpage)
+}
+
 function render_angebotsinfo_page() {
     load_angebot_by_resource_path(function(status, selected_angebot) {
         if (status === "ok") {
@@ -702,64 +829,6 @@ function render_angebotsinfo_page() {
     })
     load_assignments(render_angebot_locations)
     load_username(render_user_menu)
-}
-
-function render_angebotslisting_page() {
-    load_current_angebotsinfos()
-    render_angebote_resultset()
-    load_username(render_user_menu)
-}
-
-function render_angebote_resultset(items) {
-    var $list = $('.list-area')
-    var items_to_render = angebotsinfos
-    if (items) {
-        items_to_render = items
-        $('.headline.list h2').hide()
-        $list.empty()
-    } else {
-        $('.headline.list h2').show()
-    }
-    $list.empty()
-    if (items_to_render.length === 0) {
-        $list.append("<p>F&uuml;r das heutige Datum und dieser Suchanfrage liegen uns keine Informationen vor.</p>")
-        $list.append("<p>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "
-            + "uns helfen neue oder aktuelle Angebote in die <a href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</p>")
-        // ("+new Date().toLocaleDateString()+")
-    }
-    for (var aidx in items_to_render) {
-        var element = items_to_render[aidx]
-        var name = element.name
-        var contact = element.kontakt
-        // var webpage = element.webpage
-        // var descr = element.beschreibung
-        // var tags = element.tags
-        var location_count = element.locations.length
-        var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
-        if (!first_assignment) first_assignment = element.locations[0]
-        if (first_assignment) {
-            var html_string = '<a class="read-more" href="/angebote/'+element.id+'">'
-                + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
-                // html_string += '<p>' + descr + '</p>'
-                html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. <b>' + first_assignment.name + '</b><br/>'
-                    + 'Vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>&nbsp;'
-                if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
-                // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
-                html_string += '<span class="read-more">Mehr..</span>'
-                html_string += '</div></a>'
-            $list.append(html_string)
-        } else {
-            console.warn("Could not load assignment for angebotsinfo...", element)
-        }
-    }
-}
-
-function is_empty(stringValue) {
-    return (stringValue === "" || stringValue === " ")
-}
-
-function get_random_int_inclusive(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function render_angebot_detail_area() {
@@ -781,11 +850,6 @@ function render_angebot_detail_area() {
             + descr + '<br/><span class="label">Kontakt</span><br/>' + contact
             + '<br/><br/><span class="label">Webseite</span><br/><a href="' + webpage + '">'
             + webpage + '</a><br/><br/><span class="label">Stichworte</span><br/><i>' + tags + '</i>')
-}
-
-function load_current_angebotsinfos() {
-    angebotsinfos = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
-        { async: false, dataType: 'json' }).responseText)
 }
 
 function load_angebot_by_resource_path(callback) {
@@ -855,6 +919,49 @@ function has_angebote_membership(callback) {
             if (callback) callback(true)
         }
     })
+}
+
+function go_to_angebot_assignment(id) {
+    if (id) {
+        window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
+    } else {
+        setTimeout(function(e) {
+            go_to_my_angebot_listing()
+        }, 1500)
+    }
+}
+
+function go_to_my_angebot_listing() {
+    window.document.location.assign(URL_MY_ANGEBOT_LIST)
+}
+
+
+function is_empty(stringValue) {
+    return (stringValue === "" || stringValue === " ")
+}
+
+function get_random_int_inclusive(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function autocorrect_url(current_url) {
+    if (current_url.length <= 4) return true
+    var PROTOCOL_START = "http"
+    if (!current_url.startsWith("http")) {
+        $('#angebot-webpage').val(PROTOCOL_START + '://' + current_url)
+        console.log('Wir haben ein HTTP hinzugef&uuml;gt', current_url)
+    }
+    return is_valid_url(current_url)
+
+    function is_valid_url(url) {
+        var parser = document.createElement('a')
+        try {
+            parser.href = url
+            return (parser.hostname !== "localhost" && !!parser.hostname)
+        } catch (e) {
+            return false
+        }
+    }
 }
 
 function parse_angebots_id() {

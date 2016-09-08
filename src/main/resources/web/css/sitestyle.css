@@ -7,6 +7,9 @@
 @import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/item.min.css');
 @import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/input.min.css');
 @import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/icon.min.css');
+/** @import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/sticky.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/list.min.css');
+@import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css'); **/
 
 /** jQuery UI Autcomplete Overrides */
 .angebotsinfos.search .ui-state-focus {
@@ -90,32 +93,53 @@ a {
 .search .slogan {
     font-size: 2em;
     margin-top: 0.3em;
-    font-size: bold;
+    font-weight: bold;
 }
 
 .search #query {
     width: 340px;
-    margin-left: 1em;
+    /** margin-left: 1em; */
 }
 
-.search button {
-    position: relative;
-    padding: .5em;
+.search button.ui.basic.primary {
+    /** background-color: #fff !important;
+    border: #343434; **/
+    padding: 7px;
 }
 
-.search .nearby-dialog {
-    display: none;
+.search .nearby-dialog.ui.input {
+    /** display: none; **/
+    display: inline-block;
     margin-top: 1em;
 }
 
-.search .nearby-dialog.iblock {
-    display: inline-block;
+.search .nearby-dialog.ui.input input {
+    min-width: 240px;
 }
 
-.search .headline,
-.search .form-area {
+.search .form-area form {
+    display: inline-block;
+    min-width: 340px;
+    text-align: left;
+    margin-right: 2em;
+}
+
+.search .headline {
     text-align: center;
     color: #002856;
+}
+
+.search .form-area .label,
+.search .form-area {
+    text-align: center;
+}
+
+.search .filter-area,
+.search .list-area,
+.search .search-results.container {
+    max-width: 1200px !important;
+    margin: auto;
+    text-align: left;
 }
 
 .search .list-area p {
@@ -138,6 +162,20 @@ a {
     margin-right: 10px;
 }
 
+.search .list-area .status {
+    padding-left: .5em;
+}
+
+.search .list-area ul.results {
+    padding-left: 0px;
+    margin-top: 0px;
+}
+
+.search .list-area ul li.read-more a {
+    text-decoration: none;
+}
+
+.list-area .read-more,
 .detail .read-more,
 .search .read-more {
     background-color: #e3e3e3;
@@ -145,6 +183,10 @@ a {
     margin-top: 10px;
     display: inline-block;
     text-decoration: none;
+}
+
+.list-area .results li.read-more {
+    background-color: #EAEAEA;
 }
 
 .search  a.read-more {
@@ -266,10 +308,49 @@ div.ui-datepicker {
 .form-area {
     position: relative;
     padding: 1em 1em 0em 2em;
+    color: #343434;
 }
 
-.filter-area {
+.list-area {
+    padding: 1em 1em 0em 1.5em;
+}
+
+.search #location-search-form {
+    margin-bottom: 1em;
+}
+
+/** .filter-area {
     display: none;
+} **/
+
+.search .filter-area {
+    padding-top: 1em;
+    /** border-top: 1px solid rgba(34,36,38,.15); **/
+}
+
+.search h4,
+.search .filter-area h4 {
+    margin-bottom: 0px;
+    color: #666;
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.filter-area h4 {
+    margin-top: .5em;
+    font-weight: normal;
+}
+
+.search-results h4 {
+    padding-left: .5em;
+    font-weight: normal;
+}
+
+
+/** Search Filter Parameter Option Style */
+
+.filter-area .query-parameter {
+    display: inline-block;
 }
 
 .filter-area .parameter {
@@ -277,12 +358,7 @@ div.ui-datepicker {
     padding: 0.5em;
     color: #8f1414;
     display: inline-block;
-    margin: 1em 1em 1em 0em;
-}
-
-.filter-area h4 {
-    margin-bottom: 0px;
-    color: #666;
+    height: 23px;
 }
 
 .filter-area .parameter a.close {
@@ -295,6 +371,30 @@ div.ui-datepicker {
     font-weight: bold;
     font-size: 1.2em;
 }
+
+.filter-area .parameter a.close.prev,
+.filter-area .parameter a.close.next {
+    background-color: #efefef;
+    color: #a9a9a9;
+}
+
+.filter-area .parameter select {
+    background-color: #efefef;
+    margin-right: 1em;
+    margin-left: 1em;
+    cursor: pointer;
+    padding: 0px;
+    color: #343434;
+}
+
+.filter-area .parameter select:hover,
+.filter-area .parameter a.close.next:hover,
+.filter-area .parameter a.close.prev:hover {
+    color: #002856;
+}
+
+
+/** Assignemnt UI */
 
 .assignment .form-area {
     padding: 5px;
@@ -359,11 +459,6 @@ span.angebot-name {
 .form-area #angebot-webpage,
 .form-area #angebot-name {
     min-width: 340px;
-}
-
-.form-area .ui.input {
-    display: block;
-    margin-bottom: 1em;
 }
 
 #name-search {
@@ -534,9 +629,37 @@ ul.angebote li small {
     .top-menu .ui.menu .login.item {
         display: none !important;
     }
+    .search .headline img {
+        display: none;
+    }
+    .search .headline {
+        text-align: left;
+        padding-left: 1em;
+    }
+    .search .filter-area h4 {
+        text-align: left;
+        display: block;
+        margin-top: 1em;
+    }
+    .search .filter-area .query-parameter {
+        margin-top: 1em;
+    }
+    /** .search .filter-area .parameter.location {
+        line-height: 2.5em;
+    } **/
+    .search .filter-area .parameter.location .coord-values,
+    .search .filter-area .parameter.location .alt-count {
+        display: none;
+    }
+    .search .form-area label {
+        display: none;
+    }
+    .search .form-area {
+        text-align: left;
+    }
     .search #query {
         margin-left: 0em;
-        width: 80%;
+        width: 240px;
     }
     .top-menu .ui.menu a img {
         border: none;
@@ -556,7 +679,6 @@ ul.angebote li small {
         border-left: 0px solid transparent;
     }
 }
-
 
 /** CKEditor Overrides */
 
