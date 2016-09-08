@@ -279,6 +279,10 @@ function render_query_parameter() {
     toggle_time_parameter_display($filter_area)
     //
     toggle_text_parameter_display($filter_area)
+    //
+    if (!search_input && !location_coords && !time_parameter) {
+        $('.list-area .status').html("Bitte gib einen Suchbegriff ein oder w&auml;hle einen Standort")
+    }
 }
 
 function remove_location_parameter() {

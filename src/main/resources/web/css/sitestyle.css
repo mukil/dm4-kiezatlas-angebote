@@ -15,11 +15,11 @@
 .angebotsinfos.search .ui-state-focus {
     border: 1px solid #eaca8f;
     background: #FC3;
-    color: #002856;
+    color: #27638C;
 }
 
 .angebotsinfos.search .ui-menu-item a {
-    color: #002856;
+    color: #27638C;
 }
 
 @-o-viewport {
@@ -42,7 +42,7 @@ html, body {
 
 #marker-name b,
 h3 {
-    color: #002856;
+    color: #27638C;
 }
 
 span.label,
@@ -52,7 +52,7 @@ h3.label {
 
 .search .results li.read-more a.create-link,
 a {
-    color: #002856;
+    color: #27638C;
     text-decoration: underline;
     text-decoration-color: #8f1414;
 }
@@ -127,7 +127,7 @@ a {
 
 .search .headline {
     text-align: center;
-    color: #002856;
+    color: #27638C;
 }
 
 .search .form-area .label,
@@ -231,7 +231,7 @@ a.offer-edit {
 .concrete-assignment {
     background: #fff;
     padding: 1em;
-    border: 1px solid #002856;
+    border: 1px solid #27638C;
     margin-top: 1em;
 }
 
@@ -275,8 +275,8 @@ div.ui-datepicker {
 
 .ui-widget-content .ui-state-hover,
 .ui-widget-content .ui-state-focus {
-    border: 1px solid #002856;
-    background: #002856;
+    border: 1px solid #27638C;
+    background: #27638C;
     color: #fff;
 }
 
@@ -351,7 +351,7 @@ div.ui-datepicker {
 .filter-area .parameter a.close {
     padding: 0.5em;
     background-color: #FC3;
-    color: #002856;
+    color: #27638C;
     margin: 0em 0.5em 0em 0.5em;
     cursor: pointer;
     text-decoration: none;
@@ -377,7 +377,7 @@ div.ui-datepicker {
 .filter-area .parameter select:hover,
 .filter-area .parameter a.close.next:hover,
 .filter-area .parameter a.close.prev:hover {
-    color: #002856;
+    color: #27638C;
 }
 
 
