@@ -50,6 +50,7 @@ h3.label {
     color: #a9a9a9;
 }
 
+.search .results li.read-more a.create-link,
 a {
     color: #002856;
     text-decoration: underline;
@@ -162,10 +163,6 @@ a {
     margin-right: 10px;
 }
 
-.search .list-area .status {
-    padding-left: .5em;
-}
-
 .search .list-area ul.results {
     padding-left: 0px;
     margin-top: 0px;
@@ -179,7 +176,6 @@ a {
 .detail .read-more,
 .search .read-more {
     background-color: #e3e3e3;
-    padding: 5px;
     margin-top: 10px;
     display: inline-block;
     text-decoration: none;
@@ -305,27 +301,19 @@ div.ui-datepicker {
     position: relative;
 }
 
+.list-area,
 .form-area {
     position: relative;
     padding: 1em 1em 0em 2em;
     color: #343434;
 }
 
-.list-area {
-    padding: 1em 1em 0em 1.5em;
-}
-
 .search #location-search-form {
     margin-bottom: 1em;
 }
 
-/** .filter-area {
-    display: none;
-} **/
-
 .search .filter-area {
     padding-top: 1em;
-    /** border-top: 1px solid rgba(34,36,38,.15); **/
 }
 
 .search h4,
@@ -342,7 +330,6 @@ div.ui-datepicker {
 }
 
 .search-results h4 {
-    padding-left: .5em;
     font-weight: normal;
 }
 
@@ -654,9 +641,6 @@ ul.angebote li small {
     .search .form-area label {
         display: none;
     }
-    .search .form-area {
-        text-align: left;
-    }
     .search #query {
         margin-left: 0em;
         width: 240px;
@@ -664,8 +648,9 @@ ul.angebote li small {
     .top-menu .ui.menu a img {
         border: none;
     }
-    .form-area {
+    .search .list-area, .search .form-area {
         padding: 1em 1em 0em 1em;
+        text-align: left;
     }
     .top-menu.ui.container {
         margin-left: 0px !important;

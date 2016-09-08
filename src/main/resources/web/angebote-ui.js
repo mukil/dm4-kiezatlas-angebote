@@ -147,8 +147,8 @@ function render_search_results(items) {
     }
     $listing.empty()
     if (items_to_render.length === 0) {
-        $listing.append("<li>Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder "
-            + "uns helfen neue oder aktuelle Angebote in die <a href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>")
+        $listing.append('<li class="read-more">Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder '
+            + 'uns helfen neue oder aktuelle Angebote in die <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>')
         // ("+new Date().toLocaleDateString()+")
     }
     for (var el in items_to_render) {
@@ -156,8 +156,8 @@ function render_search_results(items) {
         render_classical_list_item(element, $listing)
     }
     var message = (items_to_render.length === 1) ? "1 Angebot" : items_to_render.length + " Angebote"
-        if (items_to_render.length === 0) message = "F&uuml;r diese Suchanfrage liegen uns keine Informationen vor"
-    $('.list-area .status').text(message)
+        if (items_to_render.length === 0) message = "F&uuml;r diese Suche liegen uns keine Informationen vor"
+    $('.list-area .status').html(message)
 }
 
 function render_classical_list_item(element, $list) {
@@ -229,8 +229,8 @@ function toggle_location_parameter_display($filter_area) {
                 + '</select>N&auml;he \"'+ location_coords.name + '\" <span class="coord-values">(' + location_coords.longitude.toFixed(3)
                 + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
         if (street_coordinates.length > 0) {
-            parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
-                + '<a class="next close" title="Alternatives Ergebnis der Standortsuche" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
+            parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche nutzen" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
+                + '<a class="next close" title="Nächstes Ergebnis der Standortsuche nutzen" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
                 + '<span class="alt-count">('+street_coordinates.length +' Standorte gefunden)</span>'
         }
         if ($locationParameter.length === 0) {
