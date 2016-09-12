@@ -19,6 +19,7 @@ import de.deepamehta.workspaces.WorkspacesService;
 import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT_NAME;
+import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
 import java.io.InputStream;
 import javax.ws.rs.Path;
@@ -30,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -76,6 +78,13 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotListView() {
+        return getStaticResource("web/search.html");
+    }
+
+    @GET
+    @Path("/stichwort/{tagName}")
+    @Produces(MediaType.TEXT_HTML)
+    public InputStream getAngebotListView(@PathParam("tagName") String tag) {
         return getStaticResource("web/search.html");
     }
 
@@ -257,7 +266,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
         Topic angebot = dm4.getTopic(topicId);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
-            List<RelatedTopic> geoObjects = getAssginedGeoObjectTopics(angebot);
+            List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
             Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
             while (geoIterator.hasNext()) {
                 RelatedTopic einrichtung = geoIterator.next();
@@ -284,7 +293,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         while (iterator.hasNext()) {
             Topic angebot = iterator.next();
             if (angebot.getId() == topicId) {
-                List<RelatedTopic> geoObjects = getAssginedGeoObjectTopics(angebot);
+                List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
                 Iterator<RelatedTopic> geoIterator = geoObjects.iterator();
                 while (geoIterator.hasNext()) {
                     RelatedTopic einrichtung = geoIterator.next();
@@ -400,9 +409,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     @GET
     @Path("/filter/{now}")
-    public List<Angebotsinfos> getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
+    public AngeboteSearchResults getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
         List<Topic> offers = getAllAngebotsinfoTopicsFilteredByTime(timestamp);
-        return prepareAngebotsInfoResults(offers);
+        AngeboteSearchResults results = new AngeboteSearchResults();
+        results.setOverallAngebote(prepareAngebotsinfoResults(offers));
+        return results;
     }
 
     /**
@@ -414,31 +425,49 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/search")
     @Override
-    public List<Angebotsinfos> searchAngebotsinfosByText(@QueryParam("query") String query,
+    public AngeboteSearchResults searchAngebotsinfosByText(@QueryParam("query") String query,
             @QueryParam("location") String location, @QueryParam("radius") String radius,
             @QueryParam("datetime") long timestamp) {
         try {
             String queryString = prepareLuceneQueryString(query, false, true, false);
-            logger.info("Fulltext Query \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
-            List<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
+            logger.info("Angebote Search \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
+            List<Angebotsinfos> overallAngebote = new ArrayList<Angebotsinfos>();
+            List<AngebotsinfosAssigned> assignedAngebote = new ArrayList<AngebotsinfosAssigned>();
+            AngeboteSearchResults results = new AngeboteSearchResults();
+            List<Topic> angebotsOrte = new ArrayList<Topic>();
             // Spatial Query
             if (!location.isEmpty() && location.contains(",")) {
                 double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
-                // double longitude = Double.parseDouble(location.split(",")[0]);
-                // double latitude = Double.parseDouble(location.split(",")[1]);
                 GeoCoordinate point = new GeoCoordinate(location.trim());
-                logger.info("> Spatial Resultset Point " + point.toString() + " Radius " + r + " Service " + spatialService);
                 List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(point, r);
-                logger.info("> Spatial Resultset Size " + geoCoordinateTopics.size() + " Geo Coordinates");
-                // ### unfinished business
+                logger.info("> Spatial Resultset Size " + geoCoordinateTopics.size() + " Geo Coordinate Topics");
+                for (Topic geoCoordinate : geoCoordinateTopics) {
+                    Topic inst = kiezService.getGeoObjectByGeoCoordinateTopic(geoCoordinate);
+                    if (inst != null) {
+                        List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(inst);
+                        if (offers != null && offers.size() > 0) {
+                            angebotsOrte.add(inst);
+                        }
+                    }
+                }
+                logger.info("> Found " + angebotsOrte.size() + " locations with Angebotsinfos assigned");
             }
-            // ### merge results
+            logger.info("> Assembling angebotsinfos of " + angebotsOrte.size() + " locations...");
+            List<Topic> allAngeboteTopics = new ArrayList<Topic>();
+            for (Topic einrichtung : angebotsOrte) {
+                allAngeboteTopics.addAll(getAngeboteTopicsByGeoObject(einrichtung));
+            }
+            logger.info("> Collected " + allAngeboteTopics.size() + " angebote via spatial search.");
+            assignedAngebote = prepareAngebotsinfosAssignedResults(allAngeboteTopics);
+            logger.info("> " + assignedAngebote.size() + " unique angebote found via spatial search");
             if (queryString != null) {
-                // Prep lucene query for fulltext search
                 List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
                 logger.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
-                results.addAll(prepareAngebotsInfoResults(angebotsinfos));
+                overallAngebote.addAll(prepareAngebotsinfoResults(angebotsinfos)); // adds just new ones to resultset
             }
+            // Build up search result object
+            results.setAssignedAngebote(assignedAngebote);
+            results.setOverallAngebote(overallAngebote);
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Searching Angebotsinfos across ALL DISTRICTS failed", e);
@@ -538,7 +567,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     /** TODO: Add parameter allowing us to filer out all angbote currently not active. */
-    private List<Angebotsinfos> prepareAngebotsInfoResults(List<Topic> angebotsinfos) {
+    private List<Angebotsinfos> prepareAngebotsinfoResults(List<Topic> angebotsinfos) {
         ArrayList<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
         for (Topic angebot : angebotsinfos) {
             // 1) assemble basic angebots infos
@@ -546,7 +575,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             // 2) check if angebots info isnt already in our resultset
             if (!results.contains(result)) {
                 // 3) assemble locations and start and end time
-                List<RelatedTopic> geoObjects = getAssginedGeoObjectTopics(angebot);
+                List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
                 JSONArray locations = new JSONArray();
                 for (RelatedTopic geoObject : geoObjects) {
                     Association assignment = getAssignmentAssociation(angebot, geoObject);
@@ -555,6 +584,23 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 result.setLocations(locations);
                 logger.fine("> Fetched current Angebotsinfo \"" + result.getName()+ "\"");
                 results.add(result);
+            }
+        }
+        return results;
+    }
+
+    private List<AngebotsinfosAssigned> prepareAngebotsinfosAssignedResults(List<Topic> angebotsinfos) {
+        ArrayList<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
+        Map<Long, Topic> angebotResultset = new HashMap<Long, Topic>();
+        for (Topic angebot : angebotsinfos) {
+            if (!angebotResultset.containsKey(angebot.getId())) {
+                angebotResultset.put(angebot.getId(), angebot);
+                List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
+                for (RelatedTopic geoObject : geoObjects) {
+                    Association assignment = getAssignmentAssociation(angebot, geoObject);
+                    results.add(assembleLocationAssignmentModel(geoObject, angebot, assignment));
+                    break;
+                }
             }
         }
         return results;
@@ -788,7 +834,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @Override
-    public List<RelatedTopic> getAssginedGeoObjectTopics(Topic angebot) {
+    public List<RelatedTopic> getAssignedGeoObjectTopics(Topic angebot) {
         return angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, "dm4.core.parent", "dm4.core.child", GEO_OBJECT);
     }
 

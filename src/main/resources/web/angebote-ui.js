@@ -29,6 +29,7 @@ var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 var location_input = undefined
 var location_coords = undefined
 var location_radius = 1.5
+var available_radiants = [ 0.5, 1.0, 1.5, 2.5, 5.0, 10.0, 15.0 ]
 var search_input = undefined
 var street_coordinates = []
 var street_coords_idx = 0
@@ -39,8 +40,8 @@ var time_parameter = undefined
 
 function do_search_angebote() {
     var queryString = $('#query').val()
-    if (queryString.length === 0) {
-        $('#query').attr("placeholder", "Bitte Suchbegriff eingeben")
+    if (queryString.length === 0 && !location_coords) {
+        $('#query').attr("placeholder", "Bitte Suchbegriff eingeben").focus()
         return
     }
     $('#search-input-one').addClass('loading')
@@ -71,18 +72,17 @@ function do_search_angebote() {
     $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationValue + '&radius='
             + location_radius + '&datetime=' + dateTime, function(results) {
         render_search_results(results)
-        if (results.length > 0) {
-            $('#query').val("")
-        }
-        $('#search-input-one').removeClass('loading')
     })
 }
 
 function do_search_streetcoordinates() {
     var locationString = $('#nearby').val().trim()
     $.getJSON('/geoobject/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
-        street_coordinates = results
-        if (results) select_locationsearch_parameter()
+        if (results) {
+            street_coordinates = results
+            select_locationsearch_parameter()
+            do_search_angebote()
+        }
     })
 }
 
@@ -120,9 +120,24 @@ function do_browser_location() {
     })
 }
 
+function load_tag_view() {
+    $.getJSON('/tag/with_related_count/ka2.angebot', function(result) {
+        var $tags = $('.tag-view')
+        for (var r in result) {
+            var tag = result[r]
+            var name = tag["value"]
+            var tagHTML = '<a href="#stichwort/' + encodeURIComponent(name) +'" id="' + tag.id + '" class="' + tag["view_css_class"] +
+                '" title="Finde Angebotsinfos unter dem Stichwort ' + name + '" onclick="handle_tag_selection(this)">' + name + '</a>'
+            if (r < result.length - 1) tagHTML += ", "
+            $tags.append(tagHTML)
+        }
+    })
+}
+
 function load_current_angebotsinfos() {
-    angebotsinfos = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
+    var result = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
         { async: false, dataType: 'json' }).responseText)
+    angebotsinfos = result.overall // .timely query results assigned to .overall (server side)
 }
 
 // --------------------------- GUI methods for rendering all Search UI elements ------------ //
@@ -135,32 +150,80 @@ function show_angebote_frontpage() {
     render_query_parameter()
     render_search_results()
     load_username(render_user_menu)
+    load_tag_view()
 }
 
 function render_search_results(items) {
+    $('#search-input-one').removeClass('loading')
     var $listing = $('.list-area .results')
-    // var $list = $('.search-results .list')
-    var items_to_render = angebotsinfos
+    // overall and assigned ### merged
+    var items_to_render = { overall: [], assigned: [], timely: []}
+    var result_length = 0
     if (items) {
         items_to_render = items
+        result_length = items_to_render.overall.length + items_to_render.assigned.length
         $listing.empty()
+    } else if (angebotsinfos) {
+        items_to_render.timely = angebotsinfos
+        result_length = items_to_render.timely.length
     }
     $listing.empty()
     if (items_to_render.length === 0) {
-        $listing.append('<li class="read-more">Sie k&ouml;nnen sich alternativ &uuml;ber Einrichtungen in ihrer N&auml;he informieren oder '
-            + 'uns helfen neue oder aktuelle Angebote in die <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>')
+        $listing.append('<li class="read-more">Sie k&ouml;nnen '
+            + 'uns helfen neue oder aktuelle Angebote in unsere <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>')
         // ("+new Date().toLocaleDateString()+")
     }
-    for (var el in items_to_render) {
-        var element = items_to_render[el]
-        render_classical_list_item(element, $listing)
+    // status
+    if (items_to_render.overall.length > 0) {
+        $('#query').val("")
     }
-    var message = (items_to_render.length === 1) ? "1 Angebot" : items_to_render.length + " Angebote"
-        if (items_to_render.length === 0) message = "F&uuml;r diese Suche liegen uns keine Informationen vor"
+    // assigned (spatial, time search) list items
+    for (var el in items_to_render.timely) {
+        var element = items_to_render.timely[el]
+        render_timely_list_item(element, $listing)
+    }
+    // assigned (spatial, time search) list items
+    for (var el in items_to_render.assigned) {
+        var element = items_to_render.assigned[el]
+        render_assigned_list_item(element, $listing)
+    }
+    // overall (text search listing)
+    for (var el in items_to_render.overall) {
+        var element = items_to_render.overall[el]
+        render_overall_list_item(element, $listing)
+    }
+    var message = (result_length === 1) ? "1 Angebot" : result_length + " Angebote"
+        if (result_length === 0) message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse"
     $('.list-area .status').html(message)
 }
 
-function render_classical_list_item(element, $list) {
+function render_timely_list_item(element, $list) {
+    var name = element.name
+    var contact = element.kontakt
+    var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
+            + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
+        if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
+        html_string += '<span class="read-more">Mehr..</span>'
+        html_string += '</div></a></li>'
+    $list.append(html_string)
+}
+
+function render_assigned_list_item(element, $list) {
+    var locationName = element.name
+    var name = element.angebotsName
+    var angebotsId = element.angebotsId
+    var contact = element.kontakt
+    var html_string = '<li class="read-more"><a href="/angebote/'+angebotsId+'">'
+            + '<div id="' + angebotsId + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
+            + '<p>Wird aktuell in/im <b>' + locationName + '</b> angeboten<br/>'
+            + 'Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
+        if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
+        html_string += '<span class="read-more">Mehr..</span>'
+        html_string += '</div></a></li>'
+    $list.append(html_string)
+}
+
+function render_overall_list_item(element, $list) {
     var name = element.name
     var contact = element.kontakt
     // var webpage = element.webpage
@@ -222,13 +285,17 @@ function toggle_location_parameter_display($filter_area) {
         var $locationParameter = $('.filter-area .parameter.location')
         var parameterHTML = '<a class="close" title="Standortfilter entfernen" href="javascript:remove_location_parameter()">x</a>'
                 + '<select id="nearby-radius" onchange="handle_location_form()" title="Entfernungsangabe für die Umkreissuche">'
-                    + '<option value="0.5">0.5km</option><option value="1.0">1km</option>'
-                    + '<option value="1.5" selected>1.5km</option><option value="2.5">2.5km</option>'
-                    + '<option value="5">5km</option><option value="10">10km</option>'
-                    + '<option value="15">15km</option>'
-                + '</select>N&auml;he \"'+ location_coords.name + '\" <span class="coord-values">(' + location_coords.longitude.toFixed(3)
+        for (var ridx in available_radiants) {
+            var option_value = available_radiants[ridx]
+            if (location_radius == option_value) {
+                parameterHTML += '<option value="'+option_value+'" selected>' + option_value + 'km</option>'
+            } else {
+                parameterHTML += '<option value="'+option_value+'">' + option_value + 'km</option>'
+            }
+        }
+        parameterHTML += '</select>N&auml;he \"'+ location_coords.name + '\" <span class="coord-values">(' + location_coords.longitude.toFixed(3)
                 + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
-        if (street_coordinates.length > 0) {
+        if (street_coordinates.length > 1) {
             parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche nutzen" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
                 + '<a class="next close" title="Nächstes Ergebnis der Standortsuche nutzen" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
                 + '<span class="alt-count">('+street_coordinates.length +' Standorte gefunden)</span>'
@@ -288,19 +355,28 @@ function render_query_parameter() {
 function remove_location_parameter() {
     location_coords = undefined
     render_query_parameter()
+    // do_search_angebote()
 }
 
 function remove_time_parameter() {
     time_parameter = undefined
     render_query_parameter()
-    render_search_results([])
+    // do_search_angebote()
 }
 
 function remove_text_parameter(e) {
     search_input = undefined
     $('#query').val("")
     render_query_parameter()
-    // render_search_results()
+    // do_search_angebote()
+}
+
+function handle_tag_selection(e) {
+    var tagname = e.text
+    remove_text_parameter()
+    remove_time_parameter()
+    $('#query').val(tagname)
+    do_search_angebote()
 }
 
 function handle_fulltext_form(e) {
@@ -312,6 +388,7 @@ function handle_location_form(e) {
     if (radiusSelection) {
         location_radius = radiusSelection.options[radiusSelection.selectedIndex].value;
         console.log("Updated Location Search Radius", location_radius)
+        do_search_angebote()
     }
 }
 
