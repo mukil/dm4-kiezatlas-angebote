@@ -102,6 +102,6 @@ public interface AngebotService {
      * @param query
      * @return
      */
-    AngeboteSearchResults searchAngebotsinfosByText(String query, String location, String radius, long datetime);
+    AngeboteSearchResults searchAngebotsinfos(String query, String location, String radius, long datetime);
 
 }

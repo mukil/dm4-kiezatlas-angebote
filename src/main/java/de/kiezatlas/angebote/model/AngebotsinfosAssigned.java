@@ -299,4 +299,17 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        boolean equal = false;
+        if (obj instanceof AngebotsinfosAssigned) {
+            equal = (this.getId() == ((AngebotsinfosAssigned) obj).getId());
+        }
+        return equal;
+    }
+
+    public long getId() {
+        return Long.parseLong(getAngebotsId());  // ### should be getAssignmentId()...
+    }
+
 }

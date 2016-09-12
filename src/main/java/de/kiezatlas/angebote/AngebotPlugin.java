@@ -21,6 +21,7 @@ import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT_NAME;
 import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
+import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
 import java.io.InputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -425,7 +426,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/search")
     @Override
-    public AngeboteSearchResults searchAngebotsinfosByText(@QueryParam("query") String query,
+    public AngeboteSearchResults searchAngebotsinfos(@QueryParam("query") String query,
             @QueryParam("location") String location, @QueryParam("radius") String radius,
             @QueryParam("datetime") long timestamp) {
         try {
@@ -442,23 +443,23 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(point, r);
                 logger.info("> Spatial Resultset Size " + geoCoordinateTopics.size() + " Geo Coordinate Topics");
                 for (Topic geoCoordinate : geoCoordinateTopics) {
-                    Topic inst = kiezService.getGeoObjectByGeoCoordinateTopic(geoCoordinate);
+                    Topic inst = kiezService.getGeoObjectByGeoCoordinate(geoCoordinate);
                     if (inst != null) {
                         List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(inst);
-                        if (offers != null && offers.size() > 0) {
-                            angebotsOrte.add(inst);
-                        }
+                        if (offers != null && offers.size() > 0) angebotsOrte.add(inst);
                     }
                 }
-                logger.info("> Found " + angebotsOrte.size() + " locations with Angebotsinfos assigned");
             }
-            logger.info("> Assembling angebotsinfos of " + angebotsOrte.size() + " locations...");
-            List<Topic> allAngeboteTopics = new ArrayList<Topic>();
-            for (Topic einrichtung : angebotsOrte) {
-                allAngeboteTopics.addAll(getAngeboteTopicsByGeoObject(einrichtung));
+            logger.info("> Assembling angebotsinfos for " + angebotsOrte.size() + " locations...");
+            List<AngebotsinfosAssigned> allAngeboteTopics = new ArrayList<AngebotsinfosAssigned>();
+            for (Topic einrichtung : angebotsOrte) { // ### result set location should be set
+                List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(einrichtung);
+                for (Topic offer : offers) {
+                    allAngeboteTopics.add(prepareAngebotsinfosAssigned(offer, einrichtung));
+                }
             }
             logger.info("> Collected " + allAngeboteTopics.size() + " angebote via spatial search.");
-            assignedAngebote = prepareAngebotsinfosAssignedResults(allAngeboteTopics);
+            assignedAngebote = filterOutDuplicates(allAngeboteTopics);
             logger.info("> " + assignedAngebote.size() + " unique angebote found via spatial search");
             if (queryString != null) {
                 List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
@@ -604,6 +605,21 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             }
         }
         return results;
+    }
+
+    private List<AngebotsinfosAssigned> filterOutDuplicates(List<AngebotsinfosAssigned> angebotsinfos) {
+        List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
+        for (AngebotsinfosAssigned angebot : angebotsinfos) {
+            if (!results.contains(angebot)) {
+                results.add(angebot);
+            }
+        }
+        return results;
+    }
+
+    private AngebotsinfosAssigned prepareAngebotsinfosAssigned(Topic angebotsinfos, Topic einrichtung) {
+        Association assignment = getAssignmentAssociation(angebotsinfos, einrichtung);
+        return assembleLocationAssignmentModel(einrichtung, angebotsinfos, assignment);
     }
 
     private Angebotsinfos assembleAngebotsinfo(Topic angebot) {
