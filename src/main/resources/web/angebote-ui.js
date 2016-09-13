@@ -498,27 +498,7 @@ function clear_assignment_date_area() {
     $('#do-delete').addClass("hidden")
 }
 
-function load_users_angebote() {
-    var result = restc.request("GET", "/angebote/my")
-    for (var el in result) {
-        var item = result[el]
-        var created_val = new Date(item['childs']['dm4.time.created']['value'])
-        var modified_val = new Date(item['childs']['dm4.time.modified']['value'])
-        var created = $.datepicker.formatDate("dd. MM yy", created_val)
-        var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
-        // console.log("Angebot Item", item, created, modified)
-        $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/angebote/edit/'
-            + item.id + '">Infos bearbeiten</a><a href="/angebote/zuordnen/'
-            + item.id + '">Termine anpassen</a><br/><small>Erstellt am '
-            + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
-    }
-}
 
-/** function load_angebot(id) {
-    var topic = restc.request("GET", "/kiezatlas/angebot/" + id)
-    selected_angebot = topic
-    console.log("Angebotsinformation", topic)
-} **/
 
 // ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
 
@@ -1005,6 +985,38 @@ function load_username(renderer) {
             console.warn("ERROR", "x: " + x + " s: " + s + " e: " + e)
         }
     })
+}
+
+function load_users_angebote() {
+    var result = restc.request("GET", "/angebote/my")
+    for (var el in result) {
+        var item = result[el]
+        var created_val = new Date(item['childs']['dm4.time.created']['value'])
+        var modified_val = new Date(item['childs']['dm4.time.modified']['value'])
+        var created = $.datepicker.formatDate("dd. MM yy", created_val)
+        var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
+        // console.log("Angebot Item", item, created, modified)
+        $('ul.angebote').append('<li id="'+item.id+'">' + item.value + '<a href="/angebote/edit/'
+            + item.id + '">Infos bearbeiten</a><a href="/angebote/zuordnen/'
+            + item.id + '">Termine anpassen</a><br/><small>Erstellt am '
+            + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
+    }
+}
+
+function load_users_einrichtungen() {
+    var result = restc.request("GET", "/geoobject/my")
+    console.log("Loaded users einrichtungen", result)
+    for (var el in result) {
+        var item = result[el]
+        var created_val = new Date(item['childs']['dm4.time.created']['value'])
+        var modified_val = new Date(item['childs']['dm4.time.modified']['value'])
+        var created = $.datepicker.formatDate("dd. MM yy", created_val)
+        var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
+        // console.log("Einrichtung", item, created, modified)
+        $('ul.einrichtungen').append('<li id="'+item.id+'">' + item.value + '<a href="/geoobject/edit/'
+            + item.id + '">Einrichtungsinfos bearbeiten</a><br/><small>Erstellt am '
+            + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
+    }
 }
 
 function render_user_menu(state) {
