@@ -44,7 +44,7 @@ function do_search_angebote() {
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben").focus()
         return
     }
-    $('#search-input-one').addClass('loading')
+    show_search_loading_sign()
     var dateTime = new Date().getTime()
     if (time_parameter) { // de-activate time parameter display
         time_parameter = undefined
@@ -154,7 +154,7 @@ function show_angebote_frontpage() {
 }
 
 function render_search_results(items) {
-    $('#search-input-one').removeClass('loading')
+    hide_search_loading_sign()
     var $listing = $('.list-area .results')
     // overall and assigned ### merged
     var items_to_render = { overall: [], assigned: [], timely: []}
@@ -245,6 +245,15 @@ function render_overall_list_item(element, $list) {
         $list.append(html_string)
     } else {
         console.warn("Could not load assignment for angebotsinfo...", element)
+        var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
+            + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
+            // html_string += '<p>' + descr + '</p>'
+            html_string += '<p>F&uuml;r dieses Angebot haben wir aktuell keine Termine.<br/>'
+            if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
+            // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
+            html_string += '<span class="read-more">Mehr..</span>'
+            html_string += '</div></a></li>'
+        $list.append(html_string)
     }
 }
 
@@ -355,20 +364,35 @@ function render_query_parameter() {
 function remove_location_parameter() {
     location_coords = undefined
     render_query_parameter()
-    // do_search_angebote()
+    if (!search_input && !time_parameter) {
+        angebotsinfos = []
+        render_search_results()
+    } else {
+        do_search_angebote()
+    }
 }
 
 function remove_time_parameter() {
     time_parameter = undefined
     render_query_parameter()
-    // do_search_angebote()
+    if (!search_input && !location_input) {
+        angebotsinfos = []
+        render_search_results()
+    } else {
+        do_search_angebote()
+    }
 }
 
 function remove_text_parameter(e) {
     search_input = undefined
     $('#query').val("")
     render_query_parameter()
-    // do_search_angebote()
+    if (!time_parameter && !location_input) {
+        angebotsinfos = []
+        render_search_results()
+    } else {
+        do_search_angebote()
+    }
 }
 
 function handle_tag_selection(e) {
@@ -415,21 +439,23 @@ function do_save_angebot() {
     var topic = undefined
     if (selected_angebot) {
         // Update
-        topic = selected_angebot
-        var topic_model = {
-            "id" : selected_angebot.id,
-            "type_uri" : "ka2.angebot",
-            "childs": {
-                "ka2.angebot.name" : name,
-                "ka2.angebot.beschreibung" : descr,
-                "ka2.angebot.kontakt" : contact,
-                "ka2.angebot.webpage" : webpage,
-                "dm4.tags.tag": tags
+        if (selected_angebot.id !== 0) {
+            topic = selected_angebot
+            var topic_model = {
+                "id" : selected_angebot.id,
+                "type_uri" : "ka2.angebot",
+                "childs": {
+                    "ka2.angebot.name" : name,
+                    "ka2.angebot.beschreibung" : descr,
+                    "ka2.angebot.kontakt" : contact,
+                    "ka2.angebot.webpage" : webpage,
+                    "dm4.tags.tag": tags
+                }
             }
+            console.log("Upading Angebot Topic", topic_model)
+            topic = topic_model
+            restc.update_topic(topic_model)
         }
-        console.log("Upading Angebot Topic", topic_model)
-        topic = topic_model
-        restc.update_topic(topic_model)
     } else {
         // Create
         // ### do not allow for empty name, empty description or empty contact
@@ -745,9 +771,9 @@ function render_angebot_locations() {
     // Display Assignments
     var $einrichtungen = $('.geo-objects-area .einrichtungen')
         $einrichtungen.empty()
-        // $einrichtungen.html('<b>Hello fucked up World!</b>')
     if (geo_assignments.length === 0) {
         $('.help').html('Diesen Angebotsinfos sind aktuell noch keine Angebotszeitr&auml;ume in Einrichtungen zugewiesen.')
+        $('h3.assignments').html("F&uuml;r dieses Angebot haben wir aktuell keine Termine")
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
     }
@@ -913,40 +939,61 @@ function render_angebotsinfo_page() {
 }
 
 function render_angebot_detail_area() {
-   console.log("Show Angebotinfo Details Page", selected_angebot)
-   if (!selected_angebot) throw new Error("Angebotsinfo not found")
-    // assemble Angebotsinfo
+    if (!selected_angebot) throw new Error("Angebotsinfo not found")
     var name = (selected_angebot.name) ? selected_angebot.name : "Name des Angebots"
-    var contact = (selected_angebot.kontakt) ? selected_angebot.kontakt : "Kontakt"
-    var webpage = (selected_angebot.webpage) ? selected_angebot.webpage : "Webpage"
-    var descr = (selected_angebot.beschreibung) ? selected_angebot.beschreibung : "Beschreibung"
     var tags = "" // ### render tags
     for (var t in selected_angebot.tags) {
         tags += selected_angebot.tags[t].label
         if (t < selected_angebot.tags.length - 1) tags += ", "
     }
-    // append to DOM
     $('.angebot-name').text(name)
-    $('.angebot-infos p.body').html('<span class="label">Angebotsinfos</span><br/>'
-            + descr + '<br/><span class="label">Kontakt</span><br/>' + contact
-            + '<br/><br/><span class="label">Webseite</span><br/><a href="' + webpage + '">'
-            + webpage + '</a><br/><br/><span class="label">Stichworte</span><br/><i>' + tags + '</i>')
+    var angebotHTML = ''
+    if (selected_angebot.beschreibung) {
+        angebotHTML = '<span class="label">Angebotsinfos</span><br/>' + selected_angebot.beschreibung + '<br/>'
+    }
+    if (selected_angebot.kontakt) {
+        angebotHTML += '<span class="label">Kontakt</span><br/>' + selected_angebot.kontakt + '<br/>'
+    }
+    if (selected_angebot.webpage && selected_angebot.webpage.indexOf("http://") !== -1) {
+        angebotHTML += '<br/><br/><span class="label">Webseite</span><br/>'
+            + '<a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
+    }
+    if (tags !== "") {
+        angebotHTML += '<br/><span class="label">Stichworte</span><br/><i>' + tags + '</i>'
+    }
+    $('.angebot-infos p.body').html(angebotHTML)
 }
 
 function load_angebot_by_resource_path(callback) {
     var angebot_id = parse_angebots_id()
-    var angebotsinfoText = $.ajax('/angebote/' + angebot_id, { async: false, dataType: 'json' }).responseText
-    try {
-        selected_angebot = JSON.parse(angebotsinfoText)
-        if (callback) callback("ok", selected_angebot)
-    } catch (e) {
-        console.warn("Could not load angebotsinfo details...", e, "using", angebotsinfoText)
-        selected_angebot = angebotsinfoText
-        if (callback) callback("error", selected_angebot)
+    console.log("Loaded Angebot ID By Resource Path", angebot_id)
+    if (angebot_id != 0) {
+        var angebotsinfoText = $.ajax('/angebote/' + angebot_id, { async: false, dataType: 'json' }).responseText
+        try {
+            selected_angebot = JSON.parse(angebotsinfoText)
+            if (callback) callback("ok", selected_angebot)
+        } catch (e) {
+            console.warn("Could not load angebotsinfo details...", e, "using", angebotsinfoText)
+            selected_angebot = angebotsinfoText
+            if (callback) callback("error", selected_angebot)
+        }
+    } else {
+        console.log("No angebot to edit - Creating new one...")
+        if (callback) callback("ok", undefined)
     }
 }
 
 // ---- Generic Methods used ACROSS all screens ---- //
+
+function show_search_loading_sign() {
+    $('#search-input-one').addClass('loading')
+    $('.list-area .status').html('<div class="ui input icon"><i class="loading icon"/></div>')
+}
+
+function hide_search_loading_sign() {
+    $('#search-input-one').removeClass('loading')
+    // $('.list-area .status').html('<div class="ui input icon"><i class="loading icon"/></div>')
+}
 
 function load_username(renderer) {
     $.ajax({

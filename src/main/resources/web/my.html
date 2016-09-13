@@ -37,7 +37,7 @@
                     <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
                 </a>
                 <a href="/sign-up/login" class="login item">Login</a>
-                <a class="create item" style="display: none;" href="/geoobject/create">Neue Einrichtung</a>
+                <a class="create item" style="display: none;" href="/geoobject/create">Neuer Ort</a>
                 <a class="gesamt item" href="/">Gesamtstadtplan</a>
                 <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Angebote</a>
                 <a href="/angebote" class="all-angebote item">Angebote</a>
@@ -64,7 +64,10 @@
         <div class="angebot-area">
             <ul class="angebote"></ul>
             <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
-                <input id="do-add" type="submit" class="btn" value="Neue Angebotsinformationen anlegen"></input>
+                <input id="do-add" type="submit" class="btn" value="Neues Angebot eintragen" />
+            </form>
+            <form method="GET" action="/geoobject/create" id="angebot-form" accept-charset="UTF-8">
+                <input id="do-add" type="submit" class="btn" value="Neue Einrichtung (Ort) eintragen" />
             </form>
         </div>
 

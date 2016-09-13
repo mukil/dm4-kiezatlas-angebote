@@ -30,7 +30,7 @@
                             // Update Angebotsinfos
                             load_angebot_by_resource_path(function(res, angebotsinfo) {
                                 tagging.init()
-                                if (angebotsinfo.hasOwnProperty("tags")) {
+                                if (angebotsinfo && angebotsinfo.hasOwnProperty("tags")) {
                                     tagging.setupTags(angebotsinfo["tags"])
                                 }
                             })
@@ -77,32 +77,34 @@
         </div>
 
         <div class="task-info">
-            <h3>Neue Angebotsinfos anlegen/ Vorhandene editieren</h3>
+            <h3>Angebotsinfos bearbeiten</h3>
         </div>
 
         <div class="form-area angebot">
             <form action="javascript:do_save_angebot()" id="angebot-form" accept-charset="UTF-8">
                 <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
                 <div class="ui input focus">
-                    <input id="angebot-name" type="text" placeholder="Name des Angebots" />
+                    <input id="angebot-name" required="true" type="text" placeholder="Name des Angebots" />
                 </div>
                 <!--label for="angebot-beschreibung" id="beschreibung-label">Kurzbeschreibung</label-->
-                <textarea id="angebot-beschreibung" contenteditable="true" type="text"
+                <textarea id="angebot-beschreibung" contenteditable="true" class="mbottom" type="text"
                     placeholder="Beschreibung des Angebots"></textarea>
                 <br/>
                 <label for="angebot-kontakt" id="kontakt-label">Kontakt zum Angebot</label>
                 <div class="ui input focus">
-                    <input id="angebot-kontakt" type="text" placeholder="Kontakt" />
+                    <input id="angebot-kontakt" class="mbottom" type="text" placeholder="Kontakt" />
                 </div>
+                <br/>
                 <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)</label>
                 <div class="ui input focus">
-                    <input id="angebot-webpage" type="url" onkeyup="autocorrect_url(this.value)"
-                           placeholder="http://www.kiezatlas.de" />
+                    <input id="angebot-webpage" class="mbottom" type="url" onkeyup="autocorrect_url(this.value)" placeholder="http://www.kiezatlas.de" />
                 </div>
-                <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label>
+                <br/>
+                <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label><br/>
                 <div class="ui input focus">
-                    <input id="angebot-tags" type="text" placeholder=".., .." />
+                    <input id="angebot-tags" class="mbottom" type="text" placeholder=".., .." />
                 </div>
+                <br/>
                 <input id="do-save" type="submit" class="btn" value="Speichern" />
             </form>
         </div>

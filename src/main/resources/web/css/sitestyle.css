@@ -183,6 +183,7 @@ a {
 
 .list-area .results li.read-more {
     background-color: #EAEAEA;
+    margin-right: 2em;
 }
 
 .search  a.read-more {
@@ -308,6 +309,14 @@ div.ui-datepicker {
     color: #343434;
 }
 
+.form-area.angebot .mbottom {
+    margin-bottom: 1em;
+}
+
+.form-area.angebot label {
+    display: block;
+}
+
 .search #location-search-form {
     margin-bottom: 1em;
 }
@@ -374,7 +383,6 @@ div.ui-datepicker {
     color: #343434;
 }
 
-.filter-area .parameter select:hover,
 .filter-area .parameter a.close.next:hover,
 .filter-area .parameter a.close.prev:hover {
     color: #27638C;
@@ -655,6 +663,9 @@ ul.angebote li small {
     .search .list-area, .search .form-area {
         padding: 1em 1em 0em 1em;
         text-align: left;
+    }
+    .list-area .results li.read-more {
+        margin-right: 1em;
     }
     .top-menu.ui.container {
         margin-left: 0px !important;

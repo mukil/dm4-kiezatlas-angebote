@@ -23,7 +23,7 @@ var tagging = new function() {
     this.init = function() {
         // load all tags (user has read access too)
         allReadableTags = _.fetchAllTagTopics()
-        console.log("Initialized all available Tags", allReadableTags)
+        // console.log("Initialized all available Tags", allReadableTags)
         // activate third party library
         _.setupJQueryUIAutocompleteField(nodeId)
     }
@@ -39,7 +39,7 @@ var tagging = new function() {
             if (commaCount < topicTags.length) inputFieldValue += ", "
             commaCount++
         }
-        console.log("Setup Tags to Edit", topicTags)
+        // console.log("Setup Tags to Edit", topicTags)
         $(nodeId).val(inputFieldValue)
     }
 
