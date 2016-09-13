@@ -1006,6 +1006,7 @@ function load_users_angebote() {
 function load_users_einrichtungen() {
     var result = restc.request("GET", "/geoobject/my")
     console.log("Loaded users einrichtungen", result)
+    if (result && result.length > 0) $('.einrichtungs-area').show()
     for (var el in result) {
         var item = result[el]
         var created_val = new Date(item['childs']['dm4.time.created']['value'])

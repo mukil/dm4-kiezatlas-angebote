@@ -747,9 +747,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         Iterator<Topic> iterator = beschreibungen.iterator();
         while (iterator.hasNext()) {
             Topic next = iterator.next();
-            Topic geoObject = getParentAngebotTopic(next); // now this is never null
-            if (!uniqueResults.containsKey(geoObject.getId())) {
-                uniqueResults.put(geoObject.getId(), geoObject);
+            Topic geoObject = getParentAngebotTopic(next); // ### maybe null, clean up upgrade-mechanism
+            if (geoObject != null) {
+                if (!uniqueResults.containsKey(geoObject.getId())) {
+                    uniqueResults.put(geoObject.getId(), geoObject);
+                }
             }
         }
         return new ArrayList(uniqueResults.values());

@@ -67,6 +67,7 @@ a {
     margin-left: 2em;
 }
 
+.start .einrichtungs-area,
 .start .angebot-area {
     margin-left: 2em;
     margin-top: 0em;
@@ -228,6 +229,7 @@ a.offer-edit {
 
 /** Geo Objects in Angebots Listing */
 
+.einrichtungen li,
 .angebote li,
 .concrete-assignment {
     background: #fff;
@@ -415,6 +417,10 @@ span.angebot-name {
     margin-left: 5px;
 }
 
+.angebotsinfos.detail .einrichtungen .read-more {
+    margin-right: 2em;
+}
+
 .assignment .task-info h3,
 .assignment .date-area h3 {
     font-weight: normal;
@@ -431,6 +437,7 @@ span.angebot-name {
 .angebot-area label,
 .form-area label,
 .geo-objects-area label,
+.einrichtungs-area input[type="submit"],
 .angebot-area input[type="submit"],
 .geo-objects-area input[type="radio"],
 .date-area input[type="submit"],
@@ -497,6 +504,11 @@ div.disabled {
     pointer-events: none;
 }
 
+.einrichtungs-area {
+    display: none;
+}
+
+.einrichtungs-area ul.einrichtungen,
 .angebot-area ul.angebote {
     padding-left: 0px;
     list-style-type: none;
@@ -504,6 +516,7 @@ div.disabled {
     margin-right: 2em;
 }
 
+.einrichtungs-area li,
 .angebot-area li {
     padding: 5px 7px 5px 8px;
     margin: 5px 0px 5px 0px;
@@ -511,6 +524,7 @@ div.disabled {
     font-size: 1.2em;
 }
 
+.einrichtungs-area li a,
 .angebot-area li a {
     margin: 0px 0px 0px 10px;
     font-size: 0.9em;
@@ -531,6 +545,7 @@ div.disabled {
     border: 1px solid rgba(0, 40, 86, 0.43);
 }
 
+ul.einrichtungen li small,
 ul.angebote li small {
     color: #999;
 }
