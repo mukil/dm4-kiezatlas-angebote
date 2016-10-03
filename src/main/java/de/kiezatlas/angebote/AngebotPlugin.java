@@ -938,9 +938,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
         for (Topic angebotTopic : angeboteTopics) {
             Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
-            if (!includeFutureOnes && assignmentEndsInTheFuture(assignment)) { // all angebotsinfos assigned and ending in the future
+            if (includeFutureOnes && assignmentEndsInTheFuture(assignment)) { // all angebotsinfos assigned and ending in the future
                 addToRelatedAngebotsinfoResults(angebotsinfos, assignment, geoObject, angebotTopic);
-            } else if (includeFutureOnes && isAssignmentActiveNow(assignment)) {
+            } else if (!includeFutureOnes && isAssignmentActiveNow(assignment)) {
                 // just the angebotsinfos assigned to geoObject which are currntly active
                 addToRelatedAngebotsinfoResults(angebotsinfos, assignment, geoObject, angebotTopic);
             }
