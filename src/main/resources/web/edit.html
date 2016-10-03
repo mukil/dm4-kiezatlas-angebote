@@ -8,6 +8,7 @@
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/>
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script src="/de.kiezatlas.angebote/vendor/jquery/ui/wautocomplete/jquery-ui-1.9.2.custom.min.js"></script>
@@ -15,7 +16,8 @@
         <script src="/de.kiezatlas.angebote/vendor/ckeditor/config.js"></script>
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
+        <script src="/de.kiezatlas.angebote/edit-angebote.js"></script>
         <script src="/de.kiezatlas.angebote/tags-ui.js"></script>
 
         <script type="text/javascript">
@@ -45,6 +47,7 @@
                             + 'unter Angabe ihres Benutzernamens mit Bezug auf diese Fehlermeldung.<br/>')
                     }
                 })
+                // validate_angebots_form()
                 // ckEditor
                 CKEDITOR.inline('angebot-beschreibung')
             })
@@ -53,26 +56,16 @@
     </head>
     <body class="kiezatlas angebotsinfos edit">
 
-        <div class="top-menu ui container fluid">
-            <div class="ui menu">
+        <div class="top-menu ui menu top fixed">
+            <div class="ui container">
+                <a href="/">
+                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
+                </a>
                 <a href="/sign-up/login" class="login item">Login</a>
-                <a class="create item" style="display: none;" href="/geoobject/create">Neue Einrichtung</a>
-                <a class="item" href="/">Gesamtstadtplan</a>
-                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Angebote</a>
+                <a class="item" href="/">Einrichtungen</a>
+                <a href="/angebote/my" style="display: none;" class="angebote item">Meine Eintr&auml;ge</a>
                 <a href="/angebote" class="all-angebote item">Angebote</a>
-                <a href="/sign-up/" class="register item">Registrieren</a>
                 <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
-                <div class="right menu administration" style="display: none;">
-                    <div class="ui simple dropdown item">
-                        <i class="setting icon"></i>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <a class="item" href="/geoobject/confirmation/">Freischalten</a>
-                            <!--a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/geoobject/site/" class="item">Site-Infos</a-->
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -81,32 +74,44 @@
         </div>
 
         <div class="form-area angebot">
-            <form action="javascript:do_save_angebot()" id="angebot-form" accept-charset="UTF-8">
+            <form action="javascript:do_save_angebot_and_go_home()" id="angebot-form" accept-charset="UTF-8">
                 <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
                 <div class="ui input focus">
-                    <input id="angebot-name" required="true" type="text" placeholder="Name des Angebots" />
+                    <input id="angebot-name" name="name" maxlength="128"
+                           required="true" type="text" placeholder="Name des Angebots" />
                 </div>
-                <!--label for="angebot-beschreibung" id="beschreibung-label">Kurzbeschreibung</label-->
-                <textarea id="angebot-beschreibung" contenteditable="true" class="mbottom" type="text"
-                    placeholder="Beschreibung des Angebots"></textarea>
                 <br/>
-                <label for="angebot-kontakt" id="kontakt-label">Kontakt zum Angebot</label>
+                <textarea id="angebot-beschreibung" name="beschreibung" contenteditable="true"
+                          class="mbottom" type="text" placeholder="Beschreibung des Angebots"></textarea>
+                <!--label for="angebot-beschreibung">(Tipp: <em>Was</em> genau, an welchem Wochentag, zu welcher <em>Uhrzeit</em>?)</label-->
+                <br/>
+                <label for="angebot-kontakt" id="kontakt-label">Allgemeine/r Ansprechpartner_in</label>
                 <div class="ui input focus">
-                    <input id="angebot-kontakt" class="mbottom" type="text" placeholder="Kontakt" />
+                    <input id="angebot-kontakt" name="kontakt" class="mbottom" required="true" type="text" placeholder="Kontakt" />
                 </div>
                 <br/>
                 <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)</label>
                 <div class="ui input focus">
-                    <input id="angebot-webpage" class="mbottom" type="url" onkeyup="autocorrect_url(this.value)" placeholder="http://www.kiezatlas.de" />
+                    <input id="angebot-webpage" name="webpage" class="mbottom" type="url" onkeyup="autocorrect_url(this.value)" placeholder="http://www.kiezatlas.de" />
                 </div>
                 <br/>
                 <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label><br/>
                 <div class="ui input focus">
-                    <input id="angebot-tags" class="mbottom" type="text" placeholder=".., .." />
+                    <input id="angebot-tags" name="tags" class="mbottom" type="text" placeholder=".., .." />
                 </div>
                 <br/>
-                <input id="do-save" type="submit" class="btn" value="Speichern" />
+                <div class="ui input focus icon commands">
+                    <button id="do-save" class="ui green button" type="submit">
+                        <i class="icon save"></i>Speichern
+                    </button>
+                </div>
             </form>
+            <br/>
+            <div class="ui input focus icon">
+                <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
+                    <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;me festlegen
+                </button>
+            </div>
         </div>
 
         <div id="bottom">
@@ -120,10 +125,27 @@
                     </li>
                 </ul>
             </div>
-            <br/>
-            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
-        </div>
+            <p>
+                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
+                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            </p>        </div>
 
+        <!-- Piwik
+        <script type="text/javascript">
+        var pkBaseURL = "//stats.infokitchen.net/";
+        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+        </script><script type="text/javascript">
+        try {
+        var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 2);
+        piwikTracker.trackPageView();
+        piwikTracker.enableLinkTracking();
+        } catch( err ) {}
+        </script>
+        <noscript>
+            <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Angebotsinfos+bearbeiten')}" style="border:0" alt="" />
+        </noscript>
+        End Piwik Tracking Code -->
+        
     </body>
 </html>
 

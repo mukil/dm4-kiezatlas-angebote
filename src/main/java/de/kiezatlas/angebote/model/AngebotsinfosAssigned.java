@@ -254,12 +254,30 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         }
     }
 
+    public long getStartTimestamp() {
+        try {
+            return json.getLong("anfang_timestamp");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no StartDate", ex);
+            return -1;
+        }
+    }
+
     public String getEndDate() {
         try {
             return json.getString("ende");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
             return "";
+        }
+    }
+
+    public long getEndTimestamp() {
+        try {
+            return json.getLong("ende_timestamp");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no EndDate", ex);
+            return -1;
         }
     }
 

@@ -73,7 +73,7 @@ public interface AngebotService {
      * @return      List of "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object")
      * AND wich are CURERNT (Start < NOW && End > NOW).
      */
-    List<AngebotsinfosAssigned> getCurrentAngebotsinfosAssigned(Topic geoObject);
+    List<AngebotsinfosAssigned> getActiveAngebotsinfosAssigned(Topic geoObject, boolean current);
 
     /**
      * @return      List of all "Geo Object" topics related to the given Angebot (typeUri="ka2.angebot").

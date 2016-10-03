@@ -8,13 +8,15 @@
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/>
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
         <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery.ui.datepicker-de.js"></script-->
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
+        <script src="/de.kiezatlas.angebote/edit-angebote.js"></script>
 
         <script type="text/javascript">
 
@@ -31,37 +33,29 @@
         <div class="top-menu ui container fluid">
             <div class="ui menu">
                 <a href="/sign-up/login" class="login item">Login</a>
-                <a class="create item" style="display: none;" href="/geoobject/create">Neue Einrichtung</a>
-                <a class="item" href="/">Gesamtstadtplan</a>
-                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Angebote</a>
+                <a class="item gesamt" href="/">Einrichtungen</a>
+                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Eintr&auml;ge</a>
                 <a href="/angebote" class="all-angebote item">Angebote</a>
-                <a href="/sign-up/" class="register item">Registrieren</a>
                 <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
-                <div class="right menu administration" style="display: none;">
-                    <div class="ui simple dropdown item">
-                        <i class="setting icon"></i>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <a class="item" href="/geoobject/confirmation/">Freischalten</a>
-                            <!--a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/geoobject/site/" class="item">Site-Infos</a-->
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div class="left-side">
             <div class="task-info">
-                <h3>Zuordnung der Angebotsinfo <span class="angebot-name">dieser Angebotsinfo</span> zu einer Einrichtung</h3>
-                <p><span class="label">Bitte geben Sie im folgenden Eingabefeld den Namen einer Einrichtung im Kiezatlas ein</span> <!--span class="help">?<span--></p>
+                <h3>
+                    An welchen Einrichtungen findet dieses Angebot statt?<br/>
+                    <span class="angebot-name">dieser Angebotsinfo</span>
+                </h3>
+                <p><span class="label">Bitte w&auml;hle eine Einrichtung &uuml;ber das Suchfeld</span> <!--span class="help">?<span--></p>
                 <!-- GeoObjectTopic.lookupInstitution(alias, as) -->
             </div>
 
             <div class="form-area assignment">
                 <form action="javascript:search_geo_objects_by_name(show_geo_object_search_results)" id="name-search-form" accept-charset="UTF-8">
-                    <input id="name-search" class="ui input focus" type="text" placeholder="Einrichtungsname"></input>
-                    <input id="do-search" type="submit" class="btn" value="Einrichtung suchen"></input>
+                    <div class="ui input">
+                        <input id="name-search" type="text" placeholder="Einrichtungsname" />&nbsp;
+                        <input id="do-search" type="submit" class="btn" value="Einrichtung suchen" />
+                    </div>
                     <span class="search-info"></span>
                 </form>
                 <div class="geo-objects-area">
@@ -71,14 +65,24 @@
 
             <div class="date-area disabled">
                 <h3>Zeitraum des Angebots am Standort <span class="einrichtung-name">...</span> festlegen</h3>
-                <form id="date-select-form" action="javascript:do_save_assignment()" accept-charset="UTF-8">
-                    <label for="from">Das Angebot findet hier statt vom</label><br/>
-                    <input type="text" id="from" name="from"><br/>
-                    <label for="to">bis zum</label><br/>
-                    <input type="text" id="to" name="to"><br/>
-                    <input id="do-assign" type="submit" class="btn" value="Speichern"></input>
-                    <input id="do-delete" type="button" onclick="javascript:do_delete_assignment()" class="btn hidden"
-                           value="Zeitraum löschen"></input>
+                <form id="date-select-form" action="javascript:_void()" accept-charset="UTF-8">
+                    <label for="from" class="block-space">Das Angebot findet hier statt vom</label>
+                    <div class="ui input focus">
+                        <input type="text" id="from" name="from">
+                    </div>
+                    <label for="to" class="block-space">bis zum</label>
+                    <div class="ui input focus">
+                        <input type="text" id="to" name="to">
+                    </div>
+                    <br/>
+                    <div class="ui input focus icon block-space">
+                        <button id="do-assign" class="ui green button" onclick="do_save_assignment()"
+                                title="Bestätigt diesen Veranstaltungszeitraum">
+                            <i class="icon save"></i><span class="text">Speichern</span></button>
+                        <button id="do-delete" class="ui red button hidden" onclick="do_delete_assignment()"
+                                title="Achtung: Entfernt diesen Veranstaltungszeitraum">
+                            <i class="icon trash"></i>Zeitraum l&ouml;schen</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -89,7 +93,7 @@
                     <p class="body"></p>
                 </div>
             </div>
-            <h3>Angebot ist &uuml;ber folgende Zeitr&auml;ume <em>aktiv</em></h3>
+            <h3>Dein Angebot ist an folgenden Standorten &uuml;ber folgende Zeitr&auml;ume <em>aktiv</em></h3>
             <div class="einrichtungen"></div>
             <div class="help"></div>
         </div>
@@ -102,9 +106,27 @@
                     </li>
                 </ul>
             </div>
-            <br/>
-            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            <p>
+                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
+                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            </p>
         </div>
+
+        <!-- Piwik
+        <script type="text/javascript">
+        var pkBaseURL = "//stats.infokitchen.net/";
+        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+        </script><script type="text/javascript">
+        try {
+        var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 2);
+        piwikTracker.trackPageView();
+        piwikTracker.enableLinkTracking();
+        } catch( err ) {}
+        </script>
+        <noscript>
+            <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Terminzuweisungen')}" style="border:0" alt="" />
+        </noscript>
+        End Piwik Tracking Code -->
 
     </body>
     </html>

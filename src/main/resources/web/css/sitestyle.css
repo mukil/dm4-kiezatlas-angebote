@@ -58,12 +58,12 @@ a {
 }
 
 .edit .task-info {
-    margin-top: 3em;
+    margin-top: 5em;
     margin-left: 2em;
 }
 
 .start .task-info {
-    margin-top: 3em;
+    margin-top: 5em;
     margin-left: 2em;
 }
 
@@ -72,9 +72,10 @@ a {
     margin-left: 2em;
     margin-top: 0em;
 }
+
 .detail .detail-area {
+    margin-top: 5em;
     margin-left: 2em;
-    margin-top: 3em;
 }
 
 .list-area,
@@ -90,6 +91,28 @@ a {
 
 .search .headline {
     margin-top: 2em;
+    padding: 2em;
+    padding-bottom: 1em;
+}
+
+.white-styled-area-bottom-line {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+1,ffffff+100&1+0,0.91+100 */
+    border-bottom: 1px solid #FC3;
+    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 1%, rgba(255,255,255,0.91) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 1%,rgba(255,255,255,0.91) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 1%,rgba(255,255,255,0.91) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8ffffff',GradientType=0 ); /* IE6-9 */
+}
+
+
+.white-styled-area {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+1,ffffff+100&1+0,0.91+100 */
+    border-top: 1px solid #FC3;
+    border-bottom: 1px solid #FC3;
+    background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 1%, rgba(255,255,255,0.91) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 1%,rgba(255,255,255,0.91) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(255,255,255,1) 1%,rgba(255,255,255,0.91) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8ffffff',GradientType=0 ); /* IE6-9 */
 }
 
 .search .slogan {
@@ -216,10 +239,6 @@ a {
     display: none;
 }
 
-a.offer-edit {
-    float: right;
-}
-
 .right-side h3.linked a {
     font-size: .9em;
     float: right;
@@ -241,6 +260,9 @@ a.offer-edit {
 .concrete-assignment {
     cursor: pointer;
 }
+.geo-objects-area .einrichtungen {
+    margin-top: 1em;
+}
 
 .geo-objects-area .concrete-assignment {
     margin-left: 0px;
@@ -259,6 +281,7 @@ a.offer-edit {
     box-shadow: 3px 3px 2px 0px #a9a9a9;
 }
 
+.ui.button.hidden,
 .hidden {
     display: none;
 }
@@ -307,7 +330,7 @@ div.ui-datepicker {
 .list-area,
 .form-area {
     position: relative;
-    padding: 1em 1em 0em 2em;
+    padding: 0.5em 0.5em 0em 2em;
     color: #343434;
 }
 
@@ -402,6 +425,16 @@ div.ui-datepicker {
     margin-left: 5px;
 }
 
+.block-space {
+    display: block;
+    margin-top: 1em;
+}
+
+.block-space-bottom {
+    display: block;
+    margin-bottom: 1em;
+}
+
 span.einrichtung-name,
 span.angebot-name {
     font-style: italic;
@@ -437,6 +470,8 @@ span.angebot-name {
 .angebot-area label,
 .form-area label,
 .geo-objects-area label,
+.einrichtungs-area button,
+.angebot-area button,
 .einrichtungs-area input[type="submit"],
 .angebot-area input[type="submit"],
 .geo-objects-area input[type="radio"],
@@ -480,6 +515,7 @@ span.angebot-name {
     min-height: 160px;
 }
 
+.einrichtungs-area input,
 .angebot-area input, 
 .form-area textarea,
 .form-area input,
@@ -500,7 +536,7 @@ span.angebot-name {
 }
 
 div.disabled {
-    opacity: .3;
+    opacity: 0;
     pointer-events: none;
 }
 
@@ -518,28 +554,40 @@ div.disabled {
 
 .einrichtungs-area li,
 .angebot-area li {
-    padding: 5px 7px 5px 8px;
-    margin: 5px 0px 5px 0px;
+    padding: 1em;
+    margin: .5em 0em .5em 0em;
     background-color: #FAFAFA;
     font-size: 1.2em;
 }
 
+.einrichtungs-area li b,
+.angebot-area li b {
+    color: #27638C;
+}
+
 .einrichtungs-area li a,
 .angebot-area li a {
-    margin: 0px 0px 0px 10px;
-    font-size: 0.9em;
-    background-color: #efefef;
-    padding: .4em;
-    padding-left: .5em;
-    padding-right: .5em;
-    float: right;
-    border: 1px solid transparent;
+    text-decoration: none;
+}
+
+einrichtungs-area li a:hover,
+.angebot-area li a:hover {
     text-decoration: underline;
     text-decoration-color: #8f1414;
 }
 
-.right-side h3.linked a:hover,
-.angebot-area li a:hover {
+.angebot-area li .list-commands,
+.einrichtungs-area li .list-commands {
+    float: right;
+    margin: .5em 0em;
+}
+
+.einrichtungs-area li .list-commands button,
+.angebot-area li .list-commands button {
+    cursor: pointer;
+}
+
+.right-side h3.linked a:hover {
     text-decoration: none;
     background-color: #fff;
     border: 1px solid rgba(0, 40, 86, 0.43);
@@ -634,6 +682,11 @@ ul.angebote li small {
     font-weight: normal;
 }
 
+#bottom img.logo {
+    max-width: 150px;
+    height: auto;
+}
+
 @media (max-width:767px) {
     .top-menu .ui.menu .gesamt.item,
     .top-menu .ui.menu .all-angebote.item,
@@ -692,6 +745,7 @@ ul.angebote li small {
         padding-left: 1em;
         padding-right: 1em;
         border-left: 0px solid transparent;
+        height: 32px;
     }
 }
 

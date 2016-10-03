@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Kiezatlas 2 Angebote</title>
+        <title>Meine Einträge - Kiezatlas 2</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
 
-        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
+        <!--link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/-->
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.theme.min.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.website/css/sitestyle.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <!--link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/-->
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
-        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
-        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery.ui.datepicker-de.js"></script>
+        <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script-->
+        <script src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script>
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
+        <script src="/de.kiezatlas.angebote/my-angebote.js"></script>
+        <!--script src="/de.kiezatlas.angebote/angebote-edit.js"></script-->
 
         <script type="text/javascript">
-            
+
             $(document).ready(function(e) {
                 load_username(render_user_menu)
                 has_angebote_membership(function() {
                     load_users_angebote()
-                    // if empty - invite to create new angebote
+                    load_users_einrichtungen()
                 })
             })
             
@@ -31,43 +36,50 @@
     </head>
     <body class="kiezatlas angebotsinfos start">
 
-        <div class="top-menu ui container fluid">
-            <div class="ui menu">
+        <div class="top-menu ui menu top fixed">
+            <div class="ui container">
                 <a href="/">
                     <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
                 </a>
                 <a href="/sign-up/login" class="login item">Login</a>
-                <a class="create item" style="display: none;" href="/geoobject/create">Neuer Ort</a>
-                <a class="gesamt item" href="/">Gesamtstadtplan</a>
-                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Angebote</a>
+                <a class="gesamt item" href="/">Einrichtungen</a>
+                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Eintr&auml;ge</a>
                 <a href="/angebote" class="all-angebote item">Angebote</a>
-                <a href="/sign-up/" class="register item">Registrieren</a>
-                <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
-                <div class="right menu administration" style="display: none;">
+                <!--div class="right menu administration" style="display: none;">
                     <div class="ui simple dropdown item">
-                        <i class="setting icon"></i>
+                        <i class="setting icon"></i>Admin
                         <i class="dropdown icon"></i>
                         <div class="menu">
-                            <a class="item" href="/geoobject/confirmation/">Freischalten</a>
-                            <!--a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/geoobject/site/" class="item">Site-Infos</a-->
+                            <a class="item" href="/geoobject/confirmation/">Neueintragungen</a>
+                            <a href="/site/administration/" class="item">Listenansicht</a>
+                            <a href="/geoobject/site/" class="item">Site-Infos</a>
                         </div>
                     </div>
-                </div>
+                </div-->
+                <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
             </div>
         </div>
 
         <div class="task-info">
-            <h3>Meine Angebotsinfos im Kiezatlas</h3>
+            <h3>Meine Angebotsvorlagen</h3>
         </div>
 
         <div class="angebot-area">
             <ul class="angebote"></ul>
             <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
-                <input id="do-add" type="submit" class="btn" value="Neues Angebot eintragen" />
+                <div class="ui input block-space-bottom">
+                    <button type="submit" class="ui small button">Neues Angebot</button>
+                </div>
             </form>
+        </div>
+        
+        <div class="einrichtungs-area">
+            <h3>Meine Einrichtungsdatens&auml;tze</h3>
+            <ul class="einrichtungen"></ul>
             <form method="GET" action="/geoobject/create" id="angebot-form" accept-charset="UTF-8">
-                <input id="do-add" type="submit" class="btn" value="Neue Einrichtung (Ort) eintragen" />
+                <div class="ui input block-space-bottom">
+                    <button type="submit" class="ui small button">Neue Einrichtung</button>
+                </div>
             </form>
         </div>
 
@@ -82,9 +94,30 @@
                     </li>
                 </ul>
             </div>
-            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            <p>
+                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
+                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            </p>
         </div>
 
+        <div id="dialog-confirm" title="Eintrag löschen?">Willst Du diesen Datensatz entfernen?</div>
+
+        <!-- Piwik
+        <script type="text/javascript">
+        var pkBaseURL = "//stats.infokitchen.net/";
+        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+        </script><script type="text/javascript">
+        try {
+        var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 2);
+        piwikTracker.trackPageView();
+        piwikTracker.enableLinkTracking();
+        } catch( err ) {}
+        </script>
+        <noscript>
+            <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Meine+Eintraege')}" style="border:0" alt="" />
+        </noscript>
+        End Piwik Tracking Code -->
+        
     </body>
 </html>
 

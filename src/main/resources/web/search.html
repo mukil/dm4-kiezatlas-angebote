@@ -14,7 +14,8 @@
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script src="/de.kiezatlas.website/ka-locating.js"></script>
-        <script src="/de.kiezatlas.angebote/angebote-ui.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
+        <script src="/de.kiezatlas.angebote/search-angebote.js"></script>
         <script src="/de.kiezatlas.angebote/tags-ui.js"></script>
         <!--script src="/de.kiezatlas.website/css/semantic-ui/2.2/sticky.min.js"></script-->
 
@@ -31,77 +32,66 @@
     </head>
     <body class="kiezatlas angebotsinfos search">
 
-        <div class="top-menu ui container fluid">
-            <div class="ui menu">
-                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
+        <div class="top-menu ui menu top fixed">
+            <div class="ui container">
+                <a href="/">
+                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
+                </a>
                 <a href="/sign-up/login" class="login item">Login</a>
-                <a class="create item" style="display: none;" href="/geoobject/create">Neue Einrichtung</a>
-                <a class="item gesamt" href="/">Gesamtstadtplan</a>
-                <a href="/angebote/my" style="display: none;" class="angebote item">Meine Angebote</a>
+                <a class="item gesamt" href="/">Einrichtungen</a>
+                <a href="/angebote/my" style="display: none;" class="angebote item">Meine Eintr&auml;ge</a>
                 <a href="/angebote" class="all-angebote active item">Angebote</a>
-                <a href="/sign-up/" class="register item">Registrieren</a>
                 <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
-                <div class="right menu administration" style="display: none;">
-                    <div class="ui simple dropdown item">
-                        <i class="setting icon"></i>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <a class="item" href="/geoobject/confirmation/">Freischalten</a>
-                            <!--a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/geoobject/site/" class="item">Site-Infos</a-->
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <div class="headline">
+        <div class="headline white-styled-area-bottom-line">
             <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
             <div class="slogan">Angebotssuche</div>
         </div>
 
-            <div class="form-area">
+        <div class="form-area">
 
-                <form action="javascript:handle_fulltext_form()" id="fulltext-search-form" accept-charset="UTF-8">
-                    <div id="search-input-one" class="ui icon input focus" style="display: inline-block;">
-                        <label for="query" class="label">Suche nach Angeboten</label>
-                        <input id="query" title="Volltextsuche in allen Angebotsinformationen"
-                               name="search" placeholder="Name, Beschreibung, Stichwort des Angebots" type="text"/>
-                        <i class="search icon"></i>
-                    </div>
-                    <button class="ui basic primary button medium" onclick="do_search_angebote()" id="do-text-search">
-                        Ok
-                    </button>
-                    <!--label for="query" class="label">,</label-->
-                </form>
-
-                <form action="javascript:handle_location_form()" id="location-search-form" accept-charset="UTF-8">
-                    <div class="nearby-dialog ui input focus">
-                        <label for="nearby" class="label">In der N&auml;he von</label>
-                        <input id="nearby" title="Textbasierte Suche nach Anschrift und Geo-Koordinaten" name="nearby" class=""
-                               type="text" placeholder="Straße/Hnr., PLZ, In der Nähe von" />
-                        <button id="do-nearby" title="Standort suchen" class="ui basic button primary medium" onclick="javascript:do_search_streetcoordinates()">
-                            Go
-                        </button>
-                    </div>
-                    <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="ui basic button primary medium" onclick="javascript:do_browser_location()">
-                        <i class="location arrow icon"></i>
-                    </button>
-                </form>
-
-                <div class="filter-area">
-                    <h4>Filter der Suche</h4>
-                    <div class="query-parameter"></div>
+            <form action="javascript:handle_fulltext_form()" id="fulltext-search-form" accept-charset="UTF-8">
+                <div id="search-input-one" class="ui icon input focus" style="display: inline-block;">
+                    <label for="query" class="label">Suche nach Angeboten</label>
+                    <input id="query" title="Volltextsuche in allen Angebotsinformationen"
+                           name="search" placeholder="Name, Beschreibung, Stichwort des Angebots" type="text"/>
+                    <i class="search icon"></i>
                 </div>
+                <button class="ui basic primary button medium" onclick="do_search_angebote()" id="do-text-search">
+                    Ok
+                </button>
+                <!--label for="query" class="label">,</label-->
+            </form>
 
+            <form action="javascript:handle_location_form()" id="location-search-form" accept-charset="UTF-8">
+                <div class="nearby-dialog ui input focus">
+                    <label for="nearby" class="label">In der N&auml;he von</label>
+                    <input id="nearby" title="Textbasierte Suche nach Anschrift und Geo-Koordinaten" name="nearby" class=""
+                           type="text" placeholder="Straße/Hnr., PLZ, In der Nähe von" />
+                    <button id="do-nearby" title="Standort suchen" class="ui basic button primary medium" onclick="javascript:do_search_streetcoordinates()">
+                        Go
+                    </button>
+                </div>
+                <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="ui basic button primary medium" onclick="javascript:do_browser_location()">
+                    <i class="location arrow icon"></i>
+                </button>
+            </form>
+
+            <div class="filter-area">
+                <h4>Filter der Suche</h4>
+                <div class="query-parameter"></div>
             </div>
 
-            <div id="listing" class="list-area">
-                <h4 class="status"></h4>
-                <ul class="results"></ul>
-            </div>
+        </div>
 
-        <div id="bottom">
+        <div id="listing" class="list-area">
+            <h4 class="status"></h4>
+            <ul class="results"></ul>
+        </div>
+
+        <div id="bottom" class="white-styled-area">
             <div class="tag-view"><h4 class="label">Stichworte</h4><br/></div>
             <div class="menu">
                 <ul>
@@ -111,6 +101,22 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Piwik
+        <script type="text/javascript">
+        var pkBaseURL = "//stats.infokitchen.net/";
+        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+        </script><script type="text/javascript">
+        try {
+        var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 2);
+        piwikTracker.trackPageView();
+        piwikTracker.enableLinkTracking();
+        } catch( err ) {}
+        </script>
+        <noscript>
+            <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Angebotssuche')}" style="border:0" alt="" />
+        </noscript>
+        <End Piwik Tracking Code -->
 
     </body>
 </html>
