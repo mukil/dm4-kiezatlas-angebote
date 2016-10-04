@@ -254,8 +254,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             RelatedTopic usernameTopic = getAngebotsinfoCreator(angebot);
             if (usernameTopic != null && (usernameTopic.getSimpleValue().toString().equals(usernameAlias))) {
                 my.add(angebot);
-            } else { // ### To be removed after next clean install / DB reset
-                log.warning("Angebot \"" + angebot.getSimpleValue() + "\" hat keinen validen Username assoziiert (username=" + usernameTopic + ")");
+            } else if (usernameTopic == null) {
+                log.warning("Angebotsinfo \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
             }
         }
         return sortTopicsDescByModificationDate(my);
