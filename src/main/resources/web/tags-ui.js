@@ -8,6 +8,7 @@ var tagging = new function() {
 
     var _ = this
     var nodeId = '#angebot-tags'
+    var domElement = undefined
     var topicTags = undefined // tags the selected topic already carries
     var allReadableTags = []
     var REF_PREFIX = "ref_id:"  // duplicate of webclient.js // dm4c
@@ -88,30 +89,39 @@ var tagging = new function() {
     }
 
     this.setupJQueryUIAutocompleteField = function(identifier) {
-        var $inputfield = $(identifier).bind("keydown", function( event ) {
+        // initialize domElement for custom events
+        domElement = document.getElementById(identifier)
+        // setup jquery autocomplete
+        $(domElement).bind("keydown", function( event ) {
             if ( event.keyCode === $.ui.keyCode.TAB && $( this ).data( "ui-autocomplete" ).menu.active ) {
                 event.preventDefault()
-            } else if (event.keyCode === $.ui.keyCode.ENTER) {
-                $inputfield.autocomplete("close")
             }
-        }).autocomplete({minLength: 0,
+        })
+        .autocomplete({
+            minLength: 0,
             source: function( request, response ) {
                 // delegate back to autocomplete, but extract the last term
                 response( $.ui.autocomplete.filter( allReadableTags, extractLast( request.term ) ) )
             },
-            focus: function() {
+            focus: function(event, ui) {
                 // prevent value inserted on focus
                 return false;
             },
             select: function( event, ui ) {
+                var tag = ui.item
                 var terms = split( this.value )
                 // remove the current input
                 terms.pop()
-                // add the selected item
-                terms.push( ui.item.value )
+                // add the selected item (if not existent)
+                var exists = false
+                for (var sidx in terms) {
+                    if (terms[sidx] === tag.value) exists = true
+                }
+                if (!exists) terms.push( tag.value )
                 // add placeholder to get the comma-and-space at the end
                 terms.push( "" )
                 this.value = terms.join( ", " )
+                _.fireItemSelected(this.value)
                 return false
             }
         })
@@ -132,11 +142,11 @@ var tagging = new function() {
 
     this.processTagInputField = function(fieldIdentifier) {
         // do a parameter check
-        if ($(fieldIdentifier).children() == 0) {
-            throw new Error ("Bad identifier given, can't access input field value")
+        if ($('#' + fieldIdentifier).children() == 0) {
+            throw Error ("Bad identifier given, can't access input field value")
         }
         // split user input into an array strictly by "," thus comma values in tag names are not permitted and cut
-        var tagline = $(fieldIdentifier).val().split( /,\s*/ )
+        var tagline = $('#' + fieldIdentifier).val().split( /,\s*/ )
         if (!tagline) throw new Error("Tagging field got somehow broken, could not access text value")
         // iterate over all tag labels given and remove duplicates
         var uniqueLabels = []
@@ -156,6 +166,17 @@ var tagging = new function() {
             }
         }
         return uniqueLabels
+    }
+
+    this.listenTo = function(event_name, handler) {
+        if (!domElement) {
+            domElement.addEventListener(event_name, handler)
+        }
+    }
+
+    this.fireItemSelected = function(item) {
+        console.log("Firing Event Handler", domElement)
+        domElement.dispatchEvent(new CustomEvent('selection', { detail: item }))
     }
 
 }

@@ -89,7 +89,23 @@ function do_save_angebot() {
     }, false)
 } **/
 
-function clear_angebot_form_area() {
+function render_angebot_form() {
+    if (!selected_angebot) return
+    // Angebotsinfo
+    var name = selected_angebot.name
+    var contact = selected_angebot.kontakt
+    var webpage = selected_angebot.webpage
+    var descr = selected_angebot.beschreibung
+    // tagging.init() does this var tags = selected_angebot.tags
+    //
+    $('#angebot-name').val(name)
+    $('#angebot-kontakt').val(contact)
+    CKEDITOR.instances["angebot-beschreibung"].setData(descr)
+    $('#angebot-webpage').val(webpage)
+    $('#assignment-link').attr("data-my-href", URL_ANGEBOT_ASSIGNMENT + selected_angebot.id)
+}
+
+function clear_angebot_form() {
     $('.form-area.angebot').attr("id", -1)
     $('#angebot-name').val('')
     CKEDITOR.instances["angebot-beschreibung"].setData('')
@@ -98,7 +114,17 @@ function clear_angebot_form_area() {
     $('#angebot-tags').val('')
 }
 
-function clear_assignment_date_area() {
+
+// ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
+
+function render_assignment_page() {
+    load_angebot_by_resource_path()
+    init_datepicker()
+    render_angebot_shortinfo()
+    load_angebote_places_and_dates(render_assignments_to_edit, false)
+}
+
+function clear_assignment_dateform() {
     $('#from').val('')
     $('#to').val('')
     $('.date-area .einrichtung-name').text('...')
@@ -106,26 +132,6 @@ function clear_assignment_date_area() {
     $('#do-assign .text').text("Speichern")
     $('#do-delete').addClass("hidden")
 }
-
-
-
-// ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
-
-var selected_angebot,
-    selected_assignment,
-    selected_geo_object,
-    geo_assignments,
-    angebotsinfos
-
-function render_assignment_page() {
-    load_angebot_by_resource_path()
-    init_datepicker()
-    render_angebot_header_info()
-    load_assignments(render_assignments, false)
-}
-
-var fromDate,
-    toDate
 
 function init_datepicker() {
     // jQuery UI Datepicker Widget with German Local Dependency
@@ -154,18 +160,6 @@ function init_datepicker() {
 }
 
 // ---- Create Assignments for selected_angebot to Geo Objects -----
-
-function do_delete_assignment() {
-    // Do Delete
-    if (selected_assignment) {
-        restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
-        selected_assignment = undefined
-        selected_geo_object = undefined
-    }
-    // refresh GUI
-    clear_assignment_date_area()
-    render_assignment_page()
-}
 
 function do_save_assignment(e) {
     // ### fixme: firefox can not parse german localized date strin
@@ -216,54 +210,70 @@ function do_save_assignment(e) {
     selected_assignment = undefined
     selected_geo_object = undefined
     // refresh GUI
-    clear_assignment_date_area()
+    clear_assignment_dateform()
     hide_saving_icon('#update-assignment icon')
     render_assignment_page()
 }
 
-// ----- List and Edit existing Assignments (of Angebote to Geo Objects) -----
-
-function load_assignments(renderer, stillActive) {
-    $.ajax({
-        type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id + "/" + stillActive,
-        success: function(response) {
-            if (response) {
-                geo_assignments = response
-                console.log("Loaded Angebot Geo Assignments ", geo_assignments)
-                if (renderer) renderer(response)
-            } else {
-                $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Zuordnungen zu bearbeiten.')
-                $('.task-info').addClass('disabled')
-                $('div.angebot-area').addClass('disabled')
-                geo_assignments = []
-            }
-        },
-        error: function(x, s, e) {
-            geo_assignments = []
-            console.warn("ERROR", "x: ",x, " s: ", s," e: ", e)
-        }
-    })
+function do_delete_assignment() {
+    // Do Delete
+    if (selected_assignment) {
+        restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
+        selected_assignment = undefined
+        selected_geo_object = undefined
+    }
+    // refresh GUI
+    clear_assignment_dateform()
+    render_assignment_page()
 }
 
 // -------------------------- GUI Methods for Angebote Assignment and Editing ------------------- //
 
-function render_angebot_form() {
-    if (!selected_angebot) return
-    // Angebotsinfo
-    var name = selected_angebot.name
-    var contact = selected_angebot.kontakt
-    var webpage = selected_angebot.webpage
-    var descr = selected_angebot.beschreibung
-    // tagging.init() does this var tags = selected_angebot.tags
-    //
-    $('#angebot-name').val(name)
-    $('#angebot-kontakt').val(contact)
-    CKEDITOR.instances["angebot-beschreibung"].setData(descr)
-    $('#angebot-webpage').val(webpage)
-    $('#assignment-link').attr("data-my-href", URL_ANGEBOT_ASSIGNMENT + selected_angebot.id)
+function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
+    var queryString = $("#name-search").val()
+    if (queryString.indexOf("*") === -1) {
+        queryString += "*"
+    }
+    queryString = encodeURIComponent(queryString, "UTF-8")
+    // ### hacking message display
+    $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
+    $.ajax({
+        type: "GET", url: "/geoobject/search/by_name?query=" + queryString,
+        success: function(obj) {
+            renderer(obj)
+        },
+        error: function(x, s, e) {
+            throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
+        }
+    })
 }
 
-function render_angebot_header_info() {
+function render_geo_object_search_results(results) {
+    $('.form-area div.einrichtungen').empty()
+    for (var i in results) {
+        var obj = results[i]
+        if (obj) {
+            var $element = $('<input type="radio" title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id
+                    + '" value="geo-'+obj.id+'"><label title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
+                    + obj.name + ', <span class="label">' + obj.anschrift + '</span></label><br/>')
+            $('.form-area div.einrichtungen').append($element)
+        } else {
+            console.warn("Error during rendering Geo Objects Assignment", obj)
+        }
+    }
+    if (results.length === 0) {
+        $('.form-area div.einrichtungen').append('<div>Haben Sie die gew&uuml;nschte Einrichtung nicht finden k&ouml;nnen? Dann k&ouml;nnen '
+            + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
+            + 'einen Ort <a href="/geoobject/create">neu im Kiezatlas eintragen</a>. Alternativ k&ouml;nnen wir Ihnen noch anbieten den Namen des Einrichtungsdatensatz '
+        + 'erst noch einmal &uuml;ber die Umkreis- bzw. Volltextsuche des <a href="/" target="_blank">Gesamtstadtplan</a> abzufragen.</div>')
+    } else {
+        $('.form-area .search-info').text(results.length + ' Ergebnisse')
+    }
+    // equip all buttons with a click handler each (at once)
+    $('input[name=group]').on('click', select_geo_object)
+}
+
+function render_angebot_shortinfo() {
     if (!selected_angebot || !selected_angebot.hasOwnProperty("id")) {
        console.log("No Angebot (With ID) selected, loaded", selected_angebot)
        return
@@ -277,25 +287,26 @@ function render_angebot_header_info() {
     $('.angebot-name').text(selected_angebot.name)
     $('#navigation li.edit a').attr("href", URL_ANGEBOT_EDIT + selected_angebot.id)
     var html_string = '<span class="label">Angebotsbeschreibung</span><br/>' + descr + '<br/><span class="label">Kontakt:</span> ' + contact
-        if (webpage) html_string += '<br/><span class="label">Webseite:</span> <a href="' + webpage + '">' + webpage + '</a><br/>'
-        if (tags) {
-            if (tags.length > 0) {
-                html_string += '<br/><span class="label">Stichworte</span>&nbsp;<br/>'
-                var count = 1
-                for (var t in tags) {
-                    var tag = tags[t]
-                    html_string += '<em>' + tag.label + '</em>'
-                    if (tags.length > count) html_string += ", "
-                    count++
-                }
+    if (webpage) html_string += '<br/><span class="label">Webseite:</span> <a href="' + webpage + '">' + webpage + '</a><br/>'
+    if (tags) {
+        if (tags.length > 0) {
+            html_string += '<br/><span class="label">Stichworte</span>&nbsp;<br/>'
+            var count = 1
+            for (var t in tags) {
+                var tag = tags[t]
+                html_string += '<em>' + tag.label + '</em>'
+                if (tags.length > count) html_string += ", "
+                count++
             }
         }
-        html_string += '<br/><a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Angebot ansehen</a>&nbsp'
-            + '<a href="' + URL_ANGEBOT_EDIT + selected_angebot.id + '" class="read-more offer-edit">Vorlage bearbeiten</a>'
+    }
     $('.angebot-infos p.body').html(html_string)
+    var $links = $('<a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Angebot ansehen</a>&nbsp'
+        + '<a href="' + URL_ANGEBOT_EDIT + selected_angebot.id + '" class="read-more offer-edit">Vorlage bearbeiten</a>')
+    $('.angebotsinfos .offer-area .links').html($links)
 }
 
-function render_assignments() {
+function render_assignments_to_edit() {
     // Display Assignments on Assignment Page
     $('.right-side div.einrichtungen').empty()
     if (geo_assignments.length === 0) {
@@ -344,52 +355,10 @@ function render_selected_assignment() {
     }
 }
 
-function render_angebot_locations() {
-    // Display Assignments
-    var $einrichtungen = $('.geo-objects-area .einrichtungen')
-        $einrichtungen.empty()
-    if (geo_assignments.length === 0) {
-        $('.help').html('Diesen Angebotsinfos sind aktuell noch keine Angebotszeitr&auml;ume in Einrichtungen zugewiesen.')
-        $('h3.assignments').html("F&uuml;r dieses Angebot haben wir aktuell keine Termine")
-    } else {
-        // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
-    }
-    // ### show address or districts, too
-    for (var i in geo_assignments) {
-        var obj = geo_assignments[i]
-        // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
-        var $element = $('<a class="read-more" href="/geoobject/'+obj.locationId // ### adjust url for deployment
-                +'"><div id="' + obj.id + '" class="concrete-assignment"><h3>'
-                + obj.name + '</h3><p>'+obj.address+'<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>')
-        $einrichtungen.append($element)
-    }
-    // equip all buttons with a click handler each (at once)
-    // $einrichtungen.on('click', select_assignment)
-}
-
 function handle_name_search_input(e) {
     if (e.keyCode === 13) {
-        search_geo_objects_by_name(show_geo_object_search_results)
+        do_search_geo_objects_by_name(render_geo_object_search_results)
     }
-}
-
-function search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
-    var queryString = $("#name-search").val()
-        if (queryString.indexOf("*") === -1) {
-            queryString += "*"
-        }
-        queryString = encodeURIComponent(queryString, "UTF-8")
-        // ### hacking message display
-        $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
-        $.ajax({
-            type: "GET", url: "/geoobject/search/by_name?query=" + queryString,
-            success: function(obj) {
-                renderer(obj)
-            },
-            error: function(x, s, e) {
-                throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
-            }
-        })
 }
 
 function select_geo_object(e) {
@@ -426,91 +395,4 @@ function get_assignment(assocId) {
         if (sel.id == assocId) return sel // compares DOM id (String) with a Number
     }
     throw new Error("No Assignment for ID: " +  assocId)
-}
-
-function show_geo_object_search_results(results) {
-    $('.form-area div.einrichtungen').empty()
-    for (var i in results) {
-        var obj = results[i]
-        if (obj) {
-            var $element = $('<input type="radio" title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id
-                    + '" value="geo-'+obj.id+'"><label title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
-                    + obj.name + ', <span class="label">' + obj.anschrift + '</span></label><br/>')
-            $('.form-area div.einrichtungen').append($element)
-        } else {
-            console.warn("Error during rendering Geo Objects Assignment", obj)
-        }
-    }
-    if (results.length === 0) {
-        $('.form-area div.einrichtungen').append('<div>Haben Sie die gew&uuml;nschte Einrichtung nicht finden k&ouml;nnen? Dann k&ouml;nnen '
-            + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
-            + 'einen Ort <a href="/geoobject/create">neu im Kiezatlas eintragen</a>. Alternativ k&ouml;nnen wir Ihnen noch anbieten den Namen des Einrichtungsdatensatz '
-        + 'erst noch einmal &uuml;ber die Umkreis- bzw. Volltextsuche des <a href="/" target="_blank">Gesamtstadtplan</a> abzufragen.</div>')
-    } else {
-        $('.form-area .search-info').text(results.length + ' Ergebnisse')
-    }
-    // equip all buttons with a click handler each (at once)
-    $('input[name=group]').on('click', select_geo_object)
-}
-
-// -------------------------------- Displaying Angebotsinfos in DETAIL and LIST
-
-var selected_assignment = undefined
-
-function render_angebotsinfo_page() {
-    load_angebot_by_resource_path(function(status, selected_angebot) {
-        if (status === "ok") {
-            render_angebot_detail_area()
-        } else if( status === "error") {
-            alert("Error Rendering Selected Angebotsinfo", selected_angebot)
-            // render_angebot_detail_area()
-        }
-    })
-    load_assignments(render_angebot_locations, true)
-    load_username(render_user_menu)
-}
-
-function render_angebot_detail_area() {
-    if (!selected_angebot) throw new Error("Angebotsinfo not found")
-    var name = (selected_angebot.name) ? selected_angebot.name : "Name des Angebots"
-    var tags = "" // ### render tags
-    for (var t in selected_angebot.tags) {
-        tags += selected_angebot.tags[t].label
-        if (t < selected_angebot.tags.length - 1) tags += ", "
-    }
-    $('.angebot-name').text(name)
-    var angebotHTML = ''
-    if (selected_angebot.beschreibung) {
-        angebotHTML = '<span class="label">Angebotsinfos</span><br/>' + selected_angebot.beschreibung + '<br/>'
-    }
-    if (selected_angebot.kontakt) {
-        angebotHTML += '<span class="label">Kontakt</span><br/>' + selected_angebot.kontakt + '<br/>'
-    }
-    if (selected_angebot.webpage && selected_angebot.webpage.indexOf("http://") !== -1) {
-        angebotHTML += '<br/><br/><span class="label">Webseite</span><br/>'
-            + '<a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
-    }
-    if (tags !== "") {
-        angebotHTML += '<br/><span class="label">Stichworte</span><br/><i>' + tags + '</i>'
-    }
-    $('.angebot-infos p.body').html(angebotHTML)
-}
-
-function load_angebot_by_resource_path(callback) {
-    var angebot_id = parse_angebots_id()
-    console.log("Loaded Angebot ID By Resource Path", angebot_id)
-    if (angebot_id != 0) {
-        var angebotsinfoText = $.ajax('/angebote/' + angebot_id, { async: false, dataType: 'json' }).responseText
-        try {
-            selected_angebot = JSON.parse(angebotsinfoText)
-            if (callback) callback("ok", selected_angebot)
-        } catch (e) {
-            console.warn("Could not load angebotsinfo details...", e, "using", angebotsinfoText)
-            selected_angebot = angebotsinfoText
-            if (callback) callback("error", selected_angebot)
-        }
-    } else {
-        console.log("No angebot to edit - Creating new one...")
-        if (callback) callback("ok", undefined)
-    }
 }

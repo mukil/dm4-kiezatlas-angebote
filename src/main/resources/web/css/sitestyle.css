@@ -38,6 +38,17 @@ textarea, select {
 html, body {
     height: 100%;
     background-color: #EAEAEA;
+    color: #343434;
+}
+
+.header-message {
+    margin-top: 5em;
+    padding: 1em 2em;
+}
+
+.header-message .username {
+    font-weight: bold;
+    color: #27638C;
 }
 
 #marker-name b,
@@ -63,7 +74,7 @@ a {
 }
 
 .start .task-info {
-    margin-top: 5em;
+    margin-top: 1em;
     margin-left: 2em;
 }
 
@@ -71,6 +82,7 @@ a {
 .start .angebot-area {
     margin-left: 2em;
     margin-top: 0em;
+    margin-botto: 2em;
 }
 
 .detail .detail-area {
@@ -171,6 +183,14 @@ a {
     margin-left: 1.3em;
 }
 
+.search .list-area .loading-indicator {
+    font-size: 2.5em;
+    position: relative;
+    top: 2em;
+    left: -0.5em;
+    color: #8f1414;
+}
+
 .search .list-area .read-more p {
     margin-left: 0px;
 }
@@ -219,19 +239,20 @@ a {
     display: inline-block;
     margin-right: 5%;
     margin-left: 2em;
-    margin-top: 2em;
+    margin-top: 4em;
 }
 
 .right-side {
-    width: 45%;
+    width: 40%;
     display: inline-block;
     vertical-align: top;
-    margin-top: 2em;
+    margin-top: 4em;
+    padding-left: 1em;
 }
 
 .right-side .offer-area {
     background-color: #fff;
-    padding: 1em;
+    padding: 0em 1em 0em 1em;
     border: 1px solid #aaa;
 }
 
@@ -260,6 +281,9 @@ a {
 .concrete-assignment {
     cursor: pointer;
 }
+
+.geo-objects-area .einrichtungen
+
 .geo-objects-area .einrichtungen {
     margin-top: 1em;
 }
@@ -281,6 +305,7 @@ a {
     box-shadow: 3px 3px 2px 0px #a9a9a9;
 }
 
+.ui.input.icon .hidden,
 .ui.button.hidden,
 .hidden {
     display: none;
@@ -441,17 +466,53 @@ span.angebot-name {
 }
 
 .assignment .task-info {
-    /** margin-top: 60px; **/
-    margin-left: 5px;
+    margin-left: .5em;
+}
+
+body.angebotsinfos.start .header-message p,
+body.angebotsinfos.start .task-info,
+body.angebotsinfos.start .angebot-area,
+body.angebotsinfos.start .einrichtungs-area,
+body.angebotsinfos.detail .detail-area,
+body.angebotsinfos.detail .task-info,
+body.angebotsinfos.edit .task-info,
+body.angebotsinfos.edit .form-area {
+    max-width: 1170px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+.angebotsinfos.detail .detail-area .edit-link {
+    position: absolute;
+    top: 0em; right: 2.5em;
 }
 
 .angebotsinfos.edit .task-info h3 {
-    margin: 0px;
-    margin-left: 5px;
+    margin: 0em;
+    margin-left: 2em;
+}
+
+.angebotsinfos #do-search,
+.angebotsinfos #assignment-link {
+    margin-left: 1em;
 }
 
 .angebotsinfos.detail .einrichtungen .read-more {
     margin-right: 2em;
+}
+
+.angebotsinfos.assignment .geo-objects-area .einrichtungen {
+    margin-top: 1em;
+}
+
+.angebotsinfos.detail .geo-objects-area .einrichtungen {
+    margin-top: 0;
+}
+
+.angebotsinfos.detail .read-more {
+    margin: 0em;
+    display: block;
 }
 
 .assignment .task-info h3,
@@ -499,7 +560,7 @@ span.angebot-name {
 }
 
 #name-search {
-    width: 300px;
+    width: 75%;
 }
 
 .kiezatlas.revise .commands button {
@@ -538,10 +599,6 @@ span.angebot-name {
 div.disabled {
     opacity: 0;
     pointer-events: none;
-}
-
-.einrichtungs-area {
-    display: none;
 }
 
 .einrichtungs-area ul.einrichtungen,
@@ -687,6 +744,18 @@ ul.angebote li small {
     height: auto;
 }
 
+@media (max-width: 1200px) {
+    body.angebotsinfos.detail .detail-area,
+    body.angebotsinfos.detail .task-info,
+    body.angebotsinfos.edit .task-info,
+    body.angebotsinfos.edit .form-area {
+        margin-left: 2em;
+    }
+    #name-search {
+        width: 50%;
+    }
+}
+
 @media (max-width:767px) {
     .top-menu .ui.menu .gesamt.item,
     .top-menu .ui.menu .all-angebote.item,
@@ -698,6 +767,9 @@ ul.angebote li small {
     }
     .search .headline img {
         display: none;
+    }
+    #name-search {
+        width: 30%;
     }
     .search .headline {
         text-align: left;
@@ -746,6 +818,23 @@ ul.angebote li small {
         padding-right: 1em;
         border-left: 0px solid transparent;
         height: 32px;
+    }
+}
+
+@media (max-width:600px) {
+    .assignment .angebot-infos {
+        display: none;
+    }
+    .assignment .right-side,
+    .assignment .left-side {
+        width: 90%;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0em;
+    }
+    .assignment .right-side {
+        margin-top: 0em;
     }
 }
 

@@ -144,6 +144,22 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     /**
+     * Custom authorization utility method to check if the requesting user is creator of "Angebotsinfo".
+     */
+    @GET
+    @Path("/{id}/creator")
+    public String hasAngeboteWorkspaceMembership(@PathParam("id") long id) {
+        String username = aclService.getUsername();
+        if (id > 0) {
+            Topic angebot = dm4.getTopic(id);
+            if (angebot.getTypeUri().equals(ANGEBOT)) {
+                return isAngebotsinfoCreator(username, angebot) ? "true" : "false";
+            }
+        }
+        return "false";
+    }
+
+    /**
      * Fetches all assigned angebotsinfo topics by geo object id.
      * @param long  geoObjectId
      * @return A list of ALL angebotsinfo topics assigned to geo object.
@@ -600,6 +616,15 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         if (!isAuthenticated() || !isAngeboteWorkspaceMember(username)) {
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
+    }
+
+    private boolean isAngebotsinfoCreator(String username, Topic angebot) {
+        if (username != null && !username.equals("")) {
+            Topic usernameTopic = getAngebotsinfoCreator(angebot);
+            log.info("Checking if user=" + username + " is \"creator\" of Angebotsinfo " + angebot.getSimpleValue());
+            return username.equals(usernameTopic.getSimpleValue().toString());
+        }
+        return false;
     }
 
     private boolean isAngeboteWorkspaceMember(String username) {

@@ -13,11 +13,12 @@ var street_coords_idx = 0
 var time_parameter = undefined
 
 
-// ----------------------------------  Three Major Search UI Operations ----- //
+// ----------------------------------  The Major Search Operations --------- //
 
-function do_search_angebote() {
+function fire_angebote_search() {
     var queryString = $('#query').val()
-    if (queryString.length === 0 && !location_coords) {
+        console.log("Fire Angebote Search", queryString)
+    if ( (queryString.length === 0 && !location_coords) || queryString.trim().length < 3) {
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben").focus()
         return
     }
@@ -30,27 +31,32 @@ function do_search_angebote() {
     if (location_coords) { // existing geo-coodinates values have a higher priority
         locationValue = encodeURIComponent(location_coords.longitude.toFixed(4) + ","+ location_coords.latitude.toFixed(4))
     }
-    // New text search parameter
-    // if (queryString.trim().length < 3) return
-    queryString = queryString.replace(/,/g, "") // clean up potential tag delimiter
-    search_input = queryString.trim()
-    // Existing text search parameter
-    var $existingSearchInputParameter = $('.parameter.text .search-value')
-    if ($existingSearchInputParameter.length > 0) {
-        for (var el in $existingSearchInputParameter) {
-            if ($existingSearchInputParameter[el].localName === "span") {
-                console.log("Adding Existing Text Search Paramter", $existingSearchInputParameter[el].innerText)
-                queryString += "," + $existingSearchInputParameter[el].innerText
-            }
+    // Parse text search parameter and prepare lucene query
+    search_input = queryString.split(",") // split by tag delimiter // ### clean up value
+    console.log("Text Search Parameter", search_input)
+    var luceneQueryString = ""
+    for (var el in search_input) {
+        if (search_input.length > 0) {
+            luceneQueryString += " " + search_input[el].trim()
         }
     }
+    // display text parameter
     render_query_parameter()
-    console.log("Search Query", queryString, "Location", locationValue, "Radius", location_radius, "DateTime", dateTime)
-    $.getJSON('/angebote/search?query=' + queryString + '&location=' + locationValue + '&radius='
+    console.log("Search Query", luceneQueryString, "Location", locationValue, "Radius", location_radius, "DateTime", dateTime)
+    $.getJSON('/angebote/search?query=' + luceneQueryString + '&location=' + locationValue + '&radius='
             + location_radius + '&datetime=' + dateTime, function(results) {
+        hide_search_loading_sign()
         render_search_results(results)
     })
 }
+
+function fire_angebote_timesearch() {
+    var result = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
+        { async: false, dataType: 'json' }).responseText)
+    angebotsinfos = result.overall // .timely query results assigned to .overall (server side)
+}
+
+// ----------------------------------  Two Utility Search Operations -------- //
 
 function do_search_streetcoordinates() {
     var locationString = $('#nearby').val().trim()
@@ -58,7 +64,7 @@ function do_search_streetcoordinates() {
         if (results) {
             street_coordinates = results
             select_locationsearch_parameter()
-            do_search_angebote()
+            fire_angebote_search()
         }
     })
 }
@@ -97,44 +103,38 @@ function do_browser_location() {
     })
 }
 
-function load_tag_view() {
+// ----------------------------------  Tagcloud Search View --------- //
+
+function load_and_render_tag_search_dialog() {
     $.getJSON('/tag/with_related_count/ka2.angebot', function(result) {
         var $tags = $('.tag-view')
         for (var r in result) {
             var tag = result[r]
             var name = tag["value"]
             var tagHTML = '<a href="#stichwort/' + encodeURIComponent(name) +'" id="' + tag.id + '" class="' + tag["view_css_class"] +
-                '" title="Finde Angebotsinfos unter dem Stichwort ' + name + '" onclick="handle_tag_selection(this)">' + name + '</a>'
+                '" title="Finde Angebotsinfos unter dem Stichwort ' + name + '" onclick="handle_tag_button_select(this)">' + name + '</a>'
             if (r < result.length - 1) tagHTML += ", "
             $tags.append(tagHTML)
         }
     })
 }
 
-function load_current_angebotsinfos() {
-    var result = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
-        { async: false, dataType: 'json' }).responseText)
-    angebotsinfos = result.overall // .timely query results assigned to .overall (server side)
-}
 
 // --------------------------- GUI methods for rendering all Search UI elements ------------ //
 
-function show_angebote_frontpage() {
-    load_current_angebotsinfos()
+function render_search_frontpage() {
+    fire_angebote_timesearch()
     time_parameter = "Heute"
     location_coords = undefined
     search_input = undefined
     render_query_parameter()
     render_search_results()
-    load_username(render_user_menu)
-    load_tag_view()
 }
 
 function render_search_results(items) {
-    hide_search_loading_sign()
     var $listing = $('.list-area .results')
     // overall and assigned ### merged
-    var items_to_render = { overall: [], assigned: [], timely: []}
+    var items_to_render = { overall: [], assigned: [], timely: [] } //, spatial : [] }
     var result_length = 0
     if (items) {
         items_to_render = items
@@ -151,15 +151,15 @@ function render_search_results(items) {
         // ("+new Date().toLocaleDateString()+")
     }
     // status
-    if (items_to_render.overall.length > 0) {
+    /** if (items_to_render.overall.length > 0) {
         $('#query').val("")
-    }
-    // assigned (spatial, time search) list items
+    }**/
+    // assigned time search result items
     for (var el in items_to_render.timely) {
         var element = items_to_render.timely[el]
         render_timely_list_item(element, $listing)
     }
-    // assigned (spatial, time search) list items
+    // assigned location search list items
     for (var el in items_to_render.assigned) {
         var element = items_to_render.assigned[el]
         render_assigned_list_item(element, $listing)
@@ -170,7 +170,7 @@ function render_search_results(items) {
         render_overall_list_item(element, $listing)
     }
     var message = (result_length === 1) ? "1 Angebot" : result_length + " Angebote"
-        if (result_length === 0) message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse"
+    if (result_length === 0) message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse"
     $('.list-area .status').html(message)
 }
 
@@ -310,17 +310,19 @@ function toggle_time_parameter_display($filter_area) {
     }
 }
 
-function toggle_text_parameter_display($filter_area) {
+function render_text_parameter_display($filter_area) {
+    // clean up gui
+    $('.filter-area .parameter.text').remove()
     if (search_input) {
-        var className = search_input
-        var $parameterExists = $('.filter-area .parameter.text.' + className)
-        if ($parameterExists.length === 0) { // dont add the same query term twice)
-            $filter_area.append('<div class="parameter text ' + className + '" title="Text Suchfilter">'
-                + '<a class="close" title="Textfilter entfernen" onclick="javascript:remove_text_parameter()" href="#">x</a>'
-                + 'Suche nach \"<span class="search-value">' + search_input + '</span>\"</div>')
+        // paint gui
+        for (var i in search_input) { // contains unique elements only
+            var text_param = search_input[i].trim()
+            if (text_param.length > 0) {
+                $filter_area.append("<div class=\"parameter text " + text_param + "\" title=\"Text Suchfilter\">"
+                    + "<a class=\"close\" title=\"Textfilter entfernen\" onclick=\"javascript:remove_text_parameter('" + text_param + "')\" href=\"#\">x</a>"
+                    + "Suche nach \"<span class=\"search-value\">" + text_param + "</span>\"</div>")
+            }
         }
-    } else {
-        $('.filter-area .parameter.text').remove()
     }
 }
 
@@ -331,11 +333,19 @@ function render_query_parameter() {
     //
     toggle_time_parameter_display($filter_area)
     //
-    toggle_text_parameter_display($filter_area)
+    render_text_parameter_display($filter_area)
     //
     if (!search_input && !location_coords && !time_parameter) {
         $('.list-area .status').html("Bitte gib einen Suchbegriff ein oder w&auml;hle einen Standort")
     }
+}
+
+function show_search_loading_sign() {
+    $('.list-area .loading-indicator').removeClass('hidden')
+}
+
+function hide_search_loading_sign() {
+    $('.list-area .loading-indicator').addClass('hidden')
 }
 
 function remove_location_parameter() {
@@ -345,7 +355,7 @@ function remove_location_parameter() {
         angebotsinfos = []
         render_search_results()
     } else {
-        do_search_angebote()
+        fire_angebote_search()
     }
 }
 
@@ -356,32 +366,46 @@ function remove_time_parameter() {
         angebotsinfos = []
         render_search_results()
     } else {
-        do_search_angebote()
+        fire_angebote_search()
     }
 }
 
-function remove_text_parameter(e) {
+function remove_text_parameter(name) {
+    // build up new list of parameter
+    var new_search_input = []
+    for (var i in search_input) {
+        var el = search_input[i].trim()
+        if (el !== name) {
+            new_search_input.push(el)
+        }
+    }
+    // paint new text parameter gui
+    if (new_search_input.length === 0) {
+        remove_all_text_parameter()
+    } else {
+        search_input = new_search_input
+        // paint new list of parameter
+        $('#query').val(new_search_input.join(","))
+        render_query_parameter()
+        angebotsinfos = []
+        fire_angebote_search()
+    }
+}
+
+function remove_all_text_parameter(e) {
     search_input = undefined
     $('#query').val("")
     render_query_parameter()
-    if (!time_parameter && !location_input) {
-        angebotsinfos = []
-        render_search_results()
-    } else {
-        do_search_angebote()
-    }
+    angebotsinfos = []
+    fire_angebote_search()
 }
 
-function handle_tag_selection(e) {
+function handle_tag_button_select(e) {
     var tagname = e.text
-    remove_text_parameter()
+    remove_all_text_parameter()
     remove_time_parameter()
     $('#query').val(tagname)
-    do_search_angebote()
-}
-
-function handle_fulltext_form(e) {
-    console.log("Supressing Fulltext Search Action", e)
+    fire_angebote_search()
 }
 
 function handle_location_form(e) {
@@ -389,7 +413,7 @@ function handle_location_form(e) {
     if (radiusSelection) {
         location_radius = radiusSelection.options[radiusSelection.selectedIndex].value;
         console.log("Updated Location Search Radius", location_radius)
-        do_search_angebote()
+        fire_angebote_search()
     }
 }
 

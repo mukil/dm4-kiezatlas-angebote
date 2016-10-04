@@ -1,4 +1,15 @@
 
+// --- Angebote und Websites UI Routes
+
+var URL_ANGEBOT_LISTING     = "/angebote/"
+var URL_MY_ANGEBOT_LIST     = "/angebote/my"
+var URL_ANGEBOT_DETAIL      = "/angebote/"
+var URL_ANGEBOT_EDIT        = "/angebote/edit/"
+var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
+var URL_EINRICHTUNG_EDIT    = "/geoobject/edit/"
+
+var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
+
 // ---- Methods to CREATE/UPDATE Screen --- //
 
 var restc       = new RESTClient() // without standard extensions...
@@ -19,29 +30,7 @@ restc.get_username = function() {
 function _void() {}
 
 
-// --- Angeboute UI Routes
-
-var URL_ANGEBOT_LISTING     = "/angebote/"
-var URL_MY_ANGEBOT_LIST     = "/angebote/my"
-var URL_ANGEBOT_DETAIL      = "/angebote/"
-var URL_ANGEBOT_EDIT        = "/angebote/edit/"
-var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
-var URL_EINRICHTUNG_EDIT    = "/geoobject/edit/"
-var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
-
-
-
 // ---- Generic Methods used ACROSS all screens ---- //
-
-function show_search_loading_sign() {
-    $('#search-input-one').addClass('loading')
-    $('.list-area .status').html('<div class="ui input icon"><i class="loading icon"/></div>')
-}
-
-function hide_search_loading_sign() {
-    $('#search-input-one').removeClass('loading')
-    // $('.list-area .status').html('<div class="ui input icon"><i class="loading icon"/></div>')
-}
 
 function show_saving_icon(domSelector) {
     $(domSelector).addClass("loading").addClass("circle").removeClass("save")
@@ -64,10 +53,10 @@ function load_username(renderer) {
 }
 
 function render_user_menu(state) {
-    console.log("### Rendering User Menu (Angebote UI)", state)
     // ### Show Administration Menu for "Confirmation" WS Members
     // $('.menu.administration').attr('style', 'display: inline-block;')
     if (state) {
+        $('.username').text(state)
         $('.menu .login.item').hide()
         $('.menu .register.item').hide()
         $('.menu .angebote.item').attr('style', 'display: inline-block;')
@@ -95,14 +84,27 @@ function fetch_angebote_workspace() {
 }
 
 function has_angebote_membership(callback) {
-    // var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
-    $.getJSON('/angebote/membership/', function(response) {
-        if (!response) {
-            if (callback) callback(false)
-        } else {
-            if (callback) callback(true)
-        }
+    $.get('/angebote/membership/', function(response) {
+        if (callback) callback(JSON.parse(response))
     })
+}
+
+function is_angebote_creator(id, callback) {
+    $.get('/angebote/' + id + '/creator', function(response) {
+        if (callback) callback(JSON.parse(response))
+    })
+}
+
+function go_edit_einrichtung(id) {
+    window.document.location.replace(URL_EINRICHTUNG_EDIT + id)
+}
+
+function go_edit_angebot(id) {
+    window.document.location.replace(URL_ANGEBOT_EDIT + id)
+}
+
+function go_edit_assignments(id) {
+    window.document.location.replace(URL_ANGEBOT_ASSIGNMENT + id)
 }
 
 function go_to_angebot_assignment(id) {

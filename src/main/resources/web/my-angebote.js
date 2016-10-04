@@ -30,8 +30,6 @@ function render_angebots_item(item) {
 
 function load_users_einrichtungen() {
     var result = restc.request("GET", "/geoobject/my")
-    console.log("Loaded users einrichtungen", result)
-    if (result && result.length > 0) $('.einrichtungs-area').show()
     for (var el in result) {
         var item = result[el]
         render_einrichtungs_item(item)
@@ -52,18 +50,6 @@ function render_einrichtungs_item(item) {
                //  + 'onclick="delete_my_einrichtung('+item.id+')"><i class="trash icon" /></button></div>'
         + '</div>'
         + '<br/><small>Erstellt am ' + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
-}
-
-function go_edit_einrichtung(id) {
-    window.document.location.replace(URL_EINRICHTUNG_EDIT + id)
-}
-
-function go_edit_angebot(id) {
-    window.document.location.replace(URL_ANGEBOT_EDIT + id)
-}
-
-function go_edit_assignments(id) {
-    window.document.location.replace(URL_ANGEBOT_ASSIGNMENT + id)
 }
 
 function delete_my_angebot(id) {

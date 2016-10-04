@@ -16,6 +16,7 @@
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-model.js"></script>
         <script src="/de.kiezatlas.angebote/edit-angebote.js"></script>
 
         <script type="text/javascript">
@@ -30,8 +31,11 @@
     </head>
     <body class="kiezatlas angebotsinfos assignment">
 
-        <div class="top-menu ui container fluid">
-            <div class="ui menu">
+        <div class="top-menu ui menu top fixed">
+            <div class="ui container">
+                <a href="/">
+                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
+                </a>
                 <a href="/sign-up/login" class="login item">Login</a>
                 <a class="item gesamt" href="/">Einrichtungen</a>
                 <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Eintr&auml;ge</a>
@@ -53,7 +57,7 @@
             <div class="form-area assignment">
                 <form action="javascript:search_geo_objects_by_name(show_geo_object_search_results)" id="name-search-form" accept-charset="UTF-8">
                     <div class="ui input">
-                        <input id="name-search" type="text" placeholder="Einrichtungsname" />&nbsp;
+                        <input id="name-search" type="text" placeholder="Einrichtungsname" />
                         <input id="do-search" type="submit" class="btn" value="Einrichtung suchen" />
                     </div>
                     <span class="search-info"></span>
@@ -92,6 +96,7 @@
                 <div class="angebot-infos">
                     <p class="body"></p>
                 </div>
+                <p class="links"></p>
             </div>
             <h3>Dein Angebot ist an folgenden Standorten &uuml;ber folgende Zeitr&auml;ume <em>aktiv</em></h3>
             <div class="einrichtungen"></div>

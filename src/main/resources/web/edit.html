@@ -17,6 +17,7 @@
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
+        <script src="/de.kiezatlas.angebote/angebote-model.js"></script>
         <script src="/de.kiezatlas.angebote/edit-angebote.js"></script>
         <script src="/de.kiezatlas.angebote/tags-ui.js"></script>
 
@@ -104,14 +105,17 @@
                     <button id="do-save" class="ui green button" type="submit">
                         <i class="icon save"></i>Speichern
                     </button>
+                    <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
+                        <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;me festlegen
+                    </button>
                 </div>
             </form>
             <br/>
-            <div class="ui input focus icon">
+            <!--div class="ui input focus icon">
                 <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
                     <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;me festlegen
                 </button>
-            </div>
+            </div-->
         </div>
 
         <div id="bottom">

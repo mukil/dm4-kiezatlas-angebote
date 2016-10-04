@@ -7,10 +7,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
+        <!--link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.theme.min.css"/-->
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script src="/de.kiezatlas.angebote/vendor/jquery/ui/wautocomplete/jquery-ui-1.9.2.custom.min.js"></script>
+        <!--script src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script-->
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script src="/de.kiezatlas.website/ka-locating.js"></script>
@@ -22,9 +25,18 @@
         <script type="text/javascript">
 
             $(document).ready(function(e) {
-                show_angebote_frontpage()
+                // check user status
+                load_username(render_user_menu)
+                // load tag cloud
+                load_and_render_tag_search_dialog()
+                // do search by time
+                render_search_frontpage()
                 tagging.fetchAllTagTopics()
-                tagging.setupJQueryUIAutocompleteField('#query')
+                tagging.setupJQueryUIAutocompleteField('query')
+                tagging.listenTo("selection", function(e) {
+                    console.log("Search Input Event Received by Tag Component", e.detail)
+                    fire_angebote_search()
+                })
                 // $('.ui.sticky').sticky({ context: '#listing' })
             })
 
@@ -52,17 +64,15 @@
 
         <div class="form-area">
 
-            <form action="javascript:handle_fulltext_form()" id="fulltext-search-form" accept-charset="UTF-8">
+            <form action="javascript:_void()" id="fulltext-search-form" accept-charset="UTF-8">
                 <div id="search-input-one" class="ui icon input focus" style="display: inline-block;">
                     <label for="query" class="label">Suche nach Angeboten</label>
                     <input id="query" title="Volltextsuche in allen Angebotsinformationen"
                            name="search" placeholder="Name, Beschreibung, Stichwort des Angebots" type="text"/>
                     <i class="search icon"></i>
                 </div>
-                <button class="ui basic primary button medium" onclick="do_search_angebote()" id="do-text-search">
-                    Ok
-                </button>
-                <!--label for="query" class="label">,</label-->
+                <button class="ui basic primary button medium" title="Suchanfrage starten"
+                        onclick="fire_angebote_search()" id="do-text-search">Suche</button>
             </form>
 
             <form action="javascript:handle_location_form()" id="location-search-form" accept-charset="UTF-8">
@@ -70,13 +80,11 @@
                     <label for="nearby" class="label">In der N&auml;he von</label>
                     <input id="nearby" title="Textbasierte Suche nach Anschrift und Geo-Koordinaten" name="nearby" class=""
                            type="text" placeholder="Straße/Hnr., PLZ, In der Nähe von" />
-                    <button id="do-nearby" title="Standort suchen" class="ui basic button primary medium" onclick="javascript:do_search_streetcoordinates()">
-                        Go
-                    </button>
                 </div>
-                <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="ui basic button primary medium" onclick="javascript:do_browser_location()">
-                    <i class="location arrow icon"></i>
-                </button>
+                <button id="do-nearby" title="Standort suchen" class="ui basic button primary medium"
+                        onclick="javascript:do_search_streetcoordinates()">Go</button>
+                <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="ui basic button primary medium"
+                        onclick="javascript:do_browser_location()"><i class="location arrow icon"></i></button>
             </form>
 
             <div class="filter-area">
@@ -88,6 +96,9 @@
 
         <div id="listing" class="list-area">
             <h4 class="status"></h4>
+            <div class="ui input icon loading-indicator">
+                <i class="loading hidden spinner icon"></i>
+            </div>
             <ul class="results"></ul>
         </div>
 
