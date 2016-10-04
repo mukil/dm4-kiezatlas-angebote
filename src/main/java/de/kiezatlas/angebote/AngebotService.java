@@ -25,6 +25,8 @@ public interface AngebotService {
     public static final String ASSIGNMENT_KONTAKT          = "ka2.angebot.assignment_kontakt";
     public static final String ASSIGNMENT_BESCHREIBUNG     = "ka2.angebot.assignment_zusatz";
 
+    public static final String ANGEBOT_CREATOR_EDGE        = "ka2.angebot.creator";
+
     public static final String PROP_ANGEBOT_START_TIME     = "ka2.angebot.start_time";
     public static final String PROP_ANGEBOT_END_TIME       = "ka2.angebot.end_time";
 

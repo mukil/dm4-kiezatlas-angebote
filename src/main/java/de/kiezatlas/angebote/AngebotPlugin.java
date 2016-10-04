@@ -210,8 +210,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     @Override
     public RelatedTopic getAngebotsinfoCreator(Topic angebot) {
-        // ### use ka2.angebot.creator
-        return angebot.getRelatedTopic("dm4.core.association", null, null, "dm4.accesscontrol.username");
+        return angebot.getRelatedTopic(ANGEBOT_CREATOR_EDGE, null,
+            null, "dm4.accesscontrol.username");
     }
 
     @GET
@@ -901,7 +901,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public void postCreateTopic(Topic topic) {
         if (topic.getTypeUri().equals(ANGEBOT) && isAuthenticated()) {
             Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
-            dm4.createAssociation(mf.newAssociationModel("dm4.core.association", // ### ka2.angebot.creator
+            dm4.createAssociation(mf.newAssociationModel(ANGEBOT_CREATOR_EDGE,
                 mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
                 mf.newTopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
         }
