@@ -65,7 +65,7 @@ function do_save_angebot() {
                 "dm4.tags.tag": tags
             }
         }
-        console.log("Saving Angebot Topic: " + topic_model)
+        console.log("Saving Angebot Topic: ", topic_model)
         topic = restc.create_topic(topic_model)
     }
     hide_saving_icon('#do-save .icon')

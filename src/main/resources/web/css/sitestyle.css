@@ -404,7 +404,7 @@ div.ui-datepicker {
     padding: 0.5em;
     color: #8f1414;
     display: inline-block;
-    height: 23px;
+    height: 21px;
 }
 
 .filter-area .parameter a.close {
@@ -490,7 +490,7 @@ body.angebotsinfos.edit .form-area {
 
 .angebotsinfos.edit .task-info h3 {
     margin: 0em;
-    margin-left: 2em;
+    margin-left: 1em;
 }
 
 .angebotsinfos #do-search,
@@ -745,11 +745,15 @@ ul.angebote li small {
 }
 
 @media (max-width: 1200px) {
+    body.angebotsinfos.start .header-message p,
+    body.angebotsinfos.start .task-info,
+    body.angebotsinfos.start .angebot-area,
+    body.angebotsinfos.start .einrichtungs-area,
     body.angebotsinfos.detail .detail-area,
     body.angebotsinfos.detail .task-info,
     body.angebotsinfos.edit .task-info,
     body.angebotsinfos.edit .form-area {
-        margin-left: 2em;
+        width: 90%;
     }
     #name-search {
         width: 50%;

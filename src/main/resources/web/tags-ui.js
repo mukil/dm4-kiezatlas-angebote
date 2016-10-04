@@ -7,7 +7,7 @@
 var tagging = new function() {
 
     var _ = this
-    var nodeId = '#angebot-tags'
+    var nodeId = 'angebot-tags'
     var domElement = undefined
     var topicTags = undefined // tags the selected topic already carries
     var allReadableTags = []
@@ -41,7 +41,7 @@ var tagging = new function() {
             commaCount++
         }
         // console.log("Setup Tags to Edit", topicTags)
-        $(nodeId).val(inputFieldValue)
+        $('#' + nodeId).val(inputFieldValue)
     }
 
     // assemble tag topics to be returned
@@ -168,15 +168,16 @@ var tagging = new function() {
         return uniqueLabels
     }
 
-    this.listenTo = function(event_name, handler) {
+    this.listenToInputFieldSelection = function(handler) {
         if (!domElement) {
-            domElement.addEventListener(event_name, handler)
+            domElement.addEventListener("selection", handler)
         }
     }
 
     this.fireItemSelected = function(item) {
-        console.log("Firing Event Handler", domElement)
-        domElement.dispatchEvent(new CustomEvent('selection', { detail: item }))
+        var custom = new CustomEvent('selection', { detail: item })
+        console.log("Fire Item Selected Event", custom)
+        domElement.dispatchEvent(custom)
     }
 
 }

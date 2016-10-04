@@ -19,6 +19,7 @@ import de.deepamehta.workspaces.WorkspacesService;
 import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT_NAME;
+import static de.kiezatlas.angebote.AngebotService.ANGEBOT_CREATOR_EDGE;
 import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
 import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
@@ -35,6 +36,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -923,12 +926,32 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
      * Associates each Angebot to the currently logged in username who issued the creation (request).
      * Note: This seems to be wrapped in a transaction already, otherwise writing would not succeed.
      */
-    public void postCreateTopic(Topic topic) {
+    @Override
+    public void postCreateTopic(final Topic topic) {
         if (topic.getTypeUri().equals(ANGEBOT) && isAuthenticated()) {
-            Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
-            dm4.createAssociation(mf.newAssociationModel(ANGEBOT_CREATOR_EDGE,
-                mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
-                mf.newTopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
+            final Topic usernameTopic = aclService.getUsernameTopic(aclService.getUsername());
+            try {
+                dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<DeepaMehtaObject>() {
+                    @Override
+                    public DeepaMehtaObject call() {
+                        // 1) Creator Assignment into Private Workspace
+                        Association creatorAssignment = dm4.createAssociation(mf.newAssociationModel(ANGEBOT_CREATOR_EDGE,
+                            mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
+                            mf.newTopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
+                        Topic privateWs = dm4.getAccessControl().getPrivateWorkspace(usernameTopic.getSimpleValue().toString());
+                        workspaceService.assignToWorkspace(creatorAssignment, privateWs.getId());
+                        // 2) System Assignment
+                        Association systemAssignment = dm4.createAssociation(mf.newAssociationModel("dm4.core.association",
+                            mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
+                            mf.newTopicRoleModel(usernameTopic.getId(),"dm4.core.child")));
+                        workspaceService.assignToWorkspace(systemAssignment, dm4.getAccessControl().getSystemWorkspaceId());
+                        log.info("Created custom Username <--> Angebotsinfo assignments in the respective workspaces");
+                        return null;
+                    }
+                });
+            } catch (Exception ex) {
+                throw new RuntimeException("Creating Username <--> Angebotsinfo assignments FAILED!", ex);
+            }
         }
     }
 

@@ -23,18 +23,25 @@ public class Migration5 extends Migration {
     @Override
     public void run() {
 
+        logger.info("### Starting Migration5: Reassigning angebotsinfo - username relations to \"System\" workspace");
         List<Topic> angebotsinfos = dm4.getTopicsByType(AngebotPlugin.ANGEBOT);
         for (Topic angebot : angebotsinfos) {
-            // 1) Retype association
+            // 1) Assign standard assoc to \"System\"
             Topic username = angebot.getRelatedTopic("dm4.core.association", null,
                 null, "dm4.accesscontrol.username");
-            Association assoc = dm4.getAssociation("dm4.core.association", angebot.getId(),
+            Association systemAssoc = dm4.getAssociation("dm4.core.association", angebot.getId(),
                 username.getId(), "dm4.core.parent", "dm4.core.child");
-            assoc.setTypeUri(AngebotPlugin.ANGEBOT_CREATOR_EDGE);
-            // 2) Assign to users private worksapce
+            workspaceService.assignToWorkspace(systemAssoc, dm4.getAccessControl().getSystemWorkspaceId());
+            logger.info("=> Assigned angebotsinfo - username relation to \"System\" workspace");
+            // 2) Create new association into users \"Private Workspace\"
             Topic privateWs = dm4.getAccessControl().getPrivateWorkspace(username.getSimpleValue().toString());
-            workspaceService.assignToWorkspace(assoc, privateWs.getId());
+            Association privateCreatorAssoc = dm4.createAssociation(mf.newAssociationModel(AngebotPlugin.ANGEBOT_CREATOR_EDGE,
+                mf.newTopicRoleModel(angebot.getId(), "dm4.core.parent"),
+                mf.newTopicRoleModel(username.getId(),"dm4.core.child")));
+            workspaceService.assignToWorkspace(privateCreatorAssoc, privateWs.getId());
+            logger.info("=> Created new \"Angebotsinfo Creator\" between usern and angebotsinfo in \"Private Workspace\"");
         }
+        logger.info("### Completed Migration5: Reassigning angebotsinfo - username relations");
 
     }
 
