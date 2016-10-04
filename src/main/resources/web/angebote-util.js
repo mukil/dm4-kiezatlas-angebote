@@ -52,25 +52,21 @@ function load_username(renderer) {
     })
 }
 
-function render_user_menu(state) {
+function render_user_menu(state, myEntriesPage) {
     // ### Show Administration Menu for "Confirmation" WS Members
-    // $('.menu.administration').attr('style', 'display: inline-block;')
     if (state) {
         $('.username').text(state)
         $('.menu .login.item').hide()
-        $('.menu .register.item').hide()
         $('.menu .angebote.item').attr('style', 'display: inline-block;')
-        $('.menu .create.item').attr('style', 'display: inline-block;')
         $('.menu .logout.item').attr('style', 'display: inline-block;')
     } else {
         $('.menu .login.item').show()
-        $('.menu .create.item').hide()
-        $('.menu.administration').hide()
         $('.menu .angebote.item').hide()
         $('.menu .logout.item').hide()
-        $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Angebote zu bearbeiten.')
-        $('.task-info').addClass('disabled')
-        $('div.angebot-area').addClass('disabled')
+        if (myEntriesPage) {
+            $('div.angebot-area').addClass('disabled')
+            $('div.einrichtungs-area').addClass('disabled')
+        }
     }
 }
 
