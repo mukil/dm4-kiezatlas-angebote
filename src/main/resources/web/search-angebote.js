@@ -18,7 +18,7 @@ var time_parameter = undefined
 function fire_angebote_search() {
     var queryString = $('#query').val()
         console.log("Fire Angebote Search", queryString)
-    if ( (queryString.length === 0 && !location_coords) || queryString.trim().length < 3) {
+    if (queryString.length === 0 && !location_coords) {
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben").focus()
         return
     }
@@ -268,9 +268,22 @@ function select_next_locationsearch_result() {
 
 function toggle_location_parameter_display($filter_area) {
     if (location_coords) {
+        console.log("Location Parameter to Display", location_coords)
+        // ### geo-coded address value has no "name" attribute
         var $locationParameter = $('.filter-area .parameter.location')
         var parameterHTML = '<a class="close" title="Standortfilter entfernen" href="javascript:remove_location_parameter()">x</a>'
-                + '<select id="nearby-radius" onchange="handle_location_form()" title="Entfernungsangabe für die Umkreissuche">'
+        parameterHTML += 'N&auml;he '
+        if (location_coords.name) {
+            parameterHTML += ' \"' + location_coords.name + '\" '
+        }
+        parameterHTML += '<span class="coord-values">(' + location_coords.longitude.toFixed(3)
+                + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
+        if (street_coordinates.length > 1) {
+            parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche nutzen" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
+                + '<a class="next close" title="Nächstes Ergebnis der Standortsuche nutzen" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
+                + '<span class="alt-count">('+street_coordinates.length +' Standorte gefunden)</span>'
+        }
+        parameterHTML += '<select id="nearby-radius" onchange="handle_location_form()" title="Entfernungsangabe für die Umkreissuche">'
         for (var ridx in available_radiants) {
             var option_value = available_radiants[ridx]
             if (location_radius == option_value) {
@@ -279,13 +292,7 @@ function toggle_location_parameter_display($filter_area) {
                 parameterHTML += '<option value="'+option_value+'">' + option_value + 'km</option>'
             }
         }
-        parameterHTML += '</select>N&auml;he \"'+ location_coords.name + '\" <span class="coord-values">(' + location_coords.longitude.toFixed(3)
-                + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
-        if (street_coordinates.length > 1) {
-            parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche nutzen" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
-                + '<a class="next close" title="Nächstes Ergebnis der Standortsuche nutzen" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
-                + '<span class="alt-count">('+street_coordinates.length +' Standorte gefunden)</span>'
-        }
+        parameterHTML += '</select>'
         if ($locationParameter.length === 0) {
             $filter_area.append('<div class="parameter location" title="Standort-Suchfilter">' + parameterHTML + '</div>')
         } else {
@@ -341,11 +348,15 @@ function render_query_parameter() {
 }
 
 function show_search_loading_sign() {
-    $('.list-area .loading-indicator').removeClass('hidden')
+    // $('.list-area .loading-indicator').removeClass('hidden')
+    $('.list-area .loading-indicator .icon').removeClass('hidden')
+    $('.list-area .status').text('Suche Angebote')
+    $('.list-area .results').empty()
 }
 
 function hide_search_loading_sign() {
-    $('.list-area .loading-indicator').addClass('hidden')
+    // $('.list-area .loading-indicator').addClass('hidden')
+    $('.list-area .loading-indicator .icon').addClass('hidden')
 }
 
 function remove_location_parameter() {
