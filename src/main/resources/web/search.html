@@ -33,7 +33,7 @@
                 render_search_frontpage()
                 tagging.fetchAllTagTopics()
                 tagging.setupJQueryUIAutocompleteField('query')
-                tagging.listenTo("selection", function(e) {
+                tagging.listenToInputFieldSelection("selection", function(e) {
                     console.log("Search Input Event Received by Tag Component", e.detail)
                     fire_angebote_search()
                 })
