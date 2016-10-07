@@ -187,8 +187,13 @@ a {
     font-size: 2.5em;
     position: relative;
     top: 2em;
-    left: -0.5em;
+    left: -1em;
     color: #8f1414;
+    z-index: 1005;
+}
+
+.search .list-area .loading-indicator i.icon {
+    opacity: .9;
 }
 
 .search .list-area .read-more p {
@@ -210,6 +215,7 @@ a {
 .search .list-area ul.results {
     padding-left: 0px;
     margin-top: 0px;
+    min-height: 150px;
 }
 
 .search .list-area ul li.read-more a {
@@ -525,6 +531,14 @@ body.angebotsinfos.edit .form-area {
 .assignment .date-area .angebot-name,
 .assignment .date-area .einrichtung-name {
     font-weight: bold;
+}
+
+.assignment .ticker label,
+.assignment .ticker input {
+    cursor: pointer;
+    display: inline;
+    margin-left: 1em;
+    top: 1em;
 }
 
 .input#do-delete,
