@@ -36,7 +36,9 @@ function fire_angebote_search() {
     search_input = queryString.split(",") // split by tag delimiter // ### clean up value
     var luceneQueryString = ""
     for (var el in search_input) {
-        if (search_input.length > 1) {
+        if (search_input.length === 1) {
+            luceneQueryString = search_input[el].trim()
+        } else if (search_input.length > 1) {
             luceneQueryString += " " + search_input[el].trim()
         }
     }

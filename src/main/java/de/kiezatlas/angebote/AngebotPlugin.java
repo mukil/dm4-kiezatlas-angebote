@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -852,8 +851,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         HashMap<Long, Topic> uniqueResults = new HashMap<Long, Topic>();
         List<Topic> namen = dm4.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
         List<Topic> beschreibungen = dm4.searchTopics(query, "ka2.angebot.beschreibung");
-        List<Topic> stichwoerter = dm4.searchTopics(query, "dm4.tags.label"); // Todo: check index modes
-        List<Topic> kontakt = dm4.searchTopics(query, "ka2.angebot.kontakt"); // Todo: check index modes
+        List<Topic> stichwoerter = dm4.searchTopics(query, "dm4.tags.label");
+        List<Topic> kontakt = dm4.searchTopics(query, "ka2.angebot.kontakt");
         // List<Topic> sonstigesResults = dm4.searchTopics(query, "ka2.sonstiges");
         // List<Topic> traegerNameResults = dm4.searchTopics(query, "ka2.traeger.name");
         log.info("> " + namen.size() + ", " + beschreibungen.size() + ", " + stichwoerter.size()
@@ -866,8 +865,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         Iterator<Topic> iterator = beschreibungen.iterator();
         while (iterator.hasNext()) {
             Topic next = iterator.next();
-            Topic geoObject = getParentAngebotTopic(next); // ### maybe null, clean up upgrade-mechanism
-            if (geoObject != null) {
+            List<RelatedTopic> relatedParents = getParentAngebotTopics(next);
+            for (Topic geoObject : relatedParents) {
                 if (!uniqueResults.containsKey(geoObject.getId())) {
                     uniqueResults.put(geoObject.getId(), geoObject);
                 }
@@ -1053,8 +1052,15 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }
 
-    private Topic getParentAngebotTopic(Topic entry) {
-        return entry.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", "ka2.angebot");
+    private List<RelatedTopic> getParentAngebotTopics(Topic entry) {
+        List<RelatedTopic> angebote = new ArrayList<RelatedTopic>();
+        if (entry.getTypeUri().equals("dm4.tags.tag")) return getAllAggregatingAngebotParentTopics(entry);
+        angebote.add(entry.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", "ka2.angebot"));
+        return angebote;
+    }
+
+    private List<RelatedTopic> getAllAggregatingAngebotParentTopics(Topic entry) {
+        return entry.getRelatedTopics("dm4.core.aggregation", "dm4.core.child", "dm4.core.parent", "ka2.angebot");
     }
 
     private String getGeoObjectName(Topic geoObject) {
