@@ -173,13 +173,19 @@ function do_save_assignment(e) {
     // parse dates
     if (fromInput.length > 0) {
         // fromDate = $.datepicker.parseDate("dd. MM yy", fromInput)
-        fromDate = new Date(fromInput).getTime()
+        // we shift into the day about approx. 16minutes 20 seconds
+        fromDate = (new Date(fromInput).getTime() + 1000000)
     }
+    /** var oneDayValue = get_oneday_checkbox_value()
+    if (oneDayValue) {
+        console.log("   We could skip the From Date here..", oneDayValue)
+    } **/
     if (toInput.length > 0) {
         // toDate = $.datepicker.parseDate("dd. MM yy", toInput)
-        toDate = (new Date(toInput).getTime() + 86400000) // we want to shift this value always about 24hours
+        // we want to shift this value always about ca. 23hours 43minutes and 20seconds
+        toDate = (new Date(toInput).getTime() + (86400000 - 1000000))
     }
-    console.log("Datepicker delivered us from, to", fromInput, fromDate, toInput, toDate)
+    console.log("Shifted Datepicked delivered us from, to", fromInput, fromDate, toInput, toDate)
     // Chromium has no problem to deliver us timestamps from a german locale
     if (!selected_angebot) throw new Error("Assertion failed: An angebot must be loaded before an assignment can be created.")
     // Update
@@ -337,7 +343,7 @@ function render_selected_assignment() {
         $('.concrete-assignment').removeClass('selected')
         $('#' + selected_assignment.id).addClass('selected')
         $('.date-area').removeClass("disabled")
-        $('.date-area .einrichtung-name').text(selected_assignment.name) // ### should be geo_name
+        render_assignment_place_name(selected_assignment.name)
         $('#from').datepicker("setDate", new Date(selected_assignment.anfang_timestamp))
         $('#to').datepicker("setDate", new Date(selected_assignment.ende_timestamp))
         $('#do-assign .text').text("Zeitraum ändern")
@@ -346,13 +352,33 @@ function render_selected_assignment() {
         // clear old assignment rendering
         $('#from').datepicker("setDate", new Date())
         $('#to').datepicker("setDate", new Date())
-        // update label
-        $('.einrichtung-name').text(selected_geo_object.value)
         // update area
         $('.date-area').removeClass("disabled")
         $('#do-assign .text').text("Speichern")
         $('#do-delete').addClass("hidden")
     }
+}
+
+function handle_override_details() {
+    // ###
+    $('#override-block').removeClass('disabled')
+}
+
+function handle_oneday_assignment() {
+    var $elements = $('#do-oneday')
+    var checkbox = $elements[0]
+    console.log("Clicked 1Day Tick", $elements, checkbox)
+    /** if (checked) {
+        $('#to-form-block').show()
+    } else {
+        $('#to-form-block').hide()
+    } **/
+    $('#to-form-block').toggle()
+}
+
+function get_oneday_checkbox_value() {
+    var val = $('#do-oneday')[0].attr("checked")
+    console.log("1-Tag Checkbox Value", val)
 }
 
 function handle_name_search_input(e) {
@@ -367,6 +393,12 @@ function select_geo_object(e) {
     selected_geo_object = geo_object
     selected_assignment = undefined
     render_selected_assignment()
+    // update label
+    render_assignment_place_name(selected_geo_object.value)
+}
+
+function render_assignment_place_name(name) {
+    $('.date-area .einrichtung-name').text(name)
 }
 
 function select_assignment(event) {

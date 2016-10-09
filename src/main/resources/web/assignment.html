@@ -6,13 +6,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
 
-        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
+        <!--link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/-->
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.theme.min.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/checkbox.min.css"/>
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
-        <script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script>
+        <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script-->
         <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery.ui.datepicker-de.js"></script-->
+        <script src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script>
         <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script src="/de.kiezatlas.angebote/angebote-util.js"></script>
@@ -37,7 +41,7 @@
                     <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
                 </a>
                 <a href="/sign-up/login" class="login item">Login</a>
-                <a class="item gesamt" href="/">Einrichtungen</a>
+                <a class="item gesamt" href="/">Startseite</a>
                 <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Eintr&auml;ge</a>
                 <a href="/angebote" class="all-angebote item">Angebote</a>
                 <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
@@ -48,7 +52,6 @@
             <div class="task-info">
                 <h3>
                     An welchen Einrichtungen findet dieses Angebot statt?<br/>
-                    <span class="angebot-name">dieser Angebotsinfo</span>
                 </h3>
                 <p><span class="label">Bitte w&auml;hle eine Einrichtung &uuml;ber das Suchfeld</span> <!--span class="help">?<span--></p>
                 <!-- GeoObjectTopic.lookupInstitution(alias, as) -->
@@ -68,17 +71,32 @@
             </div>
 
             <div class="date-area disabled">
-                <h3>Zeitraum des Angebots am Standort <span class="einrichtung-name">...</span> festlegen</h3>
+                <h3>Angebotszeitraum f&uuml;r <span class="angebot-name">des Angebots</span> am Standort <i class="marker icon"></i><span class="einrichtung-name">...</span></h3>
                 <form id="date-select-form" action="javascript:_void()" accept-charset="UTF-8">
+
                     <label for="from" class="block-space">Das Angebot findet hier statt vom</label>
                     <div class="ui input focus">
                         <input type="text" id="from" name="from">
+
+                        <!--div class="ui input focus ticker">
+                            <label class="text" for="oneday">
+                                <input type="checkbox" id="do-oneday" name="oneday" class="ui basic checkbox"
+                                       onclick="handle_oneday_assignment()"
+                                       title="Bitte auswählen falls Ihr Angebot nur an diesem Tag stattfindet" />
+                                Nur an einem Tag
+                            </label>
+                        </div-->
+
                     </div>
-                    <label for="to" class="block-space">bis zum</label>
-                    <div class="ui input focus">
-                        <input type="text" id="to" name="to">
+
+                    <div id="to-form-block">
+                        <label for="to" class="block-space">bis zum</label>
+                        <div class="ui input focus">
+                            <input type="text" id="to" name="to">
+                        </div>
                     </div>
                     <br/>
+
                     <div class="ui input focus icon block-space">
                         <button id="do-assign" class="ui green button" onclick="do_save_assignment()"
                                 title="Bestätigt diesen Veranstaltungszeitraum">
@@ -87,6 +105,24 @@
                                 title="Achtung: Entfernt diesen Veranstaltungszeitraum">
                             <i class="icon trash"></i>Zeitraum l&ouml;schen</button>
                     </div>
+
+                    <!--div class="ui input focus icon block-space">
+                        <button id="do-override" class="ui basic button" onclick="handle_override_details()"
+                                title="Sie können den Kontakt und die Angebotsbeschreibung je nach Standort ändern">
+                            <i class="icon plus"></i><span class="text">Standortspezifische Infos</span>
+                        </button>
+                    </div>
+
+                    <div id="override-block" class="disabled">
+                        <label for="additional-kontakt" class="block-space">Standortspezifischer Kontakt</label>
+                        <div class="ui input focus">
+                            <input type="text" id="additional-kontakt" name="add-kontakt" />
+                        </div>
+                        <label for="additional-infos" class="block-space">Standortspezifische Infos</label>
+                        <div class="ui input focus">
+                            <input type="text" id="additional-details" name="add-infos" />
+                        </div>
+                    </div-->
                 </form>
             </div>
         </div>
@@ -98,7 +134,7 @@
                 </div>
                 <p class="links"></p>
             </div>
-            <h3>Dein Angebot ist an folgenden Standorten &uuml;ber folgende Zeitr&auml;ume <em>aktiv</em></h3>
+            <h3>Vorhandene Angebotszeitra&uuml;me</h3>
             <div class="einrichtungen"></div>
             <div class="help"></div>
         </div>

@@ -56,6 +56,7 @@ h3 {
     color: #27638C;
 }
 
+.assignment label,
 span.label,
 h3.label {
     color: #a9a9a9;
@@ -233,6 +234,12 @@ a {
 .list-area .results li.read-more {
     background-color: #EAEAEA;
     margin-right: 2em;
+}
+
+.list-area .results .klick {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #666;
 }
 
 .search  a.read-more {
@@ -792,13 +799,16 @@ ul.angebote li small {
         text-align: left;
         padding-left: 1em;
     }
+    .search .filter-area {
+        padding-top: 0em;
+    }
     .search .filter-area h4 {
         text-align: left;
         display: block;
         margin-top: 1em;
     }
     .search .filter-area .query-parameter {
-        margin-top: 1em;
+        margin-top: .5em;
     }
     /** .search .filter-area .parameter.location {
         line-height: 2.5em;
@@ -846,8 +856,12 @@ ul.angebote li small {
         margin-left: 0em;
         width: 200px;
     }
-    .search #nearby {
+    .search .nearby-dialog.ui.input #nearby {
         width: 190px;
+        min-width: 90px;
+    }
+    .search .form-area form {
+        margin-right: 0em;
     }
     .assignment .right-side,
     .assignment .left-side {
@@ -862,7 +876,7 @@ ul.angebote li small {
     }
 }
 
-@media (max-width:400px) {
+@media (max-width:460px) {
     .search #query {
         margin-left: 0em;
         width: 160px;
