@@ -189,7 +189,6 @@ a {
     top: 2em;
     left: -1em;
     color: #8f1414;
-    z-index: 1005;
 }
 
 .search .list-area .loading-indicator i.icon {
@@ -843,6 +842,13 @@ ul.angebote li small {
     .assignment .angebot-infos {
         display: none;
     }
+    .search #query {
+        margin-left: 0em;
+        width: 200px;
+    }
+    .search #nearby {
+        width: 190px;
+    }
     .assignment .right-side,
     .assignment .left-side {
         width: 90%;
@@ -855,6 +861,15 @@ ul.angebote li small {
         margin-top: 0em;
     }
 }
+
+@media (max-width:400px) {
+    .search #query {
+        margin-left: 0em;
+        width: 160px;
+    }
+    .search #nearby {
+        width: 150px;
+    }
 
 /** CKEditor Overrides */
 
