@@ -20,9 +20,10 @@ function load_angebot_by_resource_path(callback) {
             selected_angebot = JSON.parse(angebotsinfoText)
             if (callback) callback("ok", selected_angebot)
         } catch (e) {
-            console.warn("Could not load angebotsinfo details...", e, "using", angebotsinfoText)
-            selected_angebot = angebotsinfoText
-            if (callback) callback("error", selected_angebot)
+            console.warn("Could not parse angebotsinfo details...", e, "using", angebotsinfoText)
+            selected_angebot = JSON.parse(angebotsinfoText)
+            // if (callback) callback("error", selected_angebot)
+            if (callback) callback("ok", selected_angebot)
         }
     } else {
         console.log("No angebot to edit - Creating new one...")

@@ -222,15 +222,27 @@ function do_save_assignment(e) {
 }
 
 function do_delete_assignment() {
-    // Do Delete
-    if (selected_assignment) {
-        restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
-        selected_assignment = undefined
-        selected_geo_object = undefined
-    }
-    // refresh GUI
-    clear_assignment_dateform()
-    render_assignment_page()
+    $("#dialog-confirm").dialog({ resizable: false, height: "auto", width: 340, modal: true,
+        title: "Angebotszeitraum löschen", buttons: {
+            "Ja, löschen": function() {
+                // Do Delete
+                if (selected_assignment) {
+                    restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
+                    selected_assignment = undefined
+                    selected_geo_object = undefined
+                } else {
+                    alert("Could not delete assignment, please select it and try again.")
+                }
+                // refresh GUI
+                clear_assignment_dateform()
+                render_assignment_page()
+                $( this ).dialog( "close" );
+            },
+            "Nein, danke": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    })
 }
 
 // -------------------------- GUI Methods for Angebote Assignment and Editing ------------------- //
