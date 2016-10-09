@@ -75,7 +75,7 @@
         </div>
 
         <div class="form-area angebot">
-            <form action="javascript:do_save_angebot_and_go_home()" id="angebot-form" accept-charset="UTF-8">
+            <form action="javascript:_void()" id="angebot-form" accept-charset="UTF-8">
                 <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
                 <div class="ui input focus">
                     <input id="angebot-name" name="name" maxlength="128"
@@ -102,7 +102,7 @@
                 </div>
                 <br/>
                 <div class="ui input focus icon commands">
-                    <button id="do-save" class="ui green button" type="submit">
+                    <button id="do-save" class="ui green button" onclick="do_save_angebot_and_go_home()" type="submit">
                         <i class="icon save"></i>Speichern
                     </button>
                     <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
