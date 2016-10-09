@@ -59,6 +59,7 @@ function delete_my_angebot(id) {
                 restc.request("DELETE", "/angebote/" + id)
                 $('ul.angebote').empty()
                 load_users_angebote()
+                $( this ).dialog( "close" );
             },
             "Nein": function() {
                 $( this ).dialog( "close" );
