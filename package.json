@@ -1,0 +1,27 @@
+{
+  "name": "dm4-kiezatlas-angebote-ui",
+  "version": "0.3-SNAPSHOT",
+  "description": "User dialogs for managing Angebotsinfos",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mukil/dm4-kiezatlas-angebote.git"
+  },
+  "keywords": [
+    "kiezatlas"
+  ],
+  "author": "Malte Reißig",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "bugs": {
+    "url": "https://github.com/mukil/dm4-kiezatlas-angebote/issues"
+  },
+  "homepage": "https://github.com/mukil/dm4-kiezatlas-angebote#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-uglify": "^2.0.0"
+  }
+}
