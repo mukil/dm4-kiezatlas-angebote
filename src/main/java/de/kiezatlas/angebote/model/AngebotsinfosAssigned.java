@@ -62,6 +62,14 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         }
     }
 
+    public void setLocationSearchDistance(double distanceInKm) {
+        try {
+            json.put("search_distance", distanceInKm);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setAngebotsName(String nameValue) {
         try {
             json.put("angebotsName", nameValue);
@@ -206,6 +214,15 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Longitude", ex);
             return "";
+        }
+    }
+
+    public double getLocationSearchDistance() {
+        try {
+            return json.getDouble("search_distance");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Location Longitude", ex);
+            return 0.0;
         }
     }
 

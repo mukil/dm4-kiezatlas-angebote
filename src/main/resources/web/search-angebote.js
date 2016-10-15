@@ -225,7 +225,7 @@ function render_spatial_list_item(element, $list) {
             + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
         if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
-        html_string += '</div></a></li>'
+        html_string += '</div></a><div class="air-distance">Entferung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm</a></li>'
     $list.append(html_string)
 }
 

@@ -241,6 +241,13 @@ a {
     margin-right: 2em;
 }
 
+.list-area .results li .air-distance {
+    padding-left: 1.2em;
+    padding-top: 3px;
+    color: #27638C;
+    font-size: 0.9em;
+}
+
 .list-area .results .klick {
     cursor: pointer;
     text-decoration: underline;

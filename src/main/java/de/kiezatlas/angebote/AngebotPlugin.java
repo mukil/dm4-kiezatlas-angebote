@@ -13,6 +13,7 @@ import de.deepamehta.accesscontrol.AccessControlService;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
+import de.deepamehta.geomaps.GeomapsService;
 import de.deepamehta.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geospatial.GeospatialService;
 import de.deepamehta.workspaces.WorkspacesService;
@@ -76,7 +77,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     // -------------------------------------------------------------------------------------------- Instance Variables
 
-    // @Inject private GeomapsService geomapsService;
+    @Inject private GeomapsService geomapsService;
     @Inject private WorkspacesService workspaceService;
     @Inject private KiezatlasService kiezService;
     @Inject private AccessControlService aclService;
@@ -503,28 +504,27 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             List<Angebotsinfos> fulltextAngebote = new ArrayList<Angebotsinfos>();
             List<AngebotsinfosAssigned> einrichtungsAngebote = new ArrayList<AngebotsinfosAssigned>();
             AngeboteSearchResults results = new AngeboteSearchResults();
-            List<Topic> angebotsOrte = new ArrayList<Topic>();
-            // 1) Spatial Query, searching Einrichtungen by location
+            // 1) Spatial Query, searching Einrichtungen by location and assemble related angebotsinfos
             if (!location.isEmpty() && location.contains(",")) {
                 double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
-                GeoCoordinate point = new GeoCoordinate(location.trim());
-                List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(point, r);
+                GeoCoordinate searchPoint = new GeoCoordinate(location.trim());
+                List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(searchPoint, r);
                 log.info("> Spatial Resultset Size " + geoCoordinateTopics.size() + " Geo Coordinate Topics");
                 for (Topic geoCoordinate : geoCoordinateTopics) {
+                    GeoCoordinate instGeoCoord = new GeoCoordinate(geoCoordinate.getSimpleValue().toString().replace(" ", ","));
                     Topic inst = kiezService.getGeoObjectByGeoCoordinate(geoCoordinate);
                     if (inst != null) {
                         List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(inst);
                         // if no assignment exists, angebotsinfo (resp. einrichtung with all its..) is not a result
-                        if (offers != null && offers.size() > 0) angebotsOrte.add(inst);
+                        if (offers != null && offers.size() > 0) {
+                            for (Topic offer : offers) {
+                                AngebotsinfosAssigned relatedOffer = prepareAngebotsinfosAssigned(offer, inst);
+                                double distanceOfLocation = geomapsService.getDistance(searchPoint, instGeoCoord);
+                                relatedOffer.setLocationSearchDistance(distanceOfLocation);
+                                einrichtungsAngebote.add(relatedOffer);
+                            }
+                        }
                     }
-                }
-            }
-            log.info("> Assembling angebotsinfos for " + angebotsOrte.size() + " locations...");
-            // 1.1) Assemble all angebotsinfos by spatial search result
-            for (Topic einrichtung : angebotsOrte) { // ### result set location should be set
-                List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(einrichtung);
-                for (Topic offer : offers) {
-                    einrichtungsAngebote.add(prepareAngebotsinfosAssigned(offer, einrichtung));
                 }
             }
             log.info("> Collected " + einrichtungsAngebote.size() + " angebote via spatial search.");
@@ -687,6 +687,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }
 
+    /** Currently unused **/
     private List<AngebotsinfosAssigned> filterOutDuplicates(List<AngebotsinfosAssigned> angebotsinfos) {
         List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
         for (AngebotsinfosAssigned angebot : angebotsinfos) {
