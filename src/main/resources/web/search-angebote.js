@@ -234,10 +234,12 @@ function render_fulltext_list_item(element, $list) {
     var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
     if (!first_assignment) first_assignment = element.locations[0]
     if (first_assignment) {// Angebote werden nur angezeigt wenn sie mindestens ein "Assignment" haben
+        var standort_html = (location_count > 1) ? location_count + ' Standorten' : ' einem Standort'
+        var zb_html = (location_count > 1) ? 'z.B. vom' : 'Vom'
         var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
             + '<div id="' + element.id + '" class="concrete-assignment">'
-            + '<h3>' +element.name + ' wird an ' + location_count + ' Standorten angeboten</h3>'
-            + 'z.B. vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>&nbsp; @<b>' + first_assignment.name + '</b><br/>'
+            + '<h3>' +element.name + ' wird an ' + standort_html + ' angeboten</h3>'
+            + zb_html +' <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
         if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a></li>'
         $list.append(html_string)
