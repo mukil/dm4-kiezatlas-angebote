@@ -614,6 +614,10 @@ body.angebotsinfos.edit .form-area {
 
 .form-area.angebot .cke_textarea_inline {
     margin-top: 3em;
+    background-color: #fff;
+    padding: .5em; padding-top: 0px;
+    border-radius: 5px;
+    border: 1px solid #85B7D9;
 }
 
 div.disabled {
