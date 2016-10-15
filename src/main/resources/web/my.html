@@ -13,40 +13,15 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
         <!--link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/-->
 
-        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script defer src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script-->
-        <script src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script defer src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer src="/de.kiezatlas.angebote/page_inits.js" onload="my_entries_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
-        <script type="text/javascript">
-
-            $(document).ready(function(e) {
-                var notLoggedInMessage = "<p class=\"message\">Du hast aktuell nicht die Berechtigungen um eigene Angebote zu verwalten.<br/>"
-                            + "Solle dies ein Fehler sein melde Dich bitte per Email unter Angabe deines Benutzernamens bei uns: "
-                            + "<a href=\"mailto:support@kiezatlas.de\">info@kiezatlas.de</a></p><p>Falls Du f&uuml;r die Kiezatlas Website bereits einen Account hast, bitte logge dich ein.</p>"
-                load_username(function(response) {
-                    render_user_menu(response, true)
-                    if (!response) {
-                        notLoggedInMessage = "<p class=\"message\">Auf der folgenden Seite kannst Du Dich <a href=\"/sign-up/login\">einloggen</a>.</p>"
-                        $('.task-info').html(notLoggedInMessage)
-                    } else {
-                        has_angebote_membership(function(res) {
-                            if (res) {
-                                load_users_angebote()
-                            } else {
-                                $('.task-info').html(notLoggedInMessage)
-                                console.warn("Display: Du hast aktuell nicht die nötigen Berechtigungen um Angebotsinfos zu verwalten")
-                            }
-                        })
-                    }
-                })
-                load_users_einrichtungen()
-            })
-            
-        </script>
     </head>
     <body class="kiezatlas angebotsinfos start">
 
@@ -92,11 +67,10 @@
             </p>
         </div>
 
-        <div class="task-info">
-            <h3>Meine Angebotsinfos</h3>
-        </div>
+        <div class="task-info"></div>
 
         <div class="angebot-area">
+            <h3>Meine Angebotsinfos</h3>
             <ul class="angebote"></ul>
             <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
                 <div class="ui input block-space-bottom">

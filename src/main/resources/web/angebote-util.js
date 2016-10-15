@@ -52,7 +52,7 @@ function load_username(renderer) {
     })
 }
 
-function render_user_menu(state, myEntriesPage) {
+function render_user_menu(state) {
     // ### Show Administration Menu for "Confirmation" WS Members
     if (state) {
         $('.username').text(state)
@@ -63,10 +63,6 @@ function render_user_menu(state, myEntriesPage) {
         $('.menu .login.item').show()
         $('.menu .angebote.item').hide()
         $('.menu .logout.item').hide()
-        if (myEntriesPage) {
-            $('div.angebot-area').addClass('disabled')
-            $('div.einrichtungs-area').addClass('disabled')
-        }
     }
 }
 
@@ -111,6 +107,10 @@ function go_to_angebot_assignment(id) {
             go_to_my_angebot_listing()
         }, 1500)
     }
+}
+
+function go_to_frontpage() {
+    window.document.location.assign("/")
 }
 
 function go_to_my_angebot_listing() {
