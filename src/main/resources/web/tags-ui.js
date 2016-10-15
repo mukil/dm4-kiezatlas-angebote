@@ -22,14 +22,11 @@ var tagging = new function() {
         })
     }
 
-    /** Make sure, selected_angebot is initialized */
     this.init = function(domElementId, itemSelectionHandler) {
         if (domElementId) nodeId = domElementId
         if (!domElement) domElement = document.getElementById(nodeId)
         // load all tags (user has read access too)
         _.fetchAllTagTopics(function() {
-            console.log("Start setting up tagging input field", allReadableTags)
-            // console.log("Initialized all available Tags", allReadableTags)
             // activate third party library
             _.setupJQueryUIAutocompleteField(nodeId)
         })
@@ -102,7 +99,7 @@ var tagging = new function() {
         $(domElement).bind("keydown", function( event ) {
             if ( event.keyCode === $.ui.keyCode.TAB && $( this ).data( "ui-autocomplete" ).menu.active ) {
                 event.preventDefault()
-                _.fireItemSelected(this.value)
+                // _.fireItemSelected(this.value)
             }
         })
         .autocomplete({

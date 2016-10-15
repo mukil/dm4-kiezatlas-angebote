@@ -19,7 +19,10 @@ function init_search_page() {
     load_and_render_tag_search_dialog()
     // do search by time
     render_search_frontpage()
-    tagging.init("query", fire_angebote_search)
+    tagging.init("query", function(e) {
+        // console.log("Tag selection input handler received", e)
+        fire_angebote_search()
+    })
 }
 
 // ----------------------------------  The Major Search Operations --------- //
@@ -57,14 +60,16 @@ function fire_angebote_search() {
     $.getJSON('/angebote/search?query=' + luceneQueryString + '&location=' + locationValue + '&radius='
             + location_radius + '&datetime=' + dateTime, function(results) {
         hide_search_loading_sign()
-        render_search_results(results)
+        angebotsinfos = results
+        render_search_results()
     })
 }
 
 function fire_angebote_timesearch() {
     var result = JSON.parse($.ajax('/angebote/filter/' + new Date().getTime(),
         { async: false, dataType: 'json' }).responseText)
-    angebotsinfos = result.overall // .timely query results assigned to .overall (server side)
+    angebotsinfos = result // .timely query results are also assigned to .spatial (server side)
+    render_search_results()
 }
 
 // ----------------------------------  Two Utility Search Operations -------- //
@@ -141,101 +146,102 @@ function render_search_frontpage() {
     location_coords = undefined
     search_input = []
     render_query_parameter()
-    render_search_results()
 }
 
-function render_search_results(items) {
+function render_search_results() {
     var $listing = $('.list-area .results')
-    // overall and assigned ### merged
-    var items_to_render = { overall: [], assigned: [], timely: [] } //, spatial : [] }
     var result_length = 0
-    if (items) {
-        items_to_render = items
-        result_length = items_to_render.overall.length + items_to_render.assigned.length
+    if (angebotsinfos) {
+        result_length = angebotsinfos.fulltext.length + angebotsinfos.spatial.length + angebotsinfos.timely.length
         $listing.empty()
-    } else if (angebotsinfos) {
-        items_to_render.timely = angebotsinfos
-        result_length = items_to_render.timely.length
     }
+    console.log("Search Result Item Object", angebotsinfos)
     $listing.empty()
-    if (items_to_render.length === 0) {
+    // status
+    if (angebotsinfos.length === 0) {
         $listing.append('<li class="read-more">Sie k&ouml;nnen '
             + 'uns helfen neue oder aktuelle Angebote in unsere <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>')
         // ("+new Date().toLocaleDateString()+")
     }
-    // status
-    /** if (items_to_render.overall.length > 0) {
-        $('#query').val("")
-    }**/
-    // assigned time search result items
-    for (var el in items_to_render.timely) {
-        var element = items_to_render.timely[el]
-        render_timely_list_item(element, $listing)
-    }
+    var complete_resultset = split_angebote_results(angebotsinfos)
+    console.log("Split Search Results", complete_resultset)
     // assigned location search list items
-    for (var el in items_to_render.assigned) {
-        var element = items_to_render.assigned[el]
-        render_assigned_list_item(element, $listing)
+    if (angebotsinfos.spatial) {
+        // ### special sorting by distance
+        // ... angebotsinfos.spatial.sort(angebote_compare_by_end_earliest_last)
+        for (var el in angebotsinfos.spatial) {
+            var element = angebotsinfos.spatial[el]
+            render_spatial_list_item(element, $listing)
+        }
     }
-    // overall (text search listing)
-    for (var el in items_to_render.overall) {
-        var element = items_to_render.overall[el]
-        render_overall_list_item(element, $listing)
+    if (angebotsinfos.timely) {
+        angebotsinfos.timely.sort(angebote_compare_by_end_earliest_last)
+        for (var el in angebotsinfos.timely) {
+            var element = angebotsinfos.timely[el]
+            render_fulltext_list_item(element, $listing)
+        }
+    }
+    // overall (text search listing) not necessarily with locations assigned
+    if (angebotsinfos.fulltext) {
+        angebotsinfos.fulltext.sort(angebote_compare_by_end_earliest_last)
+        for (var el in angebotsinfos.fulltext) {
+            var element = angebotsinfos.fulltext[el]
+            render_fulltext_list_item(element, $listing)
+        }
     }
     var message = (result_length === 1) ? "1 Angebot" : result_length + " Angebote"
     if (result_length === 0) message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse"
     $('.list-area .status').html(message)
 }
 
-function render_timely_list_item(element, $list) {
-    var name = element.name
-    var contact = element.kontakt
-    var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
-            + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
-        if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
-        html_string += '<br/><span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
-        html_string += '</div></a></li>'
-    $list.append(html_string)
+function split_angebote_results(items_to_render) {
+    var split_time = new Date().getTime()
+    // var latest_end = get_latest_angebote_end_time(element)
+    var complete_resultset = {
+        current: [], outdated: []
+    }
+    for (var idx in items_to_render) {
+        for (var el in items_to_render[idx]) {
+            var element = items_to_render[idx][el]
+            // render_overall_list_item(element, $listing)
+            var latest_end = get_latest_angebote_end_time(element)
+            if (split_time > latest_end) {
+                complete_resultset.outdated.push(element)
+            } else {
+                complete_resultset.current.push(element)
+            }
+        }
+    }
+    return complete_resultset
 }
 
-function render_assigned_list_item(element, $list) {
+function render_spatial_list_item(element, $list) {
     var locationName = element.name
     var name = element.angebotsName
     var angebotsId = element.angebotsId
     var contact = element.kontakt
     var html_string = '<li class="read-more"><a href="/angebote/'+angebotsId+'">'
-            + '<div id="' + angebotsId + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
-            + '<p>Wird aktuell in/im <b>' + locationName + '</b> angeboten<br/>'
-            + 'Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
-        if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
-        html_string += '<br/><span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
+            + '<div id="' + angebotsId + '" class="concrete-assignment"><h3 class="angebot-name">'
+            + name + ' in/im ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
+        if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>'
+        html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
         html_string += '</div></a></li>'
     $list.append(html_string)
 }
 
-function render_overall_list_item(element, $list) {
-    var name = element.name
-    var contact = element.kontakt
-    // var webpage = element.webpage
-    // var descr = element.beschreibung
-    // var tags = element.tags
+function render_fulltext_list_item(element, $list) {
     var location_count = element.locations.length
     var first_assignment = element.locations[get_random_int_inclusive(1, location_count+1)]
     if (!first_assignment) first_assignment = element.locations[0]
-    var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
-        + '<div id="' + element.id + '" class="concrete-assignment"><h3 class="angebot-name">'+name+'</h3>'
-    if (first_assignment) {
-        html_string += '<p>Wird aktuell an ' + location_count + ' Orten angeboten, z.B. <b>' + first_assignment.name + '</b><br/>'
-            + 'Vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>&nbsp;'
-    } else {
-        console.warn("Could not load assignment for angebotsinfo...", element)
-        html_string += '<p>F&uuml;r dieses Angebot haben wir aktuell keine Termine.<br/>'
+    if (first_assignment) {// Angebote werden nur angezeigt wenn sie mindestens ein "Assignment" haben
+        var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
+            + '<div id="' + element.id + '" class="concrete-assignment">'
+            + '<h3>' +element.name + ' wird an ' + location_count + ' Standorten angeboten</h3>'
+            + 'z.B. vom <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>&nbsp; @<b>' + first_assignment.name + '</b><br/>'
+        if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
+        html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a></li>'
+        $list.append(html_string)
     }
-    if (!is_empty(contact)) html_string += '<span class="contact">Kontakt: ' + contact + '</span>'
-    // if (!is_empty(webpage)) html_string += '<a href="' + webpage + '">Webseite</a>'
-    html_string += '<br/><span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
-    html_string += '</div></a></li>'
-    $list.append(html_string)
 }
 
 // -------------------------------------- Search UI Helper and Utility Methods ------------------- //
@@ -365,7 +371,7 @@ function remove_location_parameter() {
     location_coords = undefined
     render_query_parameter()
     if (!search_input && !time_parameter) {
-        angebotsinfos = []
+        angebotsinfos = undefined
         render_search_results()
     } else {
         fire_angebote_search()
@@ -376,7 +382,7 @@ function remove_time_parameter(fireSearch) {
     time_parameter = undefined
     render_query_parameter()
     if (!search_input && !location_input) {
-        angebotsinfos = []
+        angebotsinfos = undefined
         render_search_results()
     }
     if (fireSearch) fire_angebote_search()
@@ -399,7 +405,7 @@ function remove_text_parameter(name, fireSearch) {
         // paint new list of parameter
         $('#query').val(new_search_input.join(","))
         render_query_parameter()
-        angebotsinfos = []
+        angebotsinfos = undefined
     }
     if (fireSearch) fire_angebote_search()
 }
@@ -408,7 +414,7 @@ function remove_all_text_parameter(e) {
     search_input = []
     $('#query').val("")
     render_query_parameter()
-    angebotsinfos = []
+    angebotsinfos = undefined
 }
 
 function handle_tag_button_select(e) {

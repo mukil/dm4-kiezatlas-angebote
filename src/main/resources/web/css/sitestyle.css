@@ -47,10 +47,15 @@ h3 {
     color: #27638C;
 }
 
+.assignment .geo-objects-area .label,
 .assignment label,
 span.label,
 h3.label {
     color: #a9a9a9;
+}
+
+.assignment .geo-objects-area label {
+    color: #343434;
 }
 
 .search .results li.read-more a.create-link,

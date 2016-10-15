@@ -14,17 +14,18 @@ public class AngeboteSearchResults implements JSONEnabled {
     
     public AngeboteSearchResults() {
         try {
-            results.put("overall", new JSONArray());
-            results.put("assigned", new JSONArray());
+            results.put("fulltext", new JSONArray());
+            results.put("spatial", new JSONArray());
+            results.put("timely", new JSONArray());
         } catch (JSONException ex) {
             Logger.getLogger(AngeboteSearchResults.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void setOverallAngebote(List<Angebotsinfos> infos) {
+    public void setFulltextResults(List<Angebotsinfos> infos) {
         try {
             if (infos != null) {
-                JSONArray overall = results.getJSONArray("overall");
+                JSONArray overall = results.getJSONArray("fulltext");
                 for (Angebotsinfos info : infos) {
                     JSONObject item = info.toJSON();
                     overall.put(item);
@@ -35,21 +36,46 @@ public class AngeboteSearchResults implements JSONEnabled {
         }
     }
 
-    public void addToOverallAngebote(Angebotsinfos info) {
+    public void addToFulltextResults(Angebotsinfos info) {
         try {
             if (info != null) {
-                JSONArray overall = results.getJSONArray("overall");
+                JSONArray overall = results.getJSONArray("fulltext");
                 overall.put(info.toJSON());
             }
         } catch (JSONException ex) {
             Logger.getLogger(AngeboteSearchResults.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void setAssignedAngebote(List<AngebotsinfosAssigned> infos) {
+
+    public void setTimelyResults(List<Angebotsinfos> infos) {
         try {
             if (infos != null) {
-                JSONArray overall = results.getJSONArray("assigned");
+                JSONArray overall = results.getJSONArray("timely");
+                for (Angebotsinfos info : infos) {
+                    JSONObject item = info.toJSON();
+                    overall.put(item);
+                }
+            }
+        } catch (JSONException ex) {
+            Logger.getLogger(AngeboteSearchResults.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void addToTimelyResults(Angebotsinfos info) {
+        try {
+            if (info != null) {
+                JSONArray overall = results.getJSONArray("timely");
+                overall.put(info.toJSON());
+            }
+        } catch (JSONException ex) {
+            Logger.getLogger(AngeboteSearchResults.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void setSpatialResults(List<AngebotsinfosAssigned> infos) {
+        try {
+            if (infos != null) {
+                JSONArray overall = results.getJSONArray("spatial");
                 for (AngebotsinfosAssigned info : infos) {
                     JSONObject item = info.toJSON();
                     overall.put(item);
@@ -60,10 +86,10 @@ public class AngeboteSearchResults implements JSONEnabled {
         }
     }
 
-    public void addToAssignedAngebote(AngebotsinfosAssigned info) {
+    public void addToSpatialResults(AngebotsinfosAssigned info) {
         try {
             if (info != null) {
-                JSONArray assigned = results.getJSONArray("assigned");
+                JSONArray assigned = results.getJSONArray("spatial");
                 assigned.put(info.toJSON());
             }
         } catch (JSONException ex) {

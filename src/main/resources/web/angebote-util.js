@@ -152,6 +152,36 @@ function parse_angebots_id() {
     return topicId
 }
 
+function get_latest_angebote_end_time(a) {
+    var latestEndTime = 0
+    for (var ai in a.locations) {
+        var assignment = a.locations[ai]
+        if (assignment["ende_timestamp"] > latestEndTime) latestEndTime = assignment["ende_timestamp"]
+    }
+    return latestEndTime
+}
+
+function angebote_compare_by_end_earliest_last(a, b) {
+    var oldestEndA = get_latest_angebote_end_time(a)
+    var oldestEndB = get_latest_angebote_end_time(b)
+    if (oldestEndA < oldestEndB) // sort string ascending
+        return -1
+    if (oldestEndA > oldestEndB)
+        return 1
+    return 0 //default return value (no sorting)
+}
+
+function angebote_compare_by_end_latest_first(a, b) {
+    // compare "a" and "b" in some fashion, and return -1, 0, or 1
+    var oldestEndA = get_latest_angebote_end_time(a)
+    var oldestEndB = get_latest_angebote_end_time(b)
+    if (oldestEndA > oldestEndB) // sort string descending
+        return -1
+    if (oldestEndA < oldestEndB)
+        return 1
+    return 0 //default return value (no sorting)
+}
+
 // ---- Kiezatlas 2 Website Script Copy ----
 
 function logout() {

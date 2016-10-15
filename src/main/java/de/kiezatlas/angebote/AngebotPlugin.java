@@ -480,7 +480,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public AngeboteSearchResults getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
         List<Topic> offers = getAllAngebotsinfoTopicsFilteredByTime(timestamp);
         AngeboteSearchResults results = new AngeboteSearchResults();
-        results.setOverallAngebote(prepareAngebotsinfoResults(offers));
+        // ### here, return just unique offers
+        results.setTimelyResults(prepareAngebotsinfoResults(offers));
         return results;
     }
 
@@ -499,11 +500,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         try {
             String queryString = prepareLuceneQueryString(query, false, true, false);
             log.info("Angebote Search \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
-            List<Angebotsinfos> overallAngebote = new ArrayList<Angebotsinfos>();
-            List<AngebotsinfosAssigned> assignedAngebote = new ArrayList<AngebotsinfosAssigned>();
+            List<Angebotsinfos> fulltextAngebote = new ArrayList<Angebotsinfos>();
+            List<AngebotsinfosAssigned> einrichtungsAngebote = new ArrayList<AngebotsinfosAssigned>();
             AngeboteSearchResults results = new AngeboteSearchResults();
             List<Topic> angebotsOrte = new ArrayList<Topic>();
-            // Spatial Query
+            // 1) Spatial Query, searching Einrichtungen by location
             if (!location.isEmpty() && location.contains(",")) {
                 double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
                 GeoCoordinate point = new GeoCoordinate(location.trim());
@@ -513,29 +514,32 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                     Topic inst = kiezService.getGeoObjectByGeoCoordinate(geoCoordinate);
                     if (inst != null) {
                         List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(inst);
+                        // if no assignment exists, angebotsinfo (resp. einrichtung with all its..) is not a result
                         if (offers != null && offers.size() > 0) angebotsOrte.add(inst);
                     }
                 }
             }
             log.info("> Assembling angebotsinfos for " + angebotsOrte.size() + " locations...");
-            List<AngebotsinfosAssigned> allAngeboteTopics = new ArrayList<AngebotsinfosAssigned>();
+            // 1.1) Assemble all angebotsinfos by spatial search result
             for (Topic einrichtung : angebotsOrte) { // ### result set location should be set
                 List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(einrichtung);
                 for (Topic offer : offers) {
-                    allAngeboteTopics.add(prepareAngebotsinfosAssigned(offer, einrichtung));
+                    einrichtungsAngebote.add(prepareAngebotsinfosAssigned(offer, einrichtung));
                 }
             }
-            log.info("> Collected " + allAngeboteTopics.size() + " angebote via spatial search.");
-            assignedAngebote = filterOutDuplicates(allAngeboteTopics);
-            log.info("> " + assignedAngebote.size() + " unique angebote found via spatial search");
+            log.info("> Collected " + einrichtungsAngebote.size() + " angebote via spatial search.");
+            // 1.2) NO: Spatial search we want every offer in the radius of the location
+            // einrichtungsAngebote = filterOutDuplicates(einrichtungsAngebote);
+            // log.info("> " + einrichtungsAngebote.size() + " unique angebote found via spatial search");
+            // 2) Search fulltext in angebotsinfos directly
             if (queryString != null) {
                 List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
                 log.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
-                overallAngebote.addAll(prepareAngebotsinfoResults(angebotsinfos)); // adds just new ones to resultset
+                fulltextAngebote.addAll(prepareAngebotsinfoResults(angebotsinfos)); // adds just new ones to resultset
             }
             // Build up search result object
-            results.setAssignedAngebote(assignedAngebote);
-            results.setOverallAngebote(overallAngebote);
+            results.setSpatialResults(einrichtungsAngebote);
+            results.setFulltextResults(fulltextAngebote);
             return results;
         } catch (Exception e) {
             throw new RuntimeException("Searching Angebotsinfos across ALL DISTRICTS failed", e);
@@ -651,7 +655,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             Angebotsinfos result = assembleAngebotsinfo(angebot);
             // 2) check if angebots info isnt already in our resultset
             if (!results.contains(result)) {
-                // 3) assemble locations and start and end time
+                // 3) assemble for all locations and start and end time
                 List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
                 JSONArray locations = new JSONArray();
                 for (RelatedTopic geoObject : geoObjects) {
