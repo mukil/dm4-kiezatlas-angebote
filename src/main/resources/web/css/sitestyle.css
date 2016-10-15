@@ -753,6 +753,34 @@ ul.angebote li small {
     text-decoration-color: #8f1414;
 }
 
+.search .tag-view h4 {
+    margin-bottom: .5em;
+}
+
+.search .tag-view a.few {
+    font-size: .8em;
+}
+
+.search .tag-view a.some {
+    font-size: 1em;
+}
+
+.search .tag-view a.quitesome {
+    font-size: 1.2em;
+}
+
+.search .tag-view a.more {
+    font-size: 1.5em;
+}
+
+.search .tag-view a.many {
+    font-size: 2em;
+}
+
+.search .tag-view a.manymore {
+    font-size: 2.5em;
+}
+
 /** --- Distinct footer area --- */
 
 #bottom {
@@ -818,6 +846,9 @@ ul.angebote li small {
     }
     .search .filter-area .query-parameter {
         margin-top: .5em;
+    }
+    .search .tag-view a {
+        margin-left: 5px;
     }
     /** .search .filter-area .parameter.location {
         line-height: 2.5em;

@@ -221,8 +221,8 @@ function render_spatial_list_item(element, $list) {
     var angebotsId = element.angebotsId
     var contact = element.kontakt
     var html_string = '<li class="read-more"><a href="/angebote/'+angebotsId+'">'
-            + '<div id="' + angebotsId + '" class="concrete-assignment"><h3 class="angebot-name">'
-            + name + ' in/im ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
+            + '<div id="' + angebotsId + '" class="concrete-assignment"><h3 class="angebot-name">"'
+            + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
         if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
         html_string += '</div></a></li>'
@@ -238,7 +238,7 @@ function render_fulltext_list_item(element, $list) {
         var zb_html = (location_count > 1) ? 'z.B. vom' : 'Vom'
         var html_string = '<li class="read-more"><a href="/angebote/'+element.id+'">'
             + '<div id="' + element.id + '" class="concrete-assignment">'
-            + '<h3>' +element.name + ' wird an ' + standort_html + ' angeboten</h3>'
+            + '<h3>"' +element.name + '" wird an ' + standort_html + ' angeboten</h3>'
             + zb_html +' <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
         if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a></li>'
