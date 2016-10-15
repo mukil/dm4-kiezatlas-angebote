@@ -11,30 +11,14 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.theme.min.css"/-->
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
-        <script src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-ui-1.9.2-autocomplete.min.js"></script>
+        <script defer src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-ui-1.9.2-autocomplete.min.js"></script>
         <!--script src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script-->
-        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.website/ka-locating.js"></script>
-        <script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script defer src="/de.kiezatlas.website/ka-locating.js"></script>
+        <script defer src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="init_search_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
-        <script type="text/javascript">
-
-            $(document).ready(function(e) {
-                // check user status
-                load_username(render_user_menu)
-                // load tag cloud
-                load_and_render_tag_search_dialog()
-                // do search by time
-                render_search_frontpage()
-                tagging.init("query", function(e) {
-                    console.log("Search Input Event Received by Tag Component", e.detail)
-                    fire_angebote_search()
-                })
-            })
-
-        </script>
     </head>
     <body class="kiezatlas angebotsinfos search">
 

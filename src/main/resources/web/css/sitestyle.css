@@ -177,15 +177,13 @@ a {
 
 .search .list-area .loading-indicator,
 .task-info .loading-indicator {
-    font-size: 2.5em;
-    color: #27638C;
+    font-size: 2.5em; color: #27638C;
+    opacity: .9;
 }
 
 .task-info .loading-indicator {
-    width: 48%;
-    margin: auto;
-    position: relative;
-    top: 3em;
+    width: 50%; margin: auto;
+    position: relative; top: 3em;
 }
 
 .search .list-area .loading-indicator {

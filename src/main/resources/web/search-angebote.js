@@ -13,6 +13,15 @@ var street_coords_idx = 0
 var time_parameter = undefined
 
 
+function init_search_page() {
+    load_username(render_user_menu)
+    // load tag cloud
+    load_and_render_tag_search_dialog()
+    // do search by time
+    render_search_frontpage()
+    tagging.init("query", fire_angebote_search)
+}
+
 // ----------------------------------  The Major Search Operations --------- //
 
 function fire_angebote_search() {

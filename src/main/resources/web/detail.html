@@ -9,19 +9,19 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
         <!--link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/-->
 
-        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
-        <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script defer src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="render_angebotsinfo_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
-        <script type="text/javascript">
+        <!--script type="text/javascript">
 
             $(document).ready(function(e) {
                 render_angebotsinfo_page()
             })
 
-        </script>
+        </script-->
     </head>
     <body class="kiezatlas angebotsinfos detail">
 

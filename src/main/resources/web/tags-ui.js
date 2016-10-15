@@ -33,7 +33,7 @@ var tagging = new function() {
             // activate third party library
             _.setupJQueryUIAutocompleteField(nodeId)
         })
-        if (itemSelectionHandler) _.listenToInputFieldSelection("selection", itemSelectionHandler)
+        _.listenToInputFieldSelection(itemSelectionHandler)
     }
 
     this.setupTags = function(topicTags) {
@@ -176,15 +176,14 @@ var tagging = new function() {
         return uniqueLabels
     }
 
-    this.listenToInputFieldSelection = function(handler) {
-        if (domElement) {
-            domElement.addEventListener("selection", handler)
+    this.listenToInputFieldSelection = function(eventHandler) {
+        if (domElement && eventHandler) {
+            domElement.addEventListener("selection", function(e) { eventHandler(e) })
         }
     }
 
     this.fireItemSelected = function(item) {
         var custom = new CustomEvent('selection', { detail: item })
-        console.log("Fire Item Selected Event", custom)
         domElement.dispatchEvent(custom)
     }
 
