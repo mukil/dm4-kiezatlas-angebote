@@ -12,12 +12,12 @@ function render_angebotsinfo_page() {
                     $('.detail-area').append($edit_link)
                 }
             })
+            load_angebote_places_and_dates(render_angebot_assignment, true)
         } else if( status === "error") {
             alert("Error Rendering Selected Angebotsinfo", selected_angebot)
             // render_angebot_detail_area()
         }
     })
-    load_angebote_places_and_dates(render_angebot_assignment, true)
     load_username(function(res) {
         render_user_menu(res)
     })
@@ -48,6 +48,7 @@ function render_angebot_detail_area() {
         angebotHTML += '<br/><span class="label">Stichworte</span><br/><i>' + tags + '</i>'
     }
     $('.angebot-infos p.body').html(angebotHTML)
+    $('.task-info .loading').addClass("hidden")
 }
 
 function render_angebot_assignment() {

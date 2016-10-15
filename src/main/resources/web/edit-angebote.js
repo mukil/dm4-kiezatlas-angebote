@@ -118,10 +118,11 @@ function clear_angebot_form() {
 // ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
 
 function render_assignment_page() {
-    load_angebot_by_resource_path()
+    load_angebot_by_resource_path(function() {
+        render_angebot_shortinfo()
+        load_angebote_places_and_dates(render_assignments_to_edit, false)
+    })
     init_datepicker()
-    render_angebot_shortinfo()
-    load_angebote_places_and_dates(render_assignments_to_edit, false)
 }
 
 function clear_assignment_dateform() {

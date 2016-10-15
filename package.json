@@ -1,6 +1,6 @@
 {
   "name": "dm4-kiezatlas-angebote-ui",
-  "version": "0.3-SNAPSHOT",
+  "version": "0.3.0-SNAPSHOT",
   "description": "User dialogs for managing Angebotsinfos",
   "main": "index.js",
   "scripts": {

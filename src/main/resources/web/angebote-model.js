@@ -15,16 +15,22 @@ function load_angebot_by_resource_path(callback) {
     var angebot_id = parse_angebots_id()
     console.log("Loaded Angebot ID By Resource Path", angebot_id)
     if (angebot_id != 0) {
-        var angebotsinfoText = $.ajax('/angebote/' + angebot_id, { async: false, dataType: 'json' }).responseText
-        try {
-            selected_angebot = JSON.parse(angebotsinfoText)
-            if (callback) callback("ok", selected_angebot)
-        } catch (e) {
-            console.warn("Could not parse angebotsinfo details...", e, "using", angebotsinfoText)
-            selected_angebot = JSON.parse(angebotsinfoText)
-            // if (callback) callback("error", selected_angebot)
-            if (callback) callback("ok", selected_angebot)
-        }
+        $.ajax({
+            type: "GET", dataType: "json", url: '/angebote/' + angebot_id,
+            success: function(response) {
+                try {
+                    selected_angebot = response
+                    if (callback) callback("ok", selected_angebot)
+                } catch (e) {
+                    console.warn("Could not parse angebotsinfo details using", response)
+                    selected_angebot = response
+                    if (callback) callback("ok", selected_angebot)
+                }
+            },
+            error: function(x, s, e) {
+                if (callback) callback("error", e)
+            }
+        })
     } else {
         console.log("No angebot to edit - Creating new one...")
         if (callback) callback("ok", undefined)

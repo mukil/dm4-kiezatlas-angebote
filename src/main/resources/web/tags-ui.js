@@ -14,19 +14,26 @@ var tagging = new function() {
     var REF_PREFIX = "ref_id:"  // duplicate of webclient.js // dm4c
     var DEL_PREFIX = "del_id:"  // duplicate of webclient.js // dm4c
 
-    this.fetchAllTagTopics = function() {
-        allReadableTags = restc.get_topics("dm4.tags.tag", false, false)
-        // console.log("Load all available topics", tags)
-        return allReadableTags
+    this.fetchAllTagTopics = function(callback) {
+        restc.request("GET", "/core/topic/by_type/dm4.tags.tag", undefined, function(response) {
+            allReadableTags = response
+            console.log("Loaded all available tags", allReadableTags)
+            if (callback) callback()
+        })
     }
 
     /** Make sure, selected_angebot is initialized */
-    this.init = function() {
+    this.init = function(domElementId, itemSelectionHandler) {
+        if (domElementId) nodeId = domElementId
+        if (!domElement) domElement = document.getElementById(nodeId)
         // load all tags (user has read access too)
-        allReadableTags = _.fetchAllTagTopics()
-        // console.log("Initialized all available Tags", allReadableTags)
-        // activate third party library
-        _.setupJQueryUIAutocompleteField(nodeId)
+        _.fetchAllTagTopics(function() {
+            console.log("Start setting up tagging input field", allReadableTags)
+            // console.log("Initialized all available Tags", allReadableTags)
+            // activate third party library
+            _.setupJQueryUIAutocompleteField(nodeId)
+        })
+        if (itemSelectionHandler) _.listenToInputFieldSelection("selection", itemSelectionHandler)
     }
 
     this.setupTags = function(topicTags) {
@@ -90,11 +97,12 @@ var tagging = new function() {
 
     this.setupJQueryUIAutocompleteField = function(identifier) {
         // initialize domElement for custom events
-        domElement = document.getElementById(identifier)
+        if (!domElement) domElement = document.getElementById(identifier)
         // setup jquery autocomplete
         $(domElement).bind("keydown", function( event ) {
             if ( event.keyCode === $.ui.keyCode.TAB && $( this ).data( "ui-autocomplete" ).menu.active ) {
                 event.preventDefault()
+                _.fireItemSelected(this.value)
             }
         })
         .autocomplete({
@@ -169,7 +177,7 @@ var tagging = new function() {
     }
 
     this.listenToInputFieldSelection = function(handler) {
-        if (!domElement) {
+        if (domElement) {
             domElement.addEventListener("selection", handler)
         }
     }

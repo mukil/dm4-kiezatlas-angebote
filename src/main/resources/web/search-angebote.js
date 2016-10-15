@@ -406,7 +406,7 @@ function handle_tag_button_select(e) {
     var tagname = e.text
     remove_all_text_parameter(false)
     remove_time_parameter(false)
-    $("#query").val(tagname)
+    $("#query").val(tagname + ", ")
     fire_angebote_search()
 }
 

@@ -4,7 +4,7 @@
         <title>Angebotssuche - Kiezatlas 2</title>
 
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/>
         <!--link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.css"/>
@@ -28,9 +28,7 @@
                 load_and_render_tag_search_dialog()
                 // do search by time
                 render_search_frontpage()
-                tagging.fetchAllTagTopics()
-                tagging.setupJQueryUIAutocompleteField('query')
-                tagging.listenToInputFieldSelection("selection", function(e) {
+                tagging.init("query", function(e) {
                     console.log("Search Input Event Received by Tag Component", e.detail)
                     fire_angebote_search()
                 })
