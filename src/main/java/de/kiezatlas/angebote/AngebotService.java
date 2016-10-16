@@ -14,21 +14,21 @@ public interface AngebotService {
 
     // --------------------------------------------------------------------------------------------------------- Types
 
-    public static final String ANGEBOT                     = "ka2.angebot";
-    public static final String ANGEBOT_NAME                = "ka2.angebot.name";
-    public static final String ANGEBOT_BESCHREIBUNG        = "ka2.angebot.beschreibung";
-    public static final String ANGEBOT_KONTAKT             = "ka2.angebot.kontakt";
-    public static final String ANGEBOT_ASSIGNMENT          = "ka2.angebot.assignment";
-    public static final String ANGEBOT_WEBPAGE             = "ka2.angebot.webpage";
+    public static final String ANGEBOT                      = "ka2.angebot";
+    public static final String ANGEBOT_NAME                 = "ka2.angebot.name";
+    public static final String ANGEBOT_BESCHREIBUNG         = "ka2.angebot.beschreibung";
+    public static final String ANGEBOT_KONTAKT              = "ka2.angebot.kontakt";
+    public static final String ANGEBOT_ASSIGNMENT           = "ka2.angebot.assignment";
+    public static final String ANGEBOT_WEBPAGE              = "ka2.angebot.webpage";
     
-    public static final String ASSIGNMENT_EDGE             = "ka2.angebot.assignment";
-    public static final String ASSIGNMENT_KONTAKT          = "ka2.angebot.assignment_kontakt";
-    public static final String ASSIGNMENT_BESCHREIBUNG     = "ka2.angebot.assignment_zusatz";
+    public static final String ASSIGNMENT_EDGE              = "ka2.angebot.assignment";
+    public static final String ASSIGNMENT_KONTAKT           = "ka2.angebot.assignment_kontakt";
+    public static final String ASSIGNMENT_ZUSATZINFO        = "ka2.angebot.assignment_zusatz";
 
-    public static final String ANGEBOT_CREATOR_EDGE        = "ka2.angebot.creator";
+    public static final String ANGEBOT_CREATOR_EDGE         = "ka2.angebot.creator";
 
-    public static final String PROP_ANGEBOT_START_TIME     = "ka2.angebot.start_time";
-    public static final String PROP_ANGEBOT_END_TIME       = "ka2.angebot.end_time";
+    public static final String PROP_ANGEBOT_START_TIME      = "ka2.angebot.start_time";
+    public static final String PROP_ANGEBOT_END_TIME        = "ka2.angebot.end_time";
 
     /**
      * @return      Details for a specific "Angebotsinfo" topic Id.

@@ -38,9 +38,9 @@ function load_angebot_by_resource_path(callback) {
     }
 }
 
-function load_angebote_places_and_dates(renderer, stillActive) {
+function load_angebote_places_and_dates(renderer, justActive) {
     $.ajax({
-        type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id + "/" + stillActive,
+        type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id + "/" + justActive,
         success: function(response) {
             if (response) {
                 geo_assignments = response

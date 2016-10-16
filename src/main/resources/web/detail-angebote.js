@@ -56,8 +56,8 @@ function render_angebot_assignment() {
     var $einrichtungen = $('.geo-objects-area .einrichtungen')
         $einrichtungen.empty()
     if (geo_assignments.length === 0) {
-        $('.help').html('Diesen Angebotsinfos sind aktuell noch keine Angebotszeitr&auml;ume in Einrichtungen zugewiesen.')
-        $('h3.assignments').html("F&uuml;r dieses Angebot haben wir aktuell keine Termine")
+        $('.help').html('Diesem Angebot ist aktuell noch kein Angebotszeitr&auml;um zugewiesen.')
+        $('h3.assignments').html("Diesem Angebot ist aktuell noch kein Angebotszeitr&auml;um zugewiesen")
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
     }
@@ -65,9 +65,18 @@ function render_angebot_assignment() {
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
-        var $element = $('<a class="read-more" href="/geoobject/'+obj.location_id // ### adjust url for deployment
-                +'"><div id="' + obj.id + '" class="concrete-assignment"><h3>'
-                + obj.name + '</h3><p>'+obj.address+'<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>')
+        var elementHTML = '<a class="read-more" href="/geoobject/'+obj.location_id // ### adjust url for deployment
+            +'"><div id="' + obj.id + '" class="concrete-assignment"><h3>'
+            + obj.name + ' ' + obj.address+'</h3><p>'
+        if (obj.hasOwnProperty("kontakt")) {
+            elementHTML += '<span class="label">Kontakt:</span> ' + obj.kontakt
+            if (obj.hasOwnProperty("zusatzinfo")) elementHTML += ", "
+        }
+        if (obj.hasOwnProperty("zusatzinfo")) {
+            elementHTML += '<span class="label">Zusatz:</span> ' + obj.zusatzinfo
+        }
+        elementHTML += '<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>'
+        var $element = $(elementHTML)
         $einrichtungen.append($element)
     }
     // equip all buttons with a click handler each (at once)

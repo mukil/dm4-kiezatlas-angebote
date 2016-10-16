@@ -860,13 +860,13 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         if (standardBeschreibung != null) assignedAngebot.setDescription(standardBeschreibung);
         String webpage = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
         if (webpage != null) assignedAngebot.setWebpage(webpage);
-        // Additonal Kontakt (### Should Override Standad Kontakt)
+        // Additonal Kontakt overrides standard kontakt
         String angebotKontaktValue = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
         if (angebotKontaktValue != null) {
-            assignedAngebot.setAdditionalContact(angebotKontaktValue);
+            assignedAngebot.setKontakt(angebotKontaktValue);
         }
-        // Overrides Description (### Should Override Standad Kontakt)
-        String assignmentDescription = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_BESCHREIBUNG);
+        // Adds to Description
+        String assignmentDescription = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_ZUSATZINFO);
         if (assignmentDescription != null) {
             assignedAngebot.setAdditionalInfo(assignmentDescription);
         }
