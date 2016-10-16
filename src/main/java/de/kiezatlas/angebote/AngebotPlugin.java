@@ -36,12 +36,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -408,12 +408,12 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     /** Updates an association of type "ka2.angebot.assignment" with its two properties (timestamp "from" and "to"). */
-    @POST
+    @PUT
     @Path("/assignment/{id}/{from}/{to}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Association updateAngebotsAssignmentDate(@PathParam("id") long assocId, @PathParam("from") long fromDate,
-                                                    @PathParam("to") long toDate) {
+    public Association updateAngebotsAssignmentDate(AssociationModel assocModel, @PathParam("id") long assocId,
+                                                    @PathParam("from") long fromDate, @PathParam("to") long toDate) {
         isAuthorized(); // throws "401" if not
         Association result = dm4.getAssociation(assocId);
         try {
@@ -422,6 +422,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 setAssignmentToTime(result, toDate);
                 log.info("Succesfully updated Angebots Assignment Dates from " + new Date(fromDate).toGMTString()
                         + " to " + new Date(toDate).toGMTString());
+                result.update(assocModel);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

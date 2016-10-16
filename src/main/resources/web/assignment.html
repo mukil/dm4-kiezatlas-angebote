@@ -63,7 +63,7 @@
             </div>
 
             <div class="date-area disabled">
-                <h3 class="edit-info">Angebotszeitraum anlegen</h3>
+                <h3 class="edit-info">Neuen Angebotszeitraum anlegen</h3>
                 <!-- <span class="angebot-name">des Angebots</span> am Standort <i class="marker icon"></i><span class="einrichtung-name">...</span> -->
                 <form id="date-select-form" action="javascript:_void()" accept-charset="UTF-8">
 
@@ -88,7 +88,17 @@
                             <input type="text" id="to" name="to">
                         </div>
                     </div>
-                    <br/>
+
+                    <div id="override-block" class="disabled">
+                        <label for="additional-details" class="block-space">Zusatzinfos f&uuml;r das Angebot an dieser Einrichtung</label>
+                        <div class="ui input focus block-space">
+                            <textarea rows="2" id="additional-details" name="add-infos"></textarea>
+                        </div>
+                        <label for="additional-kontakt" class="block-space">Kontakt f&uuml;r das Angebots an dieser Einrichtung</label>
+                        <div class="ui input focus">
+                            <input type="text" id="additional-kontakt" name="add-kontakt" />
+                        </div>
+                    </div>
 
                     <div class="ui input focus icon block-space">
                         <button id="do-assign" class="ui green button" onclick="do_save_assignment()"
@@ -96,26 +106,16 @@
                             <i class="icon save"></i><span class="text">Speichern</span></button>
                         <button id="do-delete" class="ui red button hidden" onclick="do_delete_assignment()"
                                 title="Achtung: Entfernt diesen Veranstaltungszeitraum">
-                            <i class="icon trash"></i>Zeitraum l&ouml;schen</button>
+                            <i class="icon trash"></i><span class="text">Zeitraum l&ouml;schen</span></button>
                     </div>
 
                     <div class="ui input focus icon block-space">
-                        <button id="do-override" class="ui basic button" onclick="handle_override_details()"
+                        <button id="do-override" class="ui basic button" onclick="show_override_details_form()"
                                 title="Sie können den Kontakt und die Angebotsbeschreibung je nach Standort ändern">
                             <i class="icon plus"></i><span class="text">Standortspezifische Infos</span>
                         </button>
                     </div>
 
-                    <div id="override-block" class="disabled">
-                        <label for="additional-kontakt" class="block-space">Standortspezifischer Kontakt</label>
-                        <div class="ui input focus">
-                            <input type="text" id="additional-kontakt" name="add-kontakt" />
-                        </div>
-                        <label for="additional-infos" class="block-space">Standortspezifische Infos</label>
-                        <div class="ui input focus">
-                            <input type="text" id="additional-details" name="add-infos" />
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>
@@ -123,14 +123,13 @@
             <h3>Zeitr&auml;ume</h3>
             <div class="einrichtungen"></div>
             <div class="help"></div>
-            <!--h3>Angebotsinfo</h3>
             <div class="offer-area">
-                <h3 class="angebot-name">...</h3>
-                <!--div class="angebot-infos">
+                <!--h3 class="angebot-name">...</h3-->
+                <div class="angebot-infos">
                     <p class="body"></p>
                 </div>
                 <p class="links"></p>
-            </div-->
+            </div>
         </div>
 
         <div id="bottom">

@@ -120,7 +120,7 @@ function clear_angebot_form() {
 function render_assignment_page() {
     load_angebot_by_resource_path(function() {
         render_angebot_shortinfo()
-        load_angebote_places_and_dates(render_assignments_to_edit, false)
+        load_angebote_places_and_dates(render_assignments_listing, false)
     })
     init_datepicker()
 }
@@ -132,6 +132,9 @@ function clear_assignment_dateform() {
     $('.date-area').addClass("disabled")
     $('#do-assign .text').text("Speichern")
     $('#do-delete').addClass("hidden")
+    $('#additional-details').val('')
+    $('#additional-kontakt').val('')
+    $('#override-block').addClass('hidden')
 }
 
 function init_datepicker() {
@@ -169,6 +172,8 @@ function do_save_assignment(e) {
     show_saving_icon('#update-assignment icon')
     var fromInput = $('input#from').val()
     var toInput = $('input#to').val()
+    var additionalInfo = $('#additional-details').val()
+    var additionalContact = $('#additional-kontakt').val()
     var fromDate = -1
     var toDate = -1
     // parse dates
@@ -194,7 +199,14 @@ function do_save_assignment(e) {
         console.log("Dates Changed - Update Assignment", fromDate, selected_assignment_infos.von,
             "To:", toDate, selected_assignment_infos.bis)
         // Do Update
-        restc.request("POST", "/angebote/assignment/" +selected_assignment_infos.id + "/" + fromDate + "/" + toDate)
+        var assocModel = { childs: {} }
+        if (additionalContact) {
+            assocModel.childs["ka2.angebot.assignment_kontakt"] = additionalContact.trim()
+        }
+        if (additionalInfo) {
+            assocModel.childs["ka2.angebot.assignment_zusatz"] = additionalInfo.trim()
+        }
+        restc.request("PUT", "/angebote/assignment/" +selected_assignment_infos.id + "/" + fromDate + "/" + toDate, assocModel)
     } else {
         // Create
         if (!selected_angebot) throw Error("Saving Assignment Aborted, selected Angebotsinfo NOT SET")
@@ -208,7 +220,14 @@ function do_save_assignment(e) {
             "role_2": {
                 "topic_id": selected_geo_object.id,
                 "role_type_uri":"dm4.core.child"
-            }
+            },
+            childs: {}
+        }
+        if (additionalContact) {
+            assocModel.childs["ka2.angebot.assignment_kontakt"] = additionalContact.trim()
+        }
+        if (additionalInfo) {
+            assocModel.childs["ka2.angebot.assignment_zusatz"] = additionalInfo.trim()
         }
         // do create
         restc.request("POST", "/angebote/assignment/" + fromDate + "/" + toDate, assocModel)
@@ -297,38 +316,24 @@ function render_angebot_shortinfo() {
        console.log("No Angebot (With ID) selected, loaded", selected_angebot)
        return
     }
-    // Angebotsinfo
     $('.angebot-name').text('"' + selected_angebot.name + '" ')
     $('#navigation li.edit a').attr("href", URL_ANGEBOT_EDIT + selected_angebot.id)
-    // <span class="label">Angebotsbeschreibung</span>
-    var html_string = '<br/>' + selected_angebot.beschreibung + '<br/><span class="label">Kontakt:</span> ' + selected_angebot.kontakt
-    if (selected_angebot.webpage) html_string += '<br/><span class="label">Webseite:</span> <a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
-    if (selected_angebot.tags) {
-        if (selected_angebot.tags.length > 0) {
-            html_string += '<br/><span class="label">Stichworte</span>&nbsp;<br/>'
-            var count = 1
-            for (var t in selected_angebot.tags) {
-                var tag = selected_angebot.tags[t]
-                html_string += '<em>' + tag.label + '</em>'
-                if (selected_angebot.tags.length > count) html_string += ", "
-                count++
-            }
-        }
-    }
+    var html_string = '<br/>' + selected_angebot.beschreibung + '<br/>'
+        + '<span class="label">Kontakt:</span> ' + selected_angebot.kontakt
     $('.angebot-infos p.body').html(html_string)
-    var $links = $('<a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Angebot ansehen</a>&nbsp'
+    var $links = $('<a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Infos ansehen</a>&nbsp'
         + '<a href="' + URL_ANGEBOT_EDIT + selected_angebot.id + '" class="read-more offer-edit">Vorlage bearbeiten</a>')
     $('.angebotsinfos .offer-area .links').html($links)
 }
 
-function render_assignments_to_edit() {
+function render_assignments_listing() {
     // Display Assignments on Assignment Page
     $('.right-side div.einrichtungen').empty()
     if (geo_assignments.length === 0) {
-        $('.right-side .help').html('Hinweis:<br/>Diesen Angebotsinformationen sind terminlich noch keine Einrichtungen zugewiesen. Zur Zuweisung w&auml;hlen Sie '
-            + 'bitte <b>1.</b> eine <b>Einrichtung</b> und <b>2.</b> einen <b>Angebotszeitraum</b> (linke Seite). Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
-            + ' &auml;glich jederzeit wieder bearbeiten.<br/><br/>Bitte nehmen Sie zur Kenntnis das bei ihrer terminlichen Zuweisung von '
-            + 'Angebotsinfos die Inhaber_innen des Einrichtungsdatensatzes automatisch &uuml;ber das neue Angebot benachrichtigt werden.')
+        $('.right-side .help').html('<p>Diesem Angebot sind noch keine Angebotszeiträume zugewiesen. Zur Zuweisung w&auml;hlen Sie '
+            + 'bitte</p><ol><li> eine Einrichtung als Veranstaltungsort und</li><li>einen Angebotszeitraum.</li></ol><p>Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
+            + ' nachtr&auml;glich jederzeit anpassen.</p><p>Bitte nehmen Sie zur Kenntnis das bei einer Zuweisung von '
+            + 'Angeboten die Inhaber_innen des Einrichtungsdatensatzes automatisch &uuml;ber das neue Angebot per Email benachrichtigt werden.</p>')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
         $('.right-side .help').empty()
@@ -346,8 +351,8 @@ function render_assignments_to_edit() {
     $('.right-side .einrichtungen').on('click', select_assignment)
 }
 
-function render_selected_assignment_form() {
-    console.log("Selected Assignment", selected_assignment_infos)
+function render_assignment_form() {
+    console.log("Selected Assignment", selected_assignment_infos, "Edge", selected_assignment_edge)
     if (selected_assignment_infos) {
         // render new assignment selection
         $('.concrete-assignment').removeClass('selected')
@@ -359,6 +364,15 @@ function render_selected_assignment_form() {
         $('.date-area .edit-info').text("Zeitraum bearbeiten")
         $('#do-assign .text').text("Zeitraum ändern")
         $('#do-delete').removeClass("hidden")
+        // load additional override infos (per location) stored on the edge
+        var additionalContact = selected_assignment_edge.childs["ka2.angebot.assignment_kontakt"].value
+        $('#additional-kontakt').val(additionalContact)
+        var additionalInfo = selected_assignment_edge.childs["ka2.angebot.assignment_zusatz"].value
+        $('#additional-details').val(additionalInfo)
+        if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_kontakt")
+            || selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_zusatz")) {
+            show_override_details_form()
+        }
     } else {
         // clear old assignment rendering
         $('#from').datepicker("setDate", new Date())
@@ -367,12 +381,16 @@ function render_selected_assignment_form() {
         $('.date-area').removeClass("disabled")
         $('#do-assign .text').text("Speichern")
         $('#do-delete').addClass("hidden")
+        $('#do-override').removeClass('hidden')
     }
 }
 
-function handle_override_details() {
-    // ###
+function show_override_details_form() {
+    $('#override-block').removeClass('hidden')
     $('#override-block').removeClass('disabled')
+    $('#do-override').addClass('hidden')
+    $('#do-assign .text').html("Aktualisieren")
+    $('#do-delete .text').html("Zuweisung l&ouml;schen")
 }
 
 function handle_oneday_assignment() {
@@ -403,8 +421,8 @@ function select_geo_object(e) {
     // update gui state
     selected_geo_object = geo_object
     selected_assignment_infos = undefined
-    render_selected_assignment_form()
-    // update label
+    clear_assignment_dateform()
+    render_assignment_form()
     render_assignment_place_name(selected_geo_object.value)
 }
 
@@ -425,8 +443,7 @@ function select_assignment(event) {
     if (id) {
         selected_assignment_infos = get_assignment_edge(id)
         selected_assignment_edge = restc.get_association_by_id(id, true) // include children=True
-        console.warn("Selected Assignment Edge", selected_assignment_edge)
-        render_selected_assignment_form()
+        render_assignment_form()
     } else {
         throw Error("Could not detect click on Element")
         console.warn("Could not detect click on Element", element, event)
