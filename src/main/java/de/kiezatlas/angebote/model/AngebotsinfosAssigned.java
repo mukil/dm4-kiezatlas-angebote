@@ -39,7 +39,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public void setLocationId(long id) {
         try {
-            json.put("locationId", id);
+            json.put("location_id", id);
         } catch (JSONException ex) {
             throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
@@ -72,7 +72,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public void setAngebotsName(String nameValue) {
         try {
-            json.put("angebotsName", nameValue);
+            json.put("angebots_name", nameValue);
         } catch (JSONException ex) {
             throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
@@ -80,7 +80,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public void setAngebotsId(long assocId) {
         try {
-            json.put("angebotsId", assocId);
+            json.put("angebots_id", assocId);
         } catch (JSONException ex) {
             throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
@@ -183,7 +183,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public long getLocationId() {
         try {
-            return json.getLong("locationId");
+            return json.getLong("location_id");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no LocationName", ex);
             return -1;
@@ -237,7 +237,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public String getAngebotsName() {
         try {
-            return json.getString("angebotsName");
+            return json.getString("angebots_name");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no AngebotsName", ex);
             return "";
@@ -255,7 +255,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public String getAngebotsId() {
         try {
-            return json.getString("angebotsId");
+            return json.getString("angebots_id");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Id", ex);
             return "";

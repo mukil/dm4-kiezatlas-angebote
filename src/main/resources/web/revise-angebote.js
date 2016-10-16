@@ -13,7 +13,7 @@ function do_revise_assignment() {
     }
 
     function do_revise_call() {
-        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment.id + "/delete")
+        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment_infos.id + "/delete")
         console.log("Do Revise Call", result)
         $('.label.hint').text("OK, die Zuweisung dieses Angebots wurde erfolgreich aufgehoben.")
     }
@@ -34,12 +34,12 @@ function do_revise_assignment() {
 
 function render_angebotsrevise_page() {
     var assocId = parse_angebots_id()
-    selected_assignment = JSON.parse($.ajax('/angebote/assignment/' + assocId, { async: false, dataType: 'json' }).responseText)
-    $('.einrichtungs-name').text(selected_assignment.name)
-    $('.angebots-name').text(selected_assignment.angebotsName)
-    $('.von').text(selected_assignment.anfang)
-    $('.bis').text(selected_assignment.ende)
-    $('.angebots-beschreibung').html(selected_assignment.beschreibung)
-    $('.kontakt').html(selected_assignment.kontakt)
-    $('.webpage').attr("href", selected_assignment.webpage).text(selected_assignment.webpage)
+    selected_assignment_infos = JSON.parse($.ajax('/angebote/assignment/' + assocId, { async: false, dataType: 'json' }).responseText)
+    $('.einrichtungs-name').text(selected_assignment_infos.name)
+    $('.angebots-name').text(selected_assignment_infos.angebots_name)
+    $('.von').text(selected_assignment_infos.anfang)
+    $('.bis').text(selected_assignment_infos.ende)
+    $('.angebots-beschreibung').html(selected_assignment_infos.beschreibung)
+    $('.kontakt').html(selected_assignment_infos.kontakt)
+    $('.webpage').attr("href", selected_assignment_infos.webpage).text(selected_assignment_infos.webpage)
 }

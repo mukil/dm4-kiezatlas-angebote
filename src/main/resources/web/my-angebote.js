@@ -44,8 +44,10 @@ function render_einrichtungs_item(item) {
     // console.log("Einrichtung", item, created, modified)
     $('ul.einrichtungen').append('<li id="'+item.id+'"><a href="/angebote/'+item.id+'" title="View Einrichtungspage"><b>' + item.value + '</b></a>'
         + '<div class="list-commands">'
+            + '<div class="ui input focus edit-angebot"><button title="Einrichtungsdatensatz ansehen" '
+                + 'onclick="go_edit_einrichtung('+item.id+')"><i class="edit icon" />Ansehen</button></div>'
             + '<div class="ui input focus edit-angebot"><button title="Einrichtungsdatensatz bearbeiten" '
-                + 'onclick="go_edit_einrichtung('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
+                + 'onclick="go_edit_einrichtung_form('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
             // + '<div class="ui input focus delete-angebot"><button title="Einrichtungsdatensatz entfernen" '
                //  + 'onclick="delete_my_einrichtung('+item.id+')"><i class="trash icon" /></button></div>'
         + '</div>'

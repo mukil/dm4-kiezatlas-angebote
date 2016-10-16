@@ -97,7 +97,7 @@ public interface AngebotService {
      * @param now
      * @return
      */
-    List<Topic> getAllAngebotsinfoTopicsFilteredByTime(long now);
+    List<Topic> getAssignedAngeboteByTime(long now);
 
     /**
      * Fetches all Angebotsinfos by searching four child types: Name, Beschreibung, Kontakt und Tags.

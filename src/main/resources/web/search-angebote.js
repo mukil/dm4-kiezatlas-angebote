@@ -217,11 +217,11 @@ function split_angebote_results(items_to_render) {
 
 function render_spatial_list_item(element, $list) {
     var locationName = element.name
-    var name = element.angebotsName
-    var angebotsId = element.angebotsId
+    var name = element.angebots_name
+    var angebots_id = element.angebots_id
     var contact = element.kontakt
-    var html_string = '<li class="read-more"><a href="/angebote/'+angebotsId+'">'
-            + '<div id="' + angebotsId + '" class="concrete-assignment"><h3 class="angebot-name">"'
+    var html_string = '<li class="read-more"><a href="/angebote/'+angebots_id+'">'
+            + '<div id="' + angebots_id + '" class="concrete-assignment"><h3 class="angebot-name">"'
             + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
         if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'

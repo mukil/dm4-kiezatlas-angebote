@@ -65,7 +65,7 @@ function render_angebot_assignment() {
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
-        var $element = $('<a class="read-more" href="/geoobject/'+obj.locationId // ### adjust url for deployment
+        var $element = $('<a class="read-more" href="/geoobject/'+obj.location_id // ### adjust url for deployment
                 +'"><div id="' + obj.id + '" class="concrete-assignment"><h3>'
                 + obj.name + '</h3><p>'+obj.address+'<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>')
         $einrichtungen.append($element)

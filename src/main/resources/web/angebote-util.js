@@ -7,6 +7,7 @@ var URL_ANGEBOT_DETAIL      = "/angebote/"
 var URL_ANGEBOT_EDIT        = "/angebote/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
 var URL_EINRICHTUNG_EDIT    = "/geoobject/edit/"
+var URL_EINRICHTUNG    = "/geoobject/"
 
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
@@ -87,8 +88,12 @@ function is_angebote_creator(id, callback) {
     })
 }
 
-function go_edit_einrichtung(id) {
+function go_edit_einrichtung_form(id) {
     window.document.location.replace(URL_EINRICHTUNG_EDIT + id)
+}
+
+function go_edit_einrichtung(id) {
+    window.document.location.replace(URL_EINRICHTUNG + id)
 }
 
 function go_edit_angebot(id) {

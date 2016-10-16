@@ -69,8 +69,13 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     // The remaining part of the URI is the original KA1 topic id.
     private static final String KA2_GEO_OBJECT_URI_PREFIX   = "de.kiezatlas.topic.";
     private static final String WORKSPACE_ANGEBOTE_URI      = "de.kiezatlas.angebote_ws";
+    private static final String TAG = "dm4.tags.tag";
 
-    // --- DeepaMehta Time Plugin URIs
+    // --- DeepaMehta Core & Time Plugin URIs
+
+    private static final String SIMPLE_ASSOCIATION = "dm4.core.association";
+    private static final String ROLE_TYPE_CHILD = "dm4.core.child";
+    private static final String ROLE_TYPE_PARENT = "dm4.core.parent";
 
     private final static String PROP_URI_CREATED  = "dm4.time.created";
     private final static String PROP_URI_MODIFIED = "dm4.time.modified";
@@ -266,7 +271,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Override
     public Angebotsinfos getAngebotsinfo(@PathParam("topicId") long topicId) {
         Topic angebotsInfo = dm4.getTopic(topicId);
-        return assembleAngebotsinfo(angebotsInfo);
+        return prepareAngebotsinfos(angebotsInfo);
     }
 
     @GET
@@ -277,7 +282,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         Iterator<Topic> iterator = angebote.iterator();
         while (iterator.hasNext()) {
             Topic angebot = iterator.next();
-            if (angebot.getId() == topicId) return assembleAngebotsinfo(angebot);
+            if (angebot.getId() == topicId) return prepareAngebotsinfos(angebot);
         }
         throw new WebApplicationException(404);
     }
@@ -302,9 +307,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 RelatedTopic einrichtung = geoIterator.next();
                 Association assignment = getAssignmentAssociation(angebot, einrichtung);
                 if (!justActive) {
-                    results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
+                    results.add(prepareAngebotsInfosAssigned(einrichtung, angebot, assignment));
                 } else if (justActive && assignmentEndsInTheFuture(assignment)) { // skip offers which toDate is in the past
-                    results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
+                    results.add(prepareAngebotsInfosAssigned(einrichtung, angebot, assignment));
                 }
             }
         }
@@ -332,7 +337,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 while (geoIterator.hasNext()) {
                     RelatedTopic einrichtung = geoIterator.next();
                     Association assignment = getAssignmentAssociation(angebot, einrichtung);
-                    results.add(assembleLocationAssignmentModel(einrichtung, angebot, assignment));
+                    results.add(prepareAngebotsInfosAssigned(einrichtung, angebot, assignment));
                 }
             } else {
                 log.info("Angebot \"" + angebot.getSimpleValue() + "\" is not yet assigned to Geo Object ");
@@ -341,7 +346,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return results;
     }
 
-    /** Fetches the assignment with the given association id and returns the complete Angebotsinfo. */
+    /** Fetches the assignment with the given association id and returns the complete Angebotsinfo.
+     * @param assocId */
     @GET
     @Path("/assignment/{id}")
     @Transactional
@@ -354,9 +360,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 Topic player1 = dm4.getTopic(result.getPlayer1().getId());
                 Topic player2 = dm4.getTopic(result.getPlayer2().getId());
                 if (player1.getTypeUri().equals(ANGEBOT) && player2.getTypeUri().equals(GEO_OBJECT)) {
-                    model = assembleLocationAssignmentModel(player2, player1, result);
+                    model = prepareAngebotsInfosAssigned(player2, player1, result);
                 } else if (player2.getTypeUri().equals(ANGEBOT) && player1.getTypeUri().equals(GEO_OBJECT)) {
-                    model = assembleLocationAssignmentModel(player1, player2, result);
+                    model = prepareAngebotsInfosAssigned(player1, player2, result);
                 }
                 return model;
             }
@@ -368,7 +374,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     // ------------------------------------------------------------------------------------- CRUD Angebots-Assignments
 
-    /** Creates an association of type "ka2.angebot.assignment" with two properties (timestamp "from" and "to"). */
+    /** Creates an association of type "ka2.angebot.assignment" with two properties (timestamp "from" and "to").
+     * @param assocModel */
     @POST
     @Path("/assignment/{from}/{to}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -379,7 +386,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         if (assocModel == null) {
             throw new RuntimeException("Incomplete request, an AssocationModel is missing.");
         }
-        checkAuthorization(); // throws "401" if not
+        isAuthorized(); // throws "401" if not
         long player1Id = assocModel.getRoleModel1().getPlayerId();
         long player2Id = assocModel.getRoleModel2().getPlayerId();
         if (!hasAssignmentAssociation(player1Id, player2Id)) {
@@ -407,7 +414,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Transactional
     public Association updateAngebotsAssignmentDate(@PathParam("id") long assocId, @PathParam("from") long fromDate,
                                                     @PathParam("to") long toDate) {
-        checkAuthorization(); // throws "401" if not
+        isAuthorized(); // throws "401" if not
         Association result = dm4.getAssociation(assocId);
         try {
             if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
@@ -427,7 +434,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Path("/assignment/{id}/delete")
     @Transactional
     public void deleteAngebotsAssignment(@PathParam("id") long assocId) {
-        checkAuthorization(); // throws "401" if not
+        isAuthorized(); // throws "401" if not
         Association result = dm4.getAssociation(assocId);
         if (result.getTypeUri().equals(ASSIGNMENT_EDGE)) {
             String einrichtungsName = getAssignedGeoObjectName(result);
@@ -454,7 +461,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Path("/{id}")
     @Transactional
     public void deleteAngebotsinfo(@PathParam("id") long assocId) {
-        checkAuthorization(); // throws "401" if not
+        isAuthorized(); // throws "401" if not
         Topic result = dm4.getTopic(assocId);
         if (result.getTypeUri().equals(ANGEBOT)) {
             Topic username = getAngebotsinfoCreator(result);
@@ -479,10 +486,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/filter/{now}")
     public AngeboteSearchResults getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
-        List<Topic> offers = getAllAngebotsinfoTopicsFilteredByTime(timestamp);
         AngeboteSearchResults results = new AngeboteSearchResults();
-        // ### here, return just unique offers
-        results.setTimelyResults(prepareAngebotsinfoResults(offers));
+        List<Topic> offers = getAssignedAngeboteByTime(timestamp);
+        results.setTimelyResults(prepareAngebotsinfoResultList(offers));
         return results;
     }
 
@@ -501,9 +507,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         try {
             String queryString = prepareLuceneQueryString(query, false, true, false);
             log.info("Angebote Search \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
-            List<Angebotsinfos> fulltextAngebote = new ArrayList<Angebotsinfos>();
             List<AngebotsinfosAssigned> einrichtungsAngebote = new ArrayList<AngebotsinfosAssigned>();
-            AngeboteSearchResults results = new AngeboteSearchResults();
             // 1) Spatial Query, searching Einrichtungen by location and assemble related angebotsinfos
             if (!location.isEmpty() && location.contains(",")) {
                 double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
@@ -528,16 +532,15 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 }
             }
             log.info("> Collected " + einrichtungsAngebote.size() + " angebote via spatial search.");
-            // 1.2) NO: Spatial search we want every offer in the radius of the location
-            // einrichtungsAngebote = filterOutDuplicates(einrichtungsAngebote);
-            // log.info("> " + einrichtungsAngebote.size() + " unique angebote found via spatial search");
             // 2) Search fulltext in angebotsinfos directly
+            List<Angebotsinfos> fulltextAngebote = new ArrayList<Angebotsinfos>();
             if (queryString != null) {
                 List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
                 log.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
-                fulltextAngebote.addAll(prepareAngebotsinfoResults(angebotsinfos)); // adds just new ones to resultset
+                fulltextAngebote.addAll(prepareAngebotsinfoResultList(angebotsinfos)); // adds just new ones to resultset
             }
-            // Build up search result object
+            // 3) Build up search result object
+            AngeboteSearchResults results = new AngeboteSearchResults();
             results.setSpatialResults(einrichtungsAngebote);
             results.setFulltextResults(fulltextAngebote);
             return results;
@@ -546,24 +549,16 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         }
     }
 
-    private String prepareLuceneQueryString(String userQuery, boolean doAndSplit, boolean doWildcard, boolean doFuzzy) {
-        if (userQuery.isEmpty()) return null;
-        String result = new String();
-        result = userQuery.trim();
-        if (doWildcard) result += "*";
-        return result;
-    }
-
     @Override
-    public List<Topic> getAllAngebotsinfoTopicsFilteredByTime(@PathParam("now") long nowDate) {
+    public List<Topic> getAssignedAngeboteByTime(@PathParam("now") long nowDate) {
         List<Association> assocs = dm4.getAssociationsByType(ANGEBOT_ASSIGNMENT);
         List<Topic> result = new ArrayList<Topic>();
         Iterator<Association> iterator = assocs.iterator();
         while (iterator.hasNext()) {
             Association assoc = iterator.next();
             if (isAssignmentActiveNow(assoc)) {
-                Topic angebotTopic = assoc.getTopic("dm4.core.parent");
-                Topic geoObjectTopic = assoc.getTopic("dm4.core.child");
+                Topic angebotTopic = assoc.getTopic(ROLE_TYPE_PARENT);
+                Topic geoObjectTopic = assoc.getTopic(ROLE_TYPE_CHILD);
                 if (angebotTopic != null && geoObjectTopic != null) {
                     result.add(angebotTopic);
                 }
@@ -583,41 +578,55 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return (Long) assignmentEdge.getProperty(AngebotPlugin.PROP_ANGEBOT_END_TIME);
     }
 
-    /** TODO: Revise according to our new DTOs.
-    @GET
-    @Path("/locations")
-    public List<GeoObjectView> getGeoObjectsByCurrentKiezatlasAngebote() {
-        List<Topic> offers = getAngebotsinfoTopicsFilteredByTime(new Date().getTime());
-        List<GeoObjectView> results = new ArrayList<GeoObjectView>();
-        for (Topic angebot : offers) {
-            ResultList<RelatedTopic> geoObjects = getGeoObjectTopicsByAngebot(angebot);
-            for (RelatedTopic geoObject : geoObjects) {
-                logger.info("> Fetched current Angebotsinfo \"" + angebot.getSimpleValue().toString() + "\", at "
-                    + geoObject.getSimpleValue());
-                results.add(new GeoObjectView(geoObject, geomapsService, this));
-            }
-        }
-        return results;
+    @Override
+    public List<RelatedTopic> getAngeboteTopicsByGeoObject(Topic geoObject) {
+        return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT);
     }
 
-    @GET
-    @Path("/search/geoobjects")
-    public List<GeoObjectView> getGeoObjectsByAngebotsinfoTextSearch(@QueryParam("search") String query) {
-        List<Topic> offers = searchAngebotsinfosByText(query);
-        List<GeoObjectView> results = new ArrayList<GeoObjectView>();
-        for (Topic angebot : offers) {
-            ResultList<RelatedTopic> einrichtungen = getGeoObjectTopicsByAngebot(angebot);
-            for (RelatedTopic einrichtung : einrichtungen) {
-                results.add(new GeoObjectView(einrichtung, geomapsService, this));
-            }
-            logger.info(offers.size() +" Angebotsinfos assigned to " + results.size() + " Geo Objects");
+    @Override
+    public List<AngebotsinfosAssigned> getAngebotsinfosAssigned(Topic geoObject) {
+        List<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
+        List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
+        for (Topic angebotTopic : angeboteTopics) {
+            Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
+            angebotsinfos.add(prepareAngebotsInfosAssigned(geoObject, angebotTopic, assignment));
         }
-        return results;
-    }**/
+        return angebotsinfos;
+    }
+
+    @Override
+    public List<RelatedTopic> getAssignedGeoObjectTopics(Topic angebot) {
+        return angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, ROLE_TYPE_PARENT, ROLE_TYPE_CHILD, GEO_OBJECT);
+    }
+
+    /**
+     * All angebotsinfos assigned to the given geo object which are either currently active in time or,
+     * additionally, those who end in the future.
+     * @param geoObject
+     * @param includeFutureOnes
+     * @return
+     */
+    @Override
+    public List<AngebotsinfosAssigned> getActiveAngebotsinfosAssigned(Topic geoObject, boolean includeFutureOnes) {
+        List<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
+        List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
+        for (Topic angebotTopic : angeboteTopics) {
+            Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
+            if (includeFutureOnes && assignmentEndsInTheFuture(assignment)) { // all angebotsinfos assigned and ending in the future
+                addToRelatedAngebotsinfoResults(angebotsinfos, assignment, geoObject, angebotTopic);
+            } else if (!includeFutureOnes && isAssignmentActiveNow(assignment)) {
+                // just the angebotsinfos assigned to geoObject which are currntly active
+                addToRelatedAngebotsinfoResults(angebotsinfos, assignment, geoObject, angebotTopic);
+            }
+        }
+        // sort descending by to date
+        return sortAngebotsinfosAssignedDescByToDate(angebotsinfos);
+    }
+
 
     // ------------------------------------------------------------------------ Private Utility Methods
 
-    private void checkAuthorization() {
+    private void isAuthorized() {
         String username = aclService.getUsername();
         if (!isAuthenticated() || !isAngeboteWorkspaceMember(username)) {
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
@@ -647,44 +656,20 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return (username != null && !username.equals(""));
     }
 
-    /** TODO: Add parameter allowing us to filer out all angbote currently not active. */
-    private List<Angebotsinfos> prepareAngebotsinfoResults(List<Topic> angebotsinfos) {
-        ArrayList<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
-        for (Topic angebot : angebotsinfos) {
-            // 1) assemble basic angebots infos
-            Angebotsinfos result = assembleAngebotsinfo(angebot);
-            // 2) check if angebots info isnt already in our resultset
-            if (!results.contains(result)) {
-                // 3) assemble for all locations and start and end time
-                List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
-                JSONArray locations = new JSONArray();
-                for (RelatedTopic geoObject : geoObjects) {
-                    Association assignment = getAssignmentAssociation(angebot, geoObject);
-                    locations.put(assembleLocationAssignmentModel(geoObject, angebot, assignment).toJSON());
-                }
-                result.setLocations(locations);
-                log.fine("> Fetched current Angebotsinfo \"" + result.getName()+ "\"");
-                results.add(result);
-            }
-        }
-        return results;
+    private boolean isAssignmentActiveNow(Association assoc) {
+        long timestamp = new Date().getTime();
+        Long from = getAssignmentFromTime(assoc);
+        Long to = getAssignmentToTime(assoc);
+        return ((from < timestamp && to > timestamp) || // == "An activity currently open"
+                (from < 0 && to > timestamp) || // == "No start date given AND toDate is in the future
+                (from < timestamp && to < 0)); // == "Has started and has no toDate set
     }
 
-    private List<AngebotsinfosAssigned> prepareAngebotsinfosAssignedResults(List<Topic> angebotsinfos) {
-        ArrayList<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
-        Map<Long, Topic> angebotResultset = new HashMap<Long, Topic>();
-        for (Topic angebot : angebotsinfos) {
-            if (!angebotResultset.containsKey(angebot.getId())) {
-                angebotResultset.put(angebot.getId(), angebot);
-                List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
-                for (RelatedTopic geoObject : geoObjects) {
-                    Association assignment = getAssignmentAssociation(angebot, geoObject);
-                    results.add(assembleLocationAssignmentModel(geoObject, angebot, assignment));
-                    break;
-                }
-            }
-        }
-        return results;
+    private boolean assignmentEndsInTheFuture(Association assoc) {
+        long timestamp = new Date().getTime();
+        Long from = getAssignmentFromTime(assoc);
+        Long to = getAssignmentToTime(assoc);
+        return (to > timestamp || (from < timestamp && to < 0)); // Still happens OR to date is -1
     }
 
     /** Currently unused **/
@@ -696,83 +681,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             }
         }
         return results;
-    }
-
-    private AngebotsinfosAssigned prepareAngebotsinfosAssigned(Topic angebotsinfos, Topic einrichtung) {
-        Association assignment = getAssignmentAssociation(angebotsinfos, einrichtung);
-        return assembleLocationAssignmentModel(einrichtung, angebotsinfos, assignment);
-    }
-
-    private Angebotsinfos assembleAngebotsinfo(Topic angebot) {
-        Angebotsinfos infoModel = new Angebotsinfos();
-        try {
-            angebot.loadChildTopics();
-            infoModel.setName(angebot.getChildTopics().getString(ANGEBOT_NAME));
-            infoModel.setDescription(angebot.getChildTopics().getString(ANGEBOT_BESCHREIBUNG));
-            String angebotKontaktValue  = angebot.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
-            if (angebotKontaktValue != null) {
-                infoModel.setContact(angebotKontaktValue);
-            }
-            String angebotWebsiteValue = angebot.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
-            if (angebotWebsiteValue != null) {
-                infoModel.setWebpage(angebotWebsiteValue);
-            }
-            infoModel.setTags(assembleTags(angebot));
-            infoModel.setId(angebot.getId());
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not assemble Angebotsinfos", ex);
-        }
-        return infoModel;
-    }
-
-    private AngebotsinfosAssigned assembleLocationAssignmentModel(Topic geoObject, Topic angebotTopic, Association assignment) {
-        AngebotsinfosAssigned assignedAngebot = new AngebotsinfosAssigned();
-        // Everything here must not be Null
-        assignedAngebot.setLocationName(getGeoObjectName(geoObject));
-        assignedAngebot.setLocationId(geoObject.getId());
-        GeoCoordinate coordinates = kiezService.getGeoCoordinateByGeoObject(geoObject);
-        assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
-        assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address").getSimpleValue().toString());
-        assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
-        assignedAngebot.setAngebotsId(angebotTopic.getId());
-        assignedAngebot.setAssignmentId(assignment.getId());
-        // assignedAngebot.setAngebotsinfoCreator(getAngebotsinfoCreator(angebotTopic).getSimpleValue().toString());
-        assignedAngebot.setStartDate(getAssignmentStartTime(assignment));
-        assignedAngebot.setEndDate(getAssignmentEndTime(assignment));
-        // Stuff that could be Null
-        // ### Angebotsinfos Standard Contacts and Tags Missing
-        String standardKontakt = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
-        if (standardKontakt != null) assignedAngebot.setKontakt(standardKontakt);
-        String standardBeschreibung = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_BESCHREIBUNG);
-        if (standardBeschreibung != null) assignedAngebot.setDescription(standardBeschreibung);
-        String webpage = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
-        if (webpage != null) assignedAngebot.setWebpage(webpage);
-        // Additonal Kontakt (### Should Override Standad Kontakt)
-        String angebotKontaktValue = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
-        if (angebotKontaktValue != null) {
-            assignedAngebot.setAdditionalContact(angebotKontaktValue);
-        }
-        // Overrides Description (### Should Override Standad Kontakt)
-        String assignmentDescription = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_BESCHREIBUNG);
-        if (assignmentDescription != null) {
-            assignedAngebot.setAdditionalInfo(assignmentDescription);
-        }
-        return assignedAngebot;
-    }
-
-    private List<JSONObject> assembleTags(Topic angebot) throws JSONException {
-        List<JSONObject> tags = new ArrayList<JSONObject>();
-        List<RelatedTopic> tagTopics = angebot.getChildTopics().getTopicsOrNull("dm4.tags.tag");
-        if (tagTopics != null) {
-            List<RelatedTopic> all = angebot.getChildTopics().getTopics("dm4.tags.tag");
-            Iterator<RelatedTopic> iterator = all.iterator();
-            while (iterator.hasNext()) {
-                Topic tag = iterator.next();
-                JSONObject dto = new JSONObject().put("label", tag.getSimpleValue()).put("id", tag.getId());
-                tags.add(dto);
-            }
-        }
-        return tags;
     }
 
     private Topic getAssignedGeoObjectTopic(Association assignmentEdge) {
@@ -836,22 +744,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             ? player1.getSimpleValue().toString() : player2.getSimpleValue().toString();
     }
 
-    private boolean isAssignmentActiveNow(Association assoc) {
-        long timestamp = new Date().getTime();
-        Long from = getAssignmentFromTime(assoc);
-        Long to = getAssignmentToTime(assoc);
-        return ((from < timestamp && to > timestamp) || // == "An activity currently open"
-                (from < 0 && to > timestamp) || // == "No start date given AND toDate is in the future
-                (from < timestamp && to < 0)); // == "Has started and has no toDate set
-    }
-
-    private boolean assignmentEndsInTheFuture(Association assoc) {
-        long timestamp = new Date().getTime();
-        Long from = getAssignmentFromTime(assoc);
-        Long to = getAssignmentToTime(assoc);
-        return (to > timestamp || (from < timestamp && to < 0)); // Still happens OR to date is -1
-    }
-
     private List<Topic> searchInAngebotsinfoChildsByText(String query) {
         HashMap<Long, Topic> uniqueResults = new HashMap<Long, Topic>();
         List<Topic> namen = dm4.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
@@ -864,7 +756,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             + ", " + kontakt.size() + " results in four types for query=\"" + query + "\" in ANGEBOTSINFOS");
         // merge all four types in search results
         beschreibungen.addAll(namen);
-        beschreibungen.addAll(getParentTagTopics(stichwoerter));
+        beschreibungen.addAll(getParentTags(stichwoerter));
         beschreibungen.addAll(kontakt);
         // make search results only contain unique geo object topics
         Iterator<Topic> iterator = beschreibungen.iterator();
@@ -880,49 +772,120 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         return new ArrayList(uniqueResults.values());
     }
 
+    private String prepareLuceneQueryString(String userQuery, boolean doAndSplit, boolean doWildcard, boolean doFuzzy) {
+        if (userQuery.isEmpty()) return null;
+        String result = new String();
+        result = userQuery.trim();
+        if (doWildcard) result += "*";
+        return result;
+    }
+
+    private Angebotsinfos prepareAngebotsinfos(Topic angebot) {
+        Angebotsinfos infoModel = new Angebotsinfos();
+        try {
+            angebot.loadChildTopics();
+            infoModel.setName(angebot.getChildTopics().getString(ANGEBOT_NAME));
+            infoModel.setDescription(angebot.getChildTopics().getString(ANGEBOT_BESCHREIBUNG));
+            String angebotKontaktValue  = angebot.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
+            if (angebotKontaktValue != null) {
+                infoModel.setContact(angebotKontaktValue);
+            }
+            String angebotWebsiteValue = angebot.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
+            if (angebotWebsiteValue != null) {
+                infoModel.setWebpage(angebotWebsiteValue);
+            }
+            infoModel.setTags(prepareAngeboteTags(angebot));
+            infoModel.setId(angebot.getId());
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not assemble Angebotsinfos", ex);
+        }
+        return infoModel;
+    }
+
     /**
-     * Filters the given list by proximity filter if such is no null and thus excludes topics related
-     * through a higher distance value (or all elements with invalid geo-coordinates).
-    private List<AngebotViewModel> applyProximityFilter(List<RelatedTopic> angebote, ProximityFilter proximityFilter) {
-        logger.info("Applying proximityfilter to a list of " + angebote.size() + " geo-objects");
-        List<AngebotViewModel> results = new ArrayList();
-        for (Topic topic : angebote) {
-            try {
-                GeoCoordinate geoCoord = geoCoordinate(topic);
-                if (proximityFilter != null) {
-                    double distance = geomapsService.getDistance(geoCoord, proximityFilter.geoCoordinate);
-                    if (distance > proximityFilter.radius) {
-                        continue;
-                    }
+     *
+     * @param angebotsinfos
+     * @return A list of Angebotsinfos of which each has at least one location and thereiwth (angebotszeitraum) assigned.
+     */
+    private List<Angebotsinfos> prepareAngebotsinfoResultList(List<Topic> angebotsinfos) {
+        ArrayList<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
+        for (Topic angebot : angebotsinfos) {
+            // 1) assemble basic angebots infos
+            Angebotsinfos result = prepareAngebotsinfos(angebot);
+            // 2) check if angebots info isnt already in our resultset
+            if (!results.contains(result)) {
+                // 3) assemble for all locations and start and end time
+                List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
+                JSONArray locations = new JSONArray();
+                for (RelatedTopic geoObject : geoObjects) {
+                    Association assignment = getAssignmentAssociation(angebot, geoObject);
+                    locations.put(prepareAngebotsInfosAssigned(geoObject, angebot, assignment).toJSON());
                 }
-                results.add(createAngebotViewModel(topic, geoCoord));
-            } catch (Exception e) {
-                logger.warning("### Excluding geo object " + topic.getId() + " (\"" +
-                    topic.getSimpleValue() + "\") from result (" + e + ")");
+                if (locations.length() > 0) {
+                    result.setLocations(locations);
+                    results.add(result);
+                } else {
+                    log.info("SKIPPED fetching Angebotsinfo \"" + result.getName()+ "\" - No Location Assignment");
+                }
             }
         }
         return results;
     }
 
-    private GeoCoordinate geoCoordinate(Topic geoObjectTopic) {
-        Topic address = geoObjectTopic.getChildTopics().getTopic("dm4.contacts.address");
-        GeoCoordinate geoCoord = geomapsService.getGeoCoordinate(address);
-        if (geoCoord == null) {
-            throw new RuntimeException("Geo coordinate is unknown");
-        }
-        return geoCoord;
+    private AngebotsinfosAssigned prepareAngebotsinfosAssigned(Topic angebotsinfos, Topic einrichtung) {
+        Association assignment = getAssignmentAssociation(angebotsinfos, einrichtung);
+        return prepareAngebotsInfosAssigned(einrichtung, angebotsinfos, assignment);
     }
 
-    private AngebotViewModel createAngebotViewModel(Topic topic, GeoCoordinate geoCoord) {
-        AngebotViewModel angebot = new AngebotViewModel();
-        angebot.setName(topic.getSimpleValue().toString());
-        // ### which place to locate and render this angebot?
-        // ### if many geo-objects assigned
-        // geoObject.setBezirk(bezirk.getSimpleValue().toString());
-        // angebot.setGeoCoordinate(geoCoord);
-        // geoObject.setLink(link(topic, bezirk));
-        return angebot;
-    } **/
+    private AngebotsinfosAssigned prepareAngebotsInfosAssigned(Topic geoObject, Topic angebotTopic, Association assignment) {
+        AngebotsinfosAssigned assignedAngebot = new AngebotsinfosAssigned();
+        // Everything here must not be Null
+        assignedAngebot.setLocationName(getGeoObjectName(geoObject));
+        assignedAngebot.setLocationId(geoObject.getId());
+        GeoCoordinate coordinates = kiezService.getGeoCoordinateByGeoObject(geoObject);
+        assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
+        assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address").getSimpleValue().toString());
+        assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
+        assignedAngebot.setAngebotsId(angebotTopic.getId());
+        assignedAngebot.setAssignmentId(assignment.getId());
+        // assignedAngebot.setAngebotsinfoCreator(getAngebotsinfoCreator(angebotTopic).getSimpleValue().toString());
+        assignedAngebot.setStartDate(getAssignmentStartTime(assignment));
+        assignedAngebot.setEndDate(getAssignmentEndTime(assignment));
+        // Stuff that could be Null
+        // ### Angebotsinfos Standard Contacts and Tags Missing
+        String standardKontakt = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
+        if (standardKontakt != null) assignedAngebot.setKontakt(standardKontakt);
+        String standardBeschreibung = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_BESCHREIBUNG);
+        if (standardBeschreibung != null) assignedAngebot.setDescription(standardBeschreibung);
+        String webpage = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
+        if (webpage != null) assignedAngebot.setWebpage(webpage);
+        // Additonal Kontakt (### Should Override Standad Kontakt)
+        String angebotKontaktValue = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
+        if (angebotKontaktValue != null) {
+            assignedAngebot.setAdditionalContact(angebotKontaktValue);
+        }
+        // Overrides Description (### Should Override Standad Kontakt)
+        String assignmentDescription = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_BESCHREIBUNG);
+        if (assignmentDescription != null) {
+            assignedAngebot.setAdditionalInfo(assignmentDescription);
+        }
+        return assignedAngebot;
+    }
+
+    private List<JSONObject> prepareAngeboteTags(Topic angebot) throws JSONException {
+        List<JSONObject> tags = new ArrayList<JSONObject>();
+        List<RelatedTopic> tagTopics = angebot.getChildTopics().getTopicsOrNull(TAG);
+        if (tagTopics != null) {
+            List<RelatedTopic> all = angebot.getChildTopics().getTopics(TAG);
+            Iterator<RelatedTopic> iterator = all.iterator();
+            while (iterator.hasNext()) {
+                Topic tag = iterator.next();
+                JSONObject dto = new JSONObject().put("label", tag.getSimpleValue()).put("id", tag.getId());
+                tags.add(dto);
+            }
+        }
+        return tags;
+    }
 
     // --------------------------------------------------------------------------------------------------------- Hooks
 
@@ -940,14 +903,14 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                     public DeepaMehtaObject call() {
                         // 1) Creator Assignment into Private Workspace
                         Association creatorAssignment = dm4.createAssociation(mf.newAssociationModel(ANGEBOT_CREATOR_EDGE,
-                            mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
-                            mf.newTopicRoleModel(usernameTopic.getId(), "dm4.core.child")));
+                            mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_PARENT),
+                            mf.newTopicRoleModel(usernameTopic.getId(), ROLE_TYPE_CHILD)));
                         Topic privateWs = dm4.getAccessControl().getPrivateWorkspace(usernameTopic.getSimpleValue().toString());
                         workspaceService.assignToWorkspace(creatorAssignment, privateWs.getId());
                         // 2) System Assignment
-                        Association systemAssignment = dm4.createAssociation(mf.newAssociationModel("dm4.core.association",
-                            mf.newTopicRoleModel(topic.getId(), "dm4.core.parent"),
-                            mf.newTopicRoleModel(usernameTopic.getId(),"dm4.core.child")));
+                        Association systemAssignment = dm4.createAssociation(mf.newAssociationModel(SIMPLE_ASSOCIATION,
+                            mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_PARENT),
+                            mf.newTopicRoleModel(usernameTopic.getId(), ROLE_TYPE_CHILD)));
                         workspaceService.assignToWorkspace(systemAssignment, dm4.getAccessControl().getSystemWorkspaceId());
                         log.info("Created custom Username <--> Angebotsinfo assignments in the respective workspaces");
                         return null;
@@ -957,48 +920,6 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 throw new RuntimeException("Creating Username <--> Angebotsinfo assignments FAILED!", ex);
             }
         }
-    }
-
-    // ----------------------------------------------------------------------------------------------------- Accessors
-
-    @Override
-    public List<RelatedTopic> getAngeboteTopicsByGeoObject(Topic geoObject) {
-        return geoObject.getRelatedTopics(ANGEBOT_ASSIGNMENT, null, null, ANGEBOT);
-    }
-
-    @Override
-    public List<AngebotsinfosAssigned> getAngebotsinfosAssigned(Topic geoObject) {
-        List<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
-        List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
-        for (Topic angebotTopic : angeboteTopics) {
-            Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
-            angebotsinfos.add(assembleLocationAssignmentModel(geoObject, angebotTopic, assignment));
-        }
-        return angebotsinfos;
-    }
-
-    /**
-     * All angebotsinfos assigned to the given geo object which are either currently active in time or,
-     * additionally, those who end in the future.
-     * @param geoObject
-     * @param includeFutureOnes
-     * @return
-     */
-    @Override
-    public List<AngebotsinfosAssigned> getActiveAngebotsinfosAssigned(Topic geoObject, boolean includeFutureOnes) {
-        List<RelatedTopic> angeboteTopics = getAngeboteTopics(geoObject.getId());
-        List<AngebotsinfosAssigned> angebotsinfos = new ArrayList<AngebotsinfosAssigned>();
-        for (Topic angebotTopic : angeboteTopics) {
-            Association assignment = getAssignmentAssociation(angebotTopic, geoObject);
-            if (includeFutureOnes && assignmentEndsInTheFuture(assignment)) { // all angebotsinfos assigned and ending in the future
-                addToRelatedAngebotsinfoResults(angebotsinfos, assignment, geoObject, angebotTopic);
-            } else if (!includeFutureOnes && isAssignmentActiveNow(assignment)) {
-                // just the angebotsinfos assigned to geoObject which are currntly active
-                addToRelatedAngebotsinfoResults(angebotsinfos, assignment, geoObject, angebotTopic);
-            }
-        }
-        // sort descending by to date
-        return sortAngebotsinfosAssignedDescByToDate(angebotsinfos);
     }
 
     private List<AngebotsinfosAssigned> sortAngebotsinfosAssignedDescByToDate(List<AngebotsinfosAssigned> angebotsinfos) {
@@ -1038,34 +959,29 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     private void addToRelatedAngebotsinfoResults(List<AngebotsinfosAssigned> angebotsinfos,
         Association assignment, Topic geoObject, Topic angebotTopic) {
-        Topic geoObjectTopic = assignment.getTopic("dm4.core.child");
+        Topic geoObjectTopic = assignment.getTopic(ROLE_TYPE_CHILD);
         if (angebotTopic != null && geoObjectTopic != null) {
-            angebotsinfos.add(assembleLocationAssignmentModel(geoObject, angebotTopic, assignment));
+            angebotsinfos.add(prepareAngebotsInfosAssigned(geoObject, angebotTopic, assignment));
         }
     }
 
-    @Override
-    public List<RelatedTopic> getAssignedGeoObjectTopics(Topic angebot) {
-        return angebot.getRelatedTopics(ANGEBOT_ASSIGNMENT, "dm4.core.parent", "dm4.core.child", GEO_OBJECT);
-    }
-
-    private List<Topic> getParentTagTopics(List<Topic> labels) {
+    private List<Topic> getParentTags(List<Topic> labels) {
         List<Topic> results = new ArrayList<Topic>();
         for (Topic tagLabel : labels) {
-            results.add(tagLabel.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", "dm4.tags.tag"));
+            results.add(tagLabel.getRelatedTopic("dm4.core.composition", ROLE_TYPE_CHILD, ROLE_TYPE_PARENT, TAG));
         }
         return results;
     }
 
     private List<RelatedTopic> getParentAngebotTopics(Topic entry) {
         List<RelatedTopic> angebote = new ArrayList<RelatedTopic>();
-        if (entry.getTypeUri().equals("dm4.tags.tag")) return getAllAggregatingAngebotParentTopics(entry);
-        angebote.add(entry.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", "ka2.angebot"));
+        if (entry.getTypeUri().equals(TAG)) return getParentAngebotTopicsAggregating(entry);
+        angebote.add(entry.getRelatedTopic(null, ROLE_TYPE_CHILD, ROLE_TYPE_PARENT, ANGEBOT));
         return angebote;
     }
 
-    private List<RelatedTopic> getAllAggregatingAngebotParentTopics(Topic entry) {
-        return entry.getRelatedTopics("dm4.core.aggregation", "dm4.core.child", "dm4.core.parent", "ka2.angebot");
+    private List<RelatedTopic> getParentAngebotTopicsAggregating(Topic entry) {
+        return entry.getRelatedTopics("dm4.core.aggregation", ROLE_TYPE_CHILD, ROLE_TYPE_PARENT, ANGEBOT);
     }
 
     private String getGeoObjectName(Topic geoObject) {
@@ -1075,7 +991,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     private Association getAssignmentAssociation(Topic angebot, Topic geoObject) throws RuntimeException {
         try {
             return dm4.getAssociation(ANGEBOT_ASSIGNMENT, angebot.getId(),
-                geoObject.getId(), "dm4.core.parent", "dm4.core.child").loadChildTopics();
+                geoObject.getId(), ROLE_TYPE_PARENT, ROLE_TYPE_CHILD).loadChildTopics();
         } catch (Exception e) {
             log.severe("ERROR fetching Association between Angebot: " + angebot.getId()
                 + ", " + angebot.getSimpleValue() + " and Geo Object: " + geoObject.getSimpleValue()
@@ -1085,10 +1001,8 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     private boolean hasAssignmentAssociation(long angebotId, long geoObjectId) {
-        Association existFrom = dm4.getAssociation(ANGEBOT_ASSIGNMENT, angebotId, geoObjectId,
-            "dm4.core.parent", "dm4.core.child");
-        Association existTo = dm4.getAssociation(ANGEBOT_ASSIGNMENT, angebotId, geoObjectId,
-            "dm4.core.child", "dm4.core.parent");
+        Association existFrom = dm4.getAssociation(ANGEBOT_ASSIGNMENT, angebotId, geoObjectId, ROLE_TYPE_PARENT, ROLE_TYPE_CHILD);
+        Association existTo = dm4.getAssociation(ANGEBOT_ASSIGNMENT, angebotId, geoObjectId, ROLE_TYPE_CHILD, ROLE_TYPE_PARENT);
         return (existFrom != null || existTo != null);
     }
 

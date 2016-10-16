@@ -3,7 +3,8 @@
 
 var selected_angebot,
     selected_geo_object,
-    selected_assignment = undefined,
+    selected_assignment_infos = undefined,
+    selected_assignment_edge = undefined,
     geo_assignments,
     angebotsinfos,
     fromDate,

@@ -190,11 +190,11 @@ function do_save_assignment(e) {
     // Chromium has no problem to deliver us timestamps from a german locale
     if (!selected_angebot) throw new Error("Assertion failed: An angebot must be loaded before an assignment can be created.")
     // Update
-    if (selected_assignment && (fromDate != selected_assignment.von || toDate != selected_assignment.bis)) {
-        console.log("Dates Changed - Update Assignment", fromDate, selected_assignment.von,
-            "To:", toDate, selected_assignment.bis)
+    if (selected_assignment_infos && (fromDate != selected_assignment_infos.von || toDate != selected_assignment_infos.bis)) {
+        console.log("Dates Changed - Update Assignment", fromDate, selected_assignment_infos.von,
+            "To:", toDate, selected_assignment_infos.bis)
         // Do Update
-        restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/" + fromDate + "/" + toDate)
+        restc.request("POST", "/angebote/assignment/" +selected_assignment_infos.id + "/" + fromDate + "/" + toDate)
     } else {
         // Create
         if (!selected_angebot) throw Error("Saving Assignment Aborted, selected Angebotsinfo NOT SET")
@@ -214,7 +214,7 @@ function do_save_assignment(e) {
         restc.request("POST", "/angebote/assignment/" + fromDate + "/" + toDate, assocModel)
     }
     // refresh GUI
-    selected_assignment = undefined
+    selected_assignment_infos = undefined
     selected_geo_object = undefined
     // refresh GUI
     clear_assignment_dateform()
@@ -227,9 +227,9 @@ function do_delete_assignment() {
         title: "Angebotszeitraum löschen", buttons: {
             "Ja, löschen": function() {
                 // Do Delete
-                if (selected_assignment) {
-                    restc.request("POST", "/angebote/assignment/" +selected_assignment.id + "/delete")
-                    selected_assignment = undefined
+                if (selected_assignment_infos) {
+                    restc.request("POST", "/angebote/assignment/" +selected_assignment_infos.id + "/delete")
+                    selected_assignment_infos = undefined
                     selected_geo_object = undefined
                 } else {
                     alert("Could not delete assignment, please select it and try again.")
@@ -298,23 +298,19 @@ function render_angebot_shortinfo() {
        return
     }
     // Angebotsinfo
-    var contact = selected_angebot.kontakt
-    var webpage = selected_angebot.webpage
-    var descr = selected_angebot.beschreibung
-    var tags = selected_angebot.tags
-    //
-    $('.angebot-name').text(selected_angebot.name)
+    $('.angebot-name').text('"' + selected_angebot.name + '" ')
     $('#navigation li.edit a').attr("href", URL_ANGEBOT_EDIT + selected_angebot.id)
-    var html_string = '<span class="label">Angebotsbeschreibung</span><br/>' + descr + '<br/><span class="label">Kontakt:</span> ' + contact
-    if (webpage) html_string += '<br/><span class="label">Webseite:</span> <a href="' + webpage + '">' + webpage + '</a><br/>'
-    if (tags) {
-        if (tags.length > 0) {
+    // <span class="label">Angebotsbeschreibung</span>
+    var html_string = '<br/>' + selected_angebot.beschreibung + '<br/><span class="label">Kontakt:</span> ' + selected_angebot.kontakt
+    if (selected_angebot.webpage) html_string += '<br/><span class="label">Webseite:</span> <a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
+    if (selected_angebot.tags) {
+        if (selected_angebot.tags.length > 0) {
             html_string += '<br/><span class="label">Stichworte</span>&nbsp;<br/>'
             var count = 1
-            for (var t in tags) {
-                var tag = tags[t]
+            for (var t in selected_angebot.tags) {
+                var tag = selected_angebot.tags[t]
                 html_string += '<em>' + tag.label + '</em>'
-                if (tags.length > count) html_string += ", "
+                if (selected_angebot.tags.length > count) html_string += ", "
                 count++
             }
         }
@@ -350,15 +346,17 @@ function render_assignments_to_edit() {
     $('.right-side .einrichtungen').on('click', select_assignment)
 }
 
-function render_selected_assignment() {
-    if (selected_assignment) {
+function render_selected_assignment_form() {
+    console.log("Selected Assignment", selected_assignment_infos)
+    if (selected_assignment_infos) {
         // render new assignment selection
         $('.concrete-assignment').removeClass('selected')
-        $('#' + selected_assignment.id).addClass('selected')
+        $('#' + selected_assignment_infos.id).addClass('selected')
         $('.date-area').removeClass("disabled")
-        render_assignment_place_name(selected_assignment.name)
-        $('#from').datepicker("setDate", new Date(selected_assignment.anfang_timestamp))
-        $('#to').datepicker("setDate", new Date(selected_assignment.ende_timestamp))
+        render_assignment_place_name(selected_assignment_infos.name)
+        $('#from').datepicker("setDate", new Date(selected_assignment_infos.anfang_timestamp))
+        $('#to').datepicker("setDate", new Date(selected_assignment_infos.ende_timestamp))
+        $('.date-area .edit-info').text("Zeitraum bearbeiten")
         $('#do-assign .text').text("Zeitraum ändern")
         $('#do-delete').removeClass("hidden")
     } else {
@@ -404,8 +402,8 @@ function select_geo_object(e) {
     var geo_object = restc.get_topic_by_id(e.target.id)
     // update gui state
     selected_geo_object = geo_object
-    selected_assignment = undefined
-    render_selected_assignment()
+    selected_assignment_infos = undefined
+    render_selected_assignment_form()
     // update label
     render_assignment_place_name(selected_geo_object.value)
 }
@@ -425,15 +423,17 @@ function select_assignment(event) {
         id = element.parentNode.parentNode.id
     }
     if (id) {
-        var assignment = get_assignment(id)
-        selected_assignment = assignment
-        render_selected_assignment()
+        selected_assignment_infos = get_assignment_edge(id)
+        selected_assignment_edge = restc.get_association_by_id(id, true) // include children=True
+        console.warn("Selected Assignment Edge", selected_assignment_edge)
+        render_selected_assignment_form()
     } else {
-        console.warn("Could not detect click on Element", element)
+        throw Error("Could not detect click on Element")
+        console.warn("Could not detect click on Element", element, event)
     }
 }
 
-function get_assignment(assocId) {
+function get_assignment_edge(assocId) {
     if (!geo_assignments) throw new Error("Client was not initialized correctly, assignments undefined");
     for (var e in geo_assignments) {
         var sel = geo_assignments[e]
