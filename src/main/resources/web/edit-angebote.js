@@ -352,7 +352,7 @@ function render_assignments_listing() {
 }
 
 function render_assignment_form() {
-    console.log("Selected Assignment", selected_assignment_infos, "Edge", selected_assignment_edge)
+    // console.log("Selected Assignment", selected_assignment_infos, "Edge", selected_assignment_edge)
     if (selected_assignment_infos) {
         // render new assignment selection
         $('.concrete-assignment').removeClass('selected')
@@ -365,10 +365,16 @@ function render_assignment_form() {
         $('#do-assign .text').text("Zeitraum ändern")
         $('#do-delete').removeClass("hidden")
         // load additional override infos (per location) stored on the edge
-        var additionalContact = selected_assignment_edge.childs["ka2.angebot.assignment_kontakt"].value
-        $('#additional-kontakt').val(additionalContact)
-        var additionalInfo = selected_assignment_edge.childs["ka2.angebot.assignment_zusatz"].value
-        $('#additional-details').val(additionalInfo)
+        var additionalContact = undefined
+        var additionalInfo = undefined
+        if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_kontakt")) {
+            additionalContact = selected_assignment_edge.childs["ka2.angebot.assignment_kontakt"].value
+            $('#additional-kontakt').val(additionalContact)
+        }
+        if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_zusatz")) {
+            additionalInfo = selected_assignment_edge.childs["ka2.angebot.assignment_zusatz"].value
+            $('#additional-details').val(additionalInfo)
+        }
         if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_kontakt")
             || selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_zusatz")) {
             show_override_details_form()

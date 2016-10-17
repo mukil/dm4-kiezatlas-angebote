@@ -14,7 +14,7 @@ var selected_angebot,
 
 function load_angebot_by_resource_path(callback) {
     var angebot_id = parse_angebots_id()
-    console.log("Loaded Angebot ID By Resource Path", angebot_id)
+    // console.log("Loaded Angebot ID By Resource Path", angebot_id)
     if (angebot_id != 0) {
         $.ajax({
             type: "GET", dataType: "json", url: '/angebote/' + angebot_id,
@@ -44,7 +44,7 @@ function load_angebote_places_and_dates(renderer, justActive) {
         success: function(response) {
             if (response) {
                 geo_assignments = response
-                console.log("Loaded Angebot Geo Assignments ", geo_assignments)
+                // console.log("Loaded Angebot Geo Assignments ", geo_assignments)
                 if (renderer) renderer(response)
             } else {
                 $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Zuordnungen zu bearbeiten.')

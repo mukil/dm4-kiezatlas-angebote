@@ -155,7 +155,7 @@ function render_search_results() {
         result_length = angebotsinfos.fulltext.length + angebotsinfos.spatial.length + angebotsinfos.timely.length
         $listing.empty()
     }
-    console.log("Search Result Item Object", angebotsinfos)
+    // console.log("Search Result Item Object", angebotsinfos)
     $listing.empty()
     // status
     if (angebotsinfos.length === 0) {
@@ -163,8 +163,8 @@ function render_search_results() {
             + 'uns helfen neue oder aktuelle Angebote in unsere <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>')
         // ("+new Date().toLocaleDateString()+")
     }
-    var complete_resultset = split_angebote_results(angebotsinfos)
-    console.log("Split Search Results", complete_resultset)
+    // ### var complete_resultset = split_angebote_results(angebotsinfos)
+    // console.log("Split Search Results", complete_resultset)
     // assigned location search list items
     if (angebotsinfos.spatial) {
         // ### special sorting by distance
@@ -216,6 +216,7 @@ function split_angebote_results(items_to_render) {
 }
 
 function render_spatial_list_item(element, $list) {
+    // ### sort by distance
     var locationName = element.name
     var name = element.angebots_name
     var angebots_id = element.angebots_id
@@ -225,7 +226,7 @@ function render_spatial_list_item(element, $list) {
             + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
         if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
-        html_string += '</div></a><div class="air-distance">Entferung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm</a></li>'
+        html_string += '</div></a><div class="air-distance">Entfernung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm</div></li>'
     $list.append(html_string)
 }
 
@@ -241,7 +242,8 @@ function render_fulltext_list_item(element, $list) {
             + '<h3>"' +element.name + '" wird an ' + standort_html + ' angeboten</h3>'
             + zb_html +' <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
         if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
-        html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a></li>'
+        html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a>'
+            + '<div class="air-distance">&nbsp;</div></li>'
         $list.append(html_string)
     }
 }
