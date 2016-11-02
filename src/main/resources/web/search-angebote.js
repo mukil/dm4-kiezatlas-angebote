@@ -76,7 +76,7 @@ function fire_angebote_timesearch() {
 
 function do_search_streetcoordinates() {
     var locationString = $('#nearby').val().trim()
-    $.getJSON('/geoobject/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
+    $.getJSON('/website/search/coordinates?query=' + encodeURIComponent(locationString), function(results) {
         if (results) {
             street_coordinates = results
             select_locationsearch_parameter()

@@ -276,7 +276,7 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
     // ### hacking message display
     $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
     $.ajax({
-        type: "GET", url: "/geoobject/search/by_name?query=" + queryString,
+        type: "GET", url: "/website/search/by_name?query=" + queryString,
         success: function(obj) {
             renderer(obj)
         },
@@ -302,7 +302,7 @@ function render_geo_object_search_results(results) {
     if (results.length === 0) {
         $('.form-area div.einrichtungen').append('<div>Haben Sie die gew&uuml;nschte Einrichtung nicht finden k&ouml;nnen? Dann k&ouml;nnen '
             + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
-            + 'einen Ort <a href="/geoobject/create">neu im Kiezatlas eintragen</a>. Alternativ k&ouml;nnen wir Ihnen noch anbieten den Namen des Einrichtungsdatensatz '
+            + 'einen Ort <a href="' + URL_EINRICHTUNG_CREATE + '">neu im Kiezatlas eintragen</a>. Alternativ k&ouml;nnen wir Ihnen noch anbieten den Namen des Einrichtungsdatensatz '
         + 'erst noch einmal &uuml;ber die Umkreis- bzw. Volltextsuche des <a href="/" target="_blank">Gesamtstadtplan</a> abzufragen.</div>')
     } else {
         $('.form-area .search-info').text(results.length + ' Ergebnisse')

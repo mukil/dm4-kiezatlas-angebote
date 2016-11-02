@@ -24,7 +24,7 @@ function do_revise_assignment() {
         if (username) {
             do_revise_call()
             restc.logout()
-            window.document.location.assign("/")
+            window.document.location = "/"
             go_to_frontpage()
         } else {
             $('.label.hint').text("Entschuldigung, bei der Aufhebung der Zuweisung ist ein Fehler aufgetreten.")

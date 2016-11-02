@@ -2,7 +2,7 @@
 // --- Rest Client Methods to load personal data entries ---- //
 
 function load_users_angebote() {
-    var result = restc.request("GET", "/angebote/my")
+    var result = restc.request("GET", "/angebote/my/json")
     for (var el in result) {
         var item = result[el]
         render_angebots_item(item)
@@ -29,7 +29,7 @@ function render_angebots_item(item) {
 }
 
 function load_users_einrichtungen() {
-    var result = restc.request("GET", "/geoobject/my")
+    var result = restc.request("GET", "/website/geo/my/json")
     for (var el in result) {
         var item = result[el]
         render_einrichtungs_item(item)
@@ -75,7 +75,7 @@ function delete_my_angebot(id) {
      $("#dialog-confirm").dialog({ resizable: false, height: "auto", width: 340, modal: true,
         buttons: {
             "Ja, löschen": function() {
-                restc.request("DELETE", "/geoobject/" + id)
+                restc.request("DELETE", "/website/geo/" + id)
                 $('ul.einrichtungen').empty()
                 load_users_einrichtungen()
             },

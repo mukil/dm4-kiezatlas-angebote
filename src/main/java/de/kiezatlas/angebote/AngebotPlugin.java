@@ -246,7 +246,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @GET
-    @Path("/my")
+    @Path("/my/json")
     @Produces(MediaType.APPLICATION_JSON)
     @Override
     public List<Topic> getUsersAngebotsinfoTopics() {
@@ -267,8 +267,9 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     }
 
     @GET
-    @Path("/{topicId}")
+    @Path("/{topicId}/json")
     @Override
+    @Produces(MediaType.APPLICATION_JSON)
     public Angebotsinfos getAngebotsinfo(@PathParam("topicId") long topicId) {
         Topic angebotsInfo = dm4.getTopic(topicId);
         return prepareAngebotsinfos(angebotsInfo);
@@ -277,6 +278,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/user/{topicId}")
     @Override
+    @Produces(MediaType.APPLICATION_JSON)
     public Angebotsinfos getUsersAngebotsinfos(@PathParam("topicId") long topicId) {
         List<Topic> angebote = getUsersAngebotsinfoTopics();
         Iterator<Topic> iterator = angebote.iterator();

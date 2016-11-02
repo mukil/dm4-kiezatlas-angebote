@@ -39,9 +39,9 @@
                         <i class="setting icon"></i>Admin
                         <i class="dropdown icon"></i>
                         <div class="menu">
-                            <a class="item" href="/geoobject/confirmation/">Neueintragungen</a>
+                            <a class="item" href="/website/geo/confirmation/">Neueintragungen</a>
                             <a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/geoobject/site/" class="item">Site-Infos</a>
+                            <a href="/website/sites" class="item">Sites</a>
                         </div>
                     </div>
                 </div-->
@@ -82,7 +82,7 @@
         <div class="einrichtungs-area">
             <h3>Meine Einrichtungsdatens&auml;tze</h3>
             <ul class="einrichtungen"></ul>
-            <form method="GET" action="/geoobject/create" id="angebot-form" accept-charset="UTF-8">
+            <form method="GET" action="/website/geo/create" id="angebot-form" accept-charset="UTF-8">
                 <div class="ui input block-space-bottom">
                     <button type="submit" class="ui small button">Neue Einrichtung</button>
                 </div>
@@ -108,7 +108,7 @@
 
         <div id="dialog-confirm" title="Eintrag löschen?">Willst Du diesen Datensatz entfernen?</div>
 
-        <!-- Piwik
+        <!-- Piwik -->
         <script type="text/javascript">
         var pkBaseURL = "//stats.infokitchen.net/";
         document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
@@ -122,7 +122,7 @@
         <noscript>
             <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Meine+Eintraege')}" style="border:0" alt="" />
         </noscript>
-        End Piwik Tracking Code -->
+        <!-- End Piwik Tracking Code -->
         
     </body>
 </html>

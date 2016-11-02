@@ -17,7 +17,7 @@ function load_angebot_by_resource_path(callback) {
     // console.log("Loaded Angebot ID By Resource Path", angebot_id)
     if (angebot_id != 0) {
         $.ajax({
-            type: "GET", dataType: "json", url: '/angebote/' + angebot_id,
+            type: "GET", dataType: "json", url: '/angebote/' + angebot_id + '/json',
             success: function(response) {
                 try {
                     selected_angebot = response

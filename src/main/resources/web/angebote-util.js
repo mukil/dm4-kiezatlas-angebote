@@ -6,8 +6,9 @@ var URL_MY_ANGEBOT_LIST     = "/angebote/my"
 var URL_ANGEBOT_DETAIL      = "/angebote/"
 var URL_ANGEBOT_EDIT        = "/angebote/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
-var URL_EINRICHTUNG_EDIT    = "/geoobject/edit/"
-var URL_EINRICHTUNG    = "/geoobject/"
+var URL_EINRICHTUNG_EDIT    = "/website/geo/edit/"
+var URL_EINRICHTUNG         = "/website/geo/"
+var URL_EINRICHTUNG_CREATE  = "/website/geo/"
 
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
@@ -106,7 +107,7 @@ function go_edit_assignments(id) {
 
 function go_to_angebot_assignment(id) {
     if (id) {
-        window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
+        window.document.location = URL_ANGEBOT_ASSIGNMENT + id
     } else {
         setTimeout(function(e) {
             go_to_my_angebot_listing()
@@ -115,11 +116,11 @@ function go_to_angebot_assignment(id) {
 }
 
 function go_to_frontpage() {
-    window.document.location.assign("/")
+    window.document.location = "/"
 }
 
 function go_to_my_angebot_listing() {
-    window.document.location.assign(URL_MY_ANGEBOT_LIST)
+    window.document.location = URL_MY_ANGEBOT_LIST
 }
 
 
