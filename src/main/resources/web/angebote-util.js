@@ -177,6 +177,18 @@ function angebote_compare_by_end_earliest_last(a, b) {
     return 0 //default return value (no sorting)
 }
 
+function angebote_compare_by_distance_nearest_first(a, b) {
+    if (!a.search_distance) return -1
+    if (!b.search_distance) return 1
+    var oldestEndA = (a.search_distance * 1000).toFixed(0)
+    var oldestEndB = (b.search_distance * 1000).toFixed(0)
+    if (oldestEndA < oldestEndB)
+        return -1
+    if (oldestEndA > oldestEndB)
+        return 1
+    return 0 //default return value (no sorting)
+}
+
 function angebote_compare_by_end_latest_first(a, b) {
     // compare "a" and "b" in some fashion, and return -1, 0, or 1
     var oldestEndA = get_latest_angebote_end_time(a)

@@ -238,6 +238,10 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             null, "dm4.accesscontrol.username");
     }
 
+    public String getCreatorPropertyValue(Topic angebot) {
+        return (String) dm4.getProperty(angebot.getId(), "dm4.accesscontrol.creator");
+    }
+
     @GET
     @Path("/my")
     @Produces(MediaType.TEXT_HTML)
@@ -851,26 +855,26 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
         assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
         assignedAngebot.setAngebotsId(angebotTopic.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
-        // assignedAngebot.setAngebotsinfoCreator(getAngebotsinfoCreator(angebotTopic).getSimpleValue().toString());
+        assignedAngebot.setAngebotsinfoCreator(getCreatorPropertyValue(angebotTopic));
         assignedAngebot.setStartDate(getAssignmentStartTime(assignment));
         assignedAngebot.setEndDate(getAssignmentEndTime(assignment));
         // Stuff that could be Null
-        // ### Angebotsinfos Standard Contacts and Tags Missing
-        String standardKontakt = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
-        if (standardKontakt != null) assignedAngebot.setKontakt(standardKontakt);
-        String standardBeschreibung = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_BESCHREIBUNG);
-        if (standardBeschreibung != null) assignedAngebot.setDescription(standardBeschreibung);
+        // ### Tags Missing
+        String angebotsKontakt = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
+        if (angebotsKontakt != null) assignedAngebot.setKontakt(angebotsKontakt);
+        String angebotsBeschreibung = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_BESCHREIBUNG);
+        if (angebotsBeschreibung != null) assignedAngebot.setDescription(angebotsBeschreibung);
         String webpage = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
         if (webpage != null) assignedAngebot.setWebpage(webpage);
         // Additonal Kontakt overrides standard kontakt
-        String angebotKontaktValue = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
-        if (angebotKontaktValue != null) {
-            assignedAngebot.setKontakt(angebotKontaktValue);
+        String assignmentKontakt = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
+        if (assignmentKontakt != null) {
+            assignedAngebot.setKontakt(assignmentKontakt);
         }
         // Adds to Description
-        String assignmentDescription = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_ZUSATZINFO);
-        if (assignmentDescription != null) {
-            assignedAngebot.setAdditionalInfo(assignmentDescription);
+        String assignmentZusatzinfo = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_ZUSATZINFO);
+        if (assignmentZusatzinfo != null) {
+            assignedAngebot.setAdditionalInfo(assignmentZusatzinfo);
         }
         return assignedAngebot;
     }

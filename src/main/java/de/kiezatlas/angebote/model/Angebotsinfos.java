@@ -46,6 +46,14 @@ public class Angebotsinfos implements JSONEnabled {
         }
     }
 
+    public void setAngebotsinfoCreator(String username) {
+        try {
+            json.put("creator", username);
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void setWebpage(String webpageValue) {
         try {
             json.put("webpage", webpageValue);

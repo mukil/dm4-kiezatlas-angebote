@@ -167,8 +167,8 @@ function render_search_results() {
     // console.log("Split Search Results", complete_resultset)
     // assigned location search list items
     if (angebotsinfos.spatial) {
-        // ### special sorting by distance
-        // ... angebotsinfos.spatial.sort(angebote_compare_by_end_earliest_last)
+        // special sorting by distance
+        angebotsinfos.spatial.sort(angebote_compare_by_distance_nearest_first)
         for (var el in angebotsinfos.spatial) {
             var element = angebotsinfos.spatial[el]
             render_spatial_list_item(element, $listing)
@@ -216,7 +216,6 @@ function split_angebote_results(items_to_render) {
 }
 
 function render_spatial_list_item(element, $list) {
-    // ### sort by distance
     var locationName = element.name
     var name = element.angebots_name
     var angebots_id = element.angebots_id
@@ -224,7 +223,7 @@ function render_spatial_list_item(element, $list) {
     var html_string = '<li class="read-more"><a href="/angebote/'+angebots_id+'">'
             + '<div id="' + angebots_id + '" class="concrete-assignment"><h3 class="angebot-name">"'
             + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
-        if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>'
+        if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>' // , Angebot von '+element.creator+'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
         html_string += '</div></a><div class="air-distance">Entfernung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm</div></li>'
     $list.append(html_string)
@@ -241,7 +240,7 @@ function render_fulltext_list_item(element, $list) {
             + '<div id="' + element.id + '" class="concrete-assignment">'
             + '<h3>"' +element.name + '" wird an ' + standort_html + ' angeboten</h3>'
             + zb_html +' <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
-        if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
+        if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>' // ', Angebot von '+element.creator+
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a>'
             + '<div class="air-distance">&nbsp;</div></li>'
         $list.append(html_string)
