@@ -39,6 +39,11 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
+            <artifactId>dm48-thymeleaf</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-geomaps</artifactId>
             <version>4.8</version>
         </dependency>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title th:text="${angebot.name} + ' - Kiezatlas'"></title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <!--link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/-->
+
+        <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
+
+        <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+            // App initialization
+            $(document).ready(function(e) {
+                render_angebotsinfo_page()
+            })
+        /*]]>*/
+        </script>
+        
+    </head>
+    <body class="kiezatlas angebotsinfos detail">
+
+        <div class="top-menu ui menu top fixed">
+            <div class="ui container">
+                <a href="/">
+                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
+                </a>
+                <a href="/sign-up/login" class="login item">Login</a>
+                <a class="item gesamt" href="/">Startseite</a>
+                <a href="/angebote/my" style="display: none;" class="angebote item">Meine Eintr&auml;ge</a>
+                <a href="/angebote" class="item">Angebote</a>
+                <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
+            </div>
+        </div>
+
+        <div class="task-info">
+            <h3></h3>
+            <div class="ui input icon loading-indicator">
+                <i class="loading spinner icon"></i>
+            </div>
+        </div>
+        <div class="detail-area" id="angebot" th:data="${angebot.id}">
+            <div class="angebot-infos">
+                <h3 class="angebot-name" th:text="${angebot.name}"></h3>
+                <p class="body"></p>
+            </div>
+            <h3 class="assignments">Einrichtungen an denen dieses Angebot aktuell oder in der Zukunft stattfindet</h3>
+            <div class="geo-objects-area">
+                <div class="einrichtungen"></div>
+            </div>
+        </div>
+
+        <div id="bottom">
+            <div class="menu">
+                <ul>
+                    <li>
+                        <a href="/angebote" title="Zurück zur Übersicht">Zur&uuml;ck</a>
+                    </li>
+                </ul>
+            </div>
+            <p>
+                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
+                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            </p>
+        </div>
+
+        <!-- Piwik -->
+        <script type="text/javascript">
+        var pkBaseURL = "//stats.infokitchen.net/";
+        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+        </script><script type="text/javascript">
+        try {
+        var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 2);
+        piwikTracker.trackPageView();
+        piwikTracker.enableLinkTracking();
+        } catch( err ) {}
+        </script>
+        <noscript>
+            <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Angebotsdetails')}" style="border:0" alt="" />
+        </noscript>
+        <!-- End Piwik Tracking Code -->
+
+    </body>
+</html>
+

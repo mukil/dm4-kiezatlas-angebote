@@ -1,11 +1,11 @@
 package de.kiezatlas.angebote;
 
+import com.sun.jersey.api.view.Viewable;
 import de.deepamehta.core.Association;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
@@ -16,6 +16,7 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.geomaps.GeomapsService;
 import de.deepamehta.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geospatial.GeospatialService;
+import de.deepamehta.thymeleaf.ThymeleafPlugin;
 import de.deepamehta.workspaces.WorkspacesService;
 import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
@@ -56,7 +57,7 @@ import org.codehaus.jettison.json.JSONObject;
 @Path("/angebote")
 @Consumes("application/json")
 @Produces("application/json")
-public class AngebotPlugin extends PluginActivator implements AngebotService,
+public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                                                               PostCreateTopicListener {
 
     // ----------------------------------------------------------------------------------------------------- Constants
@@ -91,6 +92,11 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     private Logger log = Logger.getLogger(getClass().getName());
 
     // ------------------------------------------------------------------------------------------------ Public Methods
+
+    @Override
+    public void init() {
+        initTemplateEngine(); // initting a thymeleaf template engine for this bundle specifically too
+    }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -130,15 +136,21 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Path("/edit/{topicId}")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotEditView(@PathParam("topicId") String id) {
+    public InputStream getAngebotEditView(@PathParam("topicId") long id) {
         return getStaticResource("web/html/edit.html");
     }
 
     @GET
     @Path("/{topicId}")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotDetailView(@PathParam("topicId") String id) {
-        return getStaticResource("web/html/detail.html");
+    public Viewable getAngebotDetailView(@PathParam("topicId") long id) {
+        // return getStaticResource("web/html/detail.html");
+        Topic angebot = dm4.getTopic(id);
+        if (angebot.getTypeUri().equals(ANGEBOT)) {
+            viewData("angebot", prepareAngebotsinfos(angebot));
+            return view("detail");
+        }
+        throw new RuntimeException("Requested topic is not an angebotsinfo");
     }
 
     /**
@@ -295,7 +307,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
 
     /**
      * Fetch all assigned angebotsinfos for a given angebot.
-     * @param angebotId     ID (long) of the angebotsinfo.
+     * @param topicId       ID (long) of the angebotsinfo.
      * @param justActive    A boolean flag, if set to "false", all assigned angebots are listed if set to "true" just
      * angebotsinfos assigned with a "To Date" in the future will be returned.
      */

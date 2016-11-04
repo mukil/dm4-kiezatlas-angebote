@@ -12,8 +12,8 @@ var selected_angebot,
     
 // --- Custom RESTClient Methods --- //
 
-function load_angebot_by_resource_path(callback) {
-    var angebot_id = parse_angebots_id()
+function load_angebot_by_resource_path(id, callback) {
+    var angebot_id = id //parse_angebots_id()
     // console.log("Loaded Angebot ID By Resource Path", angebot_id)
     if (angebot_id != 0) {
         $.ajax({
