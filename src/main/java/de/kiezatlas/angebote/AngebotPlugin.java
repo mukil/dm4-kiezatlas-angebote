@@ -95,21 +95,21 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @GET
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotListView() {
-        return getStaticResource("web/search.html");
+        return getStaticResource("web/html/search.html");
     }
 
     @GET
     @Path("/stichwort/{tagName}")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotListView(@PathParam("tagName") String tag) {
-        return getStaticResource("web/search.html");
+        return getStaticResource("web/html/search.html");
     }
 
     @GET
     @Path("/zuordnen/{topicId}")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotAssignmentView(@PathParam("topicId") String id) {
-        return getStaticResource("web/assignment.html");
+        return getStaticResource("web/html/assignment.html");
     }
 
     @GET
@@ -124,21 +124,21 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
                 throw new WebApplicationException(new RuntimeException("Sorry, you are not authorized to revise this offer"), Response.Status.UNAUTHORIZED);
             }
         }
-        return getStaticResource("web/revise.html");
+        return getStaticResource("web/html/revise.html");
     }
 
     @GET
     @Path("/edit/{topicId}")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotEditView(@PathParam("topicId") String id) {
-        return getStaticResource("web/edit.html");
+        return getStaticResource("web/html/edit.html");
     }
 
     @GET
     @Path("/{topicId}")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngebotDetailView(@PathParam("topicId") String id) {
-        return getStaticResource("web/detail.html");
+        return getStaticResource("web/html/detail.html");
     }
 
     /**
@@ -242,7 +242,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     @Path("/my")
     @Produces(MediaType.TEXT_HTML)
     public InputStream getAngeboteView() {
-        return getStaticResource("web/my.html");
+        return getStaticResource("web/html/my.html");
     }
 
     @GET
@@ -491,7 +491,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
     public AngeboteSearchResults getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
         AngeboteSearchResults results = new AngeboteSearchResults();
         List<Topic> offers = getAssignedAngeboteByTime(timestamp);
-        results.setTimelyResults(prepareAngebotsinfoResultList(offers));
+        results.setTimelyResults(prepareAngebotsinfoSearchResult(offers));
         return results;
     }
 
@@ -540,7 +540,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
             if (queryString != null) {
                 List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
                 log.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
-                fulltextAngebote.addAll(prepareAngebotsinfoResultList(angebotsinfos)); // adds just new ones to resultset
+                fulltextAngebote.addAll(prepareAngebotsinfoSearchResult(angebotsinfos)); // adds just new ones to resultset
             }
             // 3) Build up search result object
             AngeboteSearchResults results = new AngeboteSearchResults();
@@ -810,7 +810,7 @@ public class AngebotPlugin extends PluginActivator implements AngebotService,
      * @param angebotsinfos
      * @return A list of Angebotsinfos of which each has at least one location and thereiwth (angebotszeitraum) assigned.
      */
-    private List<Angebotsinfos> prepareAngebotsinfoResultList(List<Topic> angebotsinfos) {
+    private List<Angebotsinfos> prepareAngebotsinfoSearchResult(List<Topic> angebotsinfos) {
         ArrayList<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
         for (Topic angebot : angebotsinfos) {
             // 1) assemble basic angebots infos
