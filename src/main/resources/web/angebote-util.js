@@ -182,9 +182,9 @@ function angebote_compare_by_distance_nearest_first(a, b) {
     if (!b.search_distance) return 1
     var oldestEndA = (a.search_distance * 1000).toFixed(0)
     var oldestEndB = (b.search_distance * 1000).toFixed(0)
-    if (oldestEndA < oldestEndB)
-        return -1
     if (oldestEndA > oldestEndB)
+        return -1
+    if (oldestEndA < oldestEndB)
         return 1
     return 0 //default return value (no sorting)
 }

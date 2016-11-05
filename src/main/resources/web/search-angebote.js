@@ -6,11 +6,15 @@
 var location_input = undefined
 var location_coords = undefined
 var location_radius = 1.5
-var available_radiants = [ 0.5, 1.0, 1.5, 2.5, 5.0, 10.0, 15.0 ]
+var available_radiants = [ 0.5, 1.0, 1.5, 2.5, 5.0 ] //  10.0, 15.0
 var search_input = []
 var street_coordinates = []
 var street_coords_idx = 0
 var time_parameter = undefined
+
+var show_intersecting = true // flag if, by default the client should only
+    // ... show search result items contained in all queries (spatial, time and fulltext)
+// var show_inactive_offers = false// flag if, offers without an active assignment should be included
 
 
 function init_search_page() {
@@ -70,6 +74,10 @@ function fire_angebote_timesearch() {
         { async: false, dataType: 'json' }).responseText)
     angebotsinfos = result // .timely query results are also assigned to .spatial (server side)
     render_search_results()
+}
+
+function focus_location_query() {
+    $('#nearby').focus()
 }
 
 // ----------------------------------  Two Utility Search Operations -------- //
@@ -148,53 +156,129 @@ function render_search_frontpage() {
     render_query_parameter()
 }
 
-function render_search_results() {
+function render_search_results(distinct_results) {
     var $listing = $('.list-area .results')
     var result_length = 0
     if (angebotsinfos) {
         result_length = angebotsinfos.fulltext.length + angebotsinfos.spatial.length + angebotsinfos.timely.length
         $listing.empty()
     }
-    // console.log("Search Result Item Object", angebotsinfos)
+    // ### maybe at some time, allow display of inactive offers, too
+    // console.log("Split Search Results By Time", split_angebote_results_by_time(angebotsinfos))
     $listing.empty()
-    // status
-    if (angebotsinfos.length === 0) {
-        $listing.append('<li class="read-more">Sie k&ouml;nnen '
-            + 'uns helfen neue oder aktuelle Angebote in unsere <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</li>')
-        // ("+new Date().toLocaleDateString()+")
-    }
-    // ### var complete_resultset = split_angebote_results(angebotsinfos)
-    // console.log("Split Search Results", complete_resultset)
-    // assigned location search list items
-    if (angebotsinfos.spatial) {
-        // special sorting by distance
-        angebotsinfos.spatial.sort(angebote_compare_by_distance_nearest_first)
-        for (var el in angebotsinfos.spatial) {
-            var element = angebotsinfos.spatial[el]
-            render_spatial_list_item(element, $listing)
+    if (!check_for_distinct_results_rendering() && !distinct_results) {  // Rendering of text and spatial search results combined
+        // fetch intersecting search result items
+        var intersection = preprocess_angebotsinfos()
+        if (intersection.length > 0) {
+            // apply spatial sorting
+            intersection.sort(angebote_compare_by_distance_nearest_first)
+            render_result_header(intersection, $listing, 'in der N&auml;he des Standorts')
+            for (var el in intersection) {
+                var element = intersection[el]
+                render_spatial_list_item(element, $listing)
+            }
+        } else {
+            var $header = $('<li class="header read-more">')
+            if (angebotsinfos.spatial.length > 0 || angebotsinfos.fulltext > 0) {
+                var count = (angebotsinfos.spatial.length + angebotsinfos.fulltext.length)
+                $header.html('<h4>Keine &Uuml;bereinstimmungen gefunden</h4><br/>'
+                    + '<h4>'+count+' Ergebnisse entsprechen zumindest <em>einem</em> der beiden Suchparameter</h4><br/><br/>')
+                var $button = $('<button class="ui basic small button">Suchergebnisse differenzieren</button>')
+                $button.click(function(e) {
+                    // show_intersecting = false
+                    render_search_results(true) // render distinct results
+                })
+                $header.append($button)
+            } else {
+                $header.html('<h4 class="status">Leider konnten wir f&uuml;r beide Suchparameter '
+                    + '(<em>Standort</em> und <em>Stichwort</em>) keine aktuellen Angebote finden.</h4>')
+            }
+            $listing.append($header)
+        }
+    } else { // Rendering of distinct search results per parameter
+        if (angebotsinfos.spatial) {
+            // special sorting by distance
+            angebotsinfos.spatial.sort(angebote_compare_by_distance_nearest_first)
+            render_result_header(angebotsinfos.spatial, $listing, 'in der N&auml;he des Standorts')
+            for (var el in angebotsinfos.spatial) {
+                var element = angebotsinfos.spatial[el]
+                render_spatial_list_item(element, $listing)
+            }
+        }
+        if (angebotsinfos.timely) {
+            angebotsinfos.timely.sort(angebote_compare_by_end_earliest_last)
+            render_result_header(angebotsinfos.timely, $listing, 'der zeitbasierten Suche')
+            for (var el in angebotsinfos.timely) {
+                var element = angebotsinfos.timely[el]
+                render_fulltext_list_item(element, $listing)
+            }
+        }
+        // overall (text search listing) not necessarily with locations assigned
+        if (angebotsinfos.fulltext) {
+            angebotsinfos.fulltext.sort(angebote_compare_by_end_earliest_last)
+            render_result_header(angebotsinfos.fulltext, $listing, 'in der Stichwortsuche')
+            for (var el in angebotsinfos.fulltext) {
+                var element = angebotsinfos.fulltext[el]
+                render_fulltext_list_item(element, $listing)
+            }
         }
     }
-    if (angebotsinfos.timely) {
-        angebotsinfos.timely.sort(angebote_compare_by_end_earliest_last)
-        for (var el in angebotsinfos.timely) {
-            var element = angebotsinfos.timely[el]
-            render_fulltext_list_item(element, $listing)
-        }
+    // update status gui
+    // var message = (result_length === 1) ? "1 Angebot" : result_length + " Angebote"
+    if (result_length === 0) {
+        var message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse.<br/>"
+            + '<br/>Sie k&ouml;nnen uns aber gerne helfen neue oder aktuelle '
+            + 'Angebote in unsere <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</br>'
+        $('.list-area .status').html(message)
+        $('.list-area .status').show()
+    } else {
+        $('.list-area .status').hide()
     }
-    // overall (text search listing) not necessarily with locations assigned
-    if (angebotsinfos.fulltext) {
-        angebotsinfos.fulltext.sort(angebote_compare_by_end_earliest_last)
-        for (var el in angebotsinfos.fulltext) {
-            var element = angebotsinfos.fulltext[el]
-            render_fulltext_list_item(element, $listing)
-        }
-    }
-    var message = (result_length === 1) ? "1 Angebot" : result_length + " Angebote"
-    if (result_length === 0) message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse"
-    $('.list-area .status').html(message)
 }
 
-function split_angebote_results(items_to_render) {
+function check_for_distinct_results_rendering() {
+    // Check if there are results of two query parameters to intersect
+    if (angebotsinfos.spatial.length > 0 && angebotsinfos.fulltext.length > 0) {
+        // Check if intersection is switched on and we do not have results for a timely search (frontpage only)
+        if (show_intersecting && angebotsinfos.timely.length === 0) return false
+    }
+    return true
+}
+
+// during distinct result rendering each list becomes its own header
+function render_result_header(items, $listing, context) {
+    var $header = $('<li class="header read-more">')
+    if (items.length > 0) {
+        var label = (items.length > 1) ? 'Ergebnisse' : 'Ergebnis'
+        $header.html('<h4>'+items.length + ' ' + label + ' ' +context+ '</h4>')
+    } /**  else if (context.indexOf("standort") === -1 && !location_coords) {
+        $header.html('<h4>Sie k&ouml;nnen auch im <a href="javascript:focus_location_query()">Umkreis eines Standorts</a> nach Angebote suchen</h4>')
+    } else if (context.indexOf("zeit") === -1 && angebotsinfos.timely.length === 0) {
+        $header.html('<h4>Keine Ergebnisse ' +context+ '</h4>')
+    } **/
+    $listing.append($header)
+}
+
+function preprocess_angebotsinfos() {
+    var results = []
+    for (var r in angebotsinfos.spatial) {
+        var element = angebotsinfos.spatial[r]
+        if (is_contained(element.angebots_id, angebotsinfos.fulltext)) {
+            results.push(element)
+        }
+    }
+    return results
+}
+
+function is_contained(elementId, list) {
+    for (var li in list) {
+        if (list[li].id === elementId) return true
+    }
+    return false
+}
+
+// ### @see show_inactive_offers
+function split_angebote_results_by_time(items_to_render) {
     var split_time = new Date().getTime()
     // var latest_end = get_latest_angebote_end_time(element)
     var complete_resultset = {
@@ -220,12 +304,16 @@ function render_spatial_list_item(element, $list) {
     var name = element.angebots_name
     var angebots_id = element.angebots_id
     var contact = element.kontakt
+    var distanceValue = "&nbsp;"
+    if (element.search_distance) {
+        distanceValue = 'Entfernung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm'
+    }
     var html_string = '<li class="read-more"><a href="/angebote/'+angebots_id+'">'
             + '<div id="' + angebots_id + '" class="concrete-assignment"><h3 class="angebot-name">"'
             + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
         if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>' // , Angebot von '+element.creator+'
         html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
-        html_string += '</div></a><div class="air-distance">Entfernung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm</div></li>'
+        html_string += '</div></a><div class="air-distance">'+distanceValue+'</div></li>'
     $list.append(html_string)
 }
 
@@ -283,13 +371,15 @@ function toggle_location_parameter_display($filter_area) {
     if (location_coords) {
         // ### geo-coded address value has no "name" attribute
         var $locationParameter = $('.filter-area .parameter.location')
-        var parameterHTML = '<a class="close" title="Standortfilter entfernen" href="javascript:remove_location_parameter()">x</a>'
-        parameterHTML += 'N&auml;he '
-        if (location_coords.name) {
+        var parameterHTML = 'N&auml;he '
+        if (location_coords.name) { // cleanup location name
+            if (location_coords.name.indexOf(', Germany') !== -1) {
+                location_coords.name = location_coords.name.replace(', Germany', '')
+            }
             parameterHTML += ' \"' + location_coords.name + '\" '
         }
-        parameterHTML += '<span class="coord-values">(' + location_coords.longitude.toFixed(3)
-                + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
+        // parameterHTML += '<span class="coord-values">(' + location_coords.longitude.toFixed(3)
+           //     + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
         if (street_coordinates.length > 1) {
             parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche nutzen" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
                 + '<a class="next close" title="Nächstes Ergebnis der Standortsuche nutzen" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
@@ -305,6 +395,7 @@ function toggle_location_parameter_display($filter_area) {
             }
         }
         parameterHTML += '</select>'
+        parameterHTML += '<a class="close" title="Standortfilter entfernen" href="javascript:remove_location_parameter()">x</a>'
         if ($locationParameter.length === 0) {
             $filter_area.append('<div class="parameter location" title="Standort-Suchfilter">' + parameterHTML + '</div>')
         } else {
@@ -318,7 +409,7 @@ function toggle_location_parameter_display($filter_area) {
 function toggle_time_parameter_display($filter_area) {
     if (time_parameter) {
         var $timeParameter = $('.filter-area .parameter.time')
-        var parameterHTML = '<a class="close" title="Datumsfilter entfernen" href="javascript:remove_time_parameter(true)">x</a>Heute'
+        var parameterHTML = 'Heute<a class="close" title="Datumsfilter entfernen" href="javascript:remove_time_parameter(true)">x</a>'
         if ($timeParameter.length === 0) {
             $filter_area.append('<div class="parameter time" title="Zeitfilter der Anfrage">'+parameterHTML+'</div>')
         } else {
@@ -338,8 +429,8 @@ function render_text_parameter_display($filter_area) {
             var text_param = search_input[i].trim()
             if (text_param.length > 0) {
                 $filter_area.append("<div class=\"parameter text " + text_param + "\" title=\"Text Suchfilter\">"
-                    + "<a class=\"close\" title=\"Textfilter entfernen\" onclick=\"javascript:remove_text_parameter('" + text_param + "', true)\" href=\"#\">x</a>"
-                    + "Suche nach \"<span class=\"search-value\">" + text_param + "</span>\"</div>")
+                    + "\"<span class=\"search-value\">" + text_param + "</span>\""
+                    + "<a class=\"close\" title=\"Stichwortfilter entfernen\" onclick=\"javascript:remove_text_parameter('" + text_param + "', true)\" href=\"#\">x</a></div>")
             }
         }
     }

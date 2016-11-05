@@ -170,7 +170,7 @@ a {
 
 .search .list-area .loading-indicator {
     position: relative;
-    top: 2em; left: -1em;
+    top: 2em; left: 2em;
 }
 
 .task-info .loading-indicator i.icon,
@@ -204,6 +204,10 @@ a {
     text-decoration: none;
 }
 
+.list-area .header.read-more {
+    display: block;
+}
+
 .list-area .read-more,
 .detail .read-more,
 .search .read-more {
@@ -211,6 +215,10 @@ a {
     margin-top: 10px;
     display: inline-block;
     text-decoration: none;
+}
+
+.search .read-more {
+    margin-top: 0px;
 }
 
 .list-area .results li.read-more {
@@ -386,7 +394,6 @@ div.ui-datepicker {
 .search h4,
 .search .filter-area h4 {
     margin-bottom: 0px;
-    color: #666;
     display: inline-block;
     margin-right: 1em;
 }
@@ -461,18 +468,21 @@ div.ui-datepicker {
 }
 
 .filter-area .parameter {
-    background-color: #fff;
+    border: 1px solid #c1c1c1;
     padding: 0.5em;
     color: #8f1414;
     display: inline-block;
     height: 21px;
+    margin-right: 1em;
+    padding-left: 1em;
 }
 
 .filter-area .parameter a.close {
-    padding: 0.5em;
-    background-color: #FC3;
+    padding-right: 0.3em;
+    padding-left: 0.5em;
+    /** background-color: #FC3; **/
     color: #343434;
-    margin: 0em 0.5em 0em 0.5em;
+    /** margin: 0em 0.5em 0em 0.5em; */
     cursor: pointer;
     text-decoration: none;
     font-weight: bold;
@@ -486,8 +496,8 @@ div.ui-datepicker {
 }
 
 .filter-area .parameter select {
-    background-color: #efefef;
-    margin-right: 1em;
+    background-color: #fff;
+    margin-right: .5em;
     margin-left: 1em;
     cursor: pointer;
     padding: 0px;
