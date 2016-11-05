@@ -1,6 +1,7 @@
 
 function render_angebotsinfo_page() {
-    load_angebot_by_resource_path(function(status, selected_angebot) {
+    var angebotsId = $('#angebot').attr("data")
+    load_angebot_by_resource_path(angebotsId, function(status, selected_angebot) {
         if (status === "ok") {
             render_angebot_detail_area()
             is_angebote_creator(selected_angebot.id, function(response) {
