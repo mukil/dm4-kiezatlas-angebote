@@ -150,6 +150,14 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         }
     }
 
+    public void setAssignmentCreator(String username) {
+        try {
+            json.put("assignment_creator", username);
+        } catch (JSONException ex) {
+            throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
+        }
+    }
+
     public void setStartDate(long fromDate) {
         try {
             json.put("anfang_timestamp", fromDate);
@@ -229,6 +237,15 @@ public class AngebotsinfosAssigned implements JSONEnabled {
     public String getAngebotsinfoCreator() {
         try {
             return json.getString("creator");
+        } catch (JSONException ex) {
+            Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Angebotsinfo Creator", ex);
+            return "";
+        }
+    }
+
+    public String getAssignmentCreator() {
+        try {
+            return json.getString("assignment_creator");
         } catch (JSONException ex) {
             Logger.getLogger(AngebotsinfosAssigned.class.getName()).log(Level.FINE, "AngebotsInfoAssigned has no Angebotsinfo Creator", ex);
             return "";

@@ -81,6 +81,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     private final static String PROP_URI_CREATED  = "dm4.time.created";
     private final static String PROP_URI_MODIFIED = "dm4.time.modified";
 
+    private static final String ASSIGNMENT_REVISION_KEY_PROP = "revision_key";
+
     // -------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject private GeomapsService geomapsService;
@@ -125,7 +127,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         Association assoc = dm4.getAssociation(assignmentId);
         if (assoc.getTypeUri().equals(ASSIGNMENT_EDGE)) {
             log.info("Loaded Assignment Edge, checking Revision Key");
-            String revisionKey = (String) assoc.getProperty("revision_key");
+            String revisionKey = (String) assoc.getProperty(ASSIGNMENT_REVISION_KEY_PROP);
             if (!revisionKey.equals(key)) {
                 throw new WebApplicationException(new RuntimeException("Sorry, you are not authorized to revise this offer"), Response.Status.UNAUTHORIZED);
             }
@@ -250,8 +252,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             null, "dm4.accesscontrol.username");
     }
 
-    public String getCreatorPropertyValue(Topic angebot) {
-        return (String) dm4.getProperty(angebot.getId(), "dm4.accesscontrol.creator");
+    private String getCreatorNameOrUndefined(long topicId) {
+        String creatorName = aclService.getCreator(topicId);
+        return (creatorName != null) ? creatorName : "undefined";
     }
 
     @GET
@@ -800,25 +803,26 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     private Angebotsinfos prepareAngebotsinfos(Topic angebot) {
-        Angebotsinfos infoModel = new Angebotsinfos();
+        Angebotsinfos viewModel = new Angebotsinfos();
         try {
             angebot.loadChildTopics();
-            infoModel.setName(angebot.getChildTopics().getString(ANGEBOT_NAME));
-            infoModel.setDescription(angebot.getChildTopics().getString(ANGEBOT_BESCHREIBUNG));
+            viewModel.setName(angebot.getChildTopics().getString(ANGEBOT_NAME));
+            viewModel.setDescription(angebot.getChildTopics().getString(ANGEBOT_BESCHREIBUNG));
             String angebotKontaktValue  = angebot.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
             if (angebotKontaktValue != null) {
-                infoModel.setContact(angebotKontaktValue);
+                viewModel.setContact(angebotKontaktValue);
             }
             String angebotWebsiteValue = angebot.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
             if (angebotWebsiteValue != null) {
-                infoModel.setWebpage(angebotWebsiteValue);
+                viewModel.setWebpage(angebotWebsiteValue);
             }
-            infoModel.setTags(prepareAngeboteTags(angebot));
-            infoModel.setId(angebot.getId());
+            viewModel.setAngebotsinfoCreator(getCreatorNameOrUndefined(angebot.getId()));
+            viewModel.setTags(prepareAngeboteTags(angebot));
+            viewModel.setId(angebot.getId());
         } catch (Exception ex) {
             throw new RuntimeException("Could not assemble Angebotsinfos", ex);
         }
-        return infoModel;
+        return viewModel;
     }
 
     /**
@@ -867,7 +871,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
         assignedAngebot.setAngebotsId(angebotTopic.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
-        assignedAngebot.setAngebotsinfoCreator(getCreatorPropertyValue(angebotTopic));
+        assignedAngebot.setAngebotsinfoCreator(getCreatorNameOrUndefined(angebotTopic.getId()));
+        assignedAngebot.setAssignmentCreator(getCreatorNameOrUndefined(assignment.getId()));
         assignedAngebot.setStartDate(getAssignmentStartTime(assignment));
         assignedAngebot.setEndDate(getAssignmentEndTime(assignment));
         // Stuff that could be Null

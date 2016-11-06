@@ -11,12 +11,14 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.theme.min.css"/-->
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/checkbox.min.css"/>
 
         <script defer src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-ui-1.9.2-autocomplete.min.js"></script>
         <!--script src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script-->
         <script defer src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
         <script defer src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
         <script defer src="/de.kiezatlas.website/ka-locating.js"></script>
+        <script defer src="/de.kiezatlas.website/css/semantic-ui/2.2/checkbox.min.js"></script>
         <script defer src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="init_search_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
@@ -55,6 +57,10 @@
                             onclick="fire_angebote_search()" id="do-text-search">
                         <i class="search icon"></i>
                     </button>
+                    <div class="ui toggle checkbox" title="Aktiviere Suche in Wortmitte und Wortende">
+                        <input id="leading-wildcard" type="checkbox" title="Aktiviere Suche in Wortmitte oder Wortende">
+                        <label>&nbsp;</label>
+                    </div>
                 </form>
 
                 <form action="javascript:_void()" id="location-search-form" accept-charset="UTF-8">

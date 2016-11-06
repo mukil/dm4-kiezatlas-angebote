@@ -104,6 +104,10 @@ a {
     font-weight: bold;
 }
 
+.search form .ui.input input#query {
+    width: 260px;
+}
+
 .search form .ui.input input {
     width: 400px;
     /** margin-left: 1em; */
@@ -231,6 +235,13 @@ a {
     padding-top: 3px;
     color: #27638C;
     font-size: 0.9em;
+}
+
+
+.list-area .results .klick,
+.list-area .results .username,
+.list-area .results .kontakt {
+    margin-right: 1em;
 }
 
 .list-area .results .klick {

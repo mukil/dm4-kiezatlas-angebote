@@ -8,6 +8,7 @@ var location_coords = undefined
 var location_radius = 1.5
 var available_radiants = [ 0.5, 1.0, 1.5, 2.5, 5.0 ] //  10.0, 15.0
 var search_input = []
+var leading_wildcard = false
 var street_coordinates = []
 var street_coords_idx = 0
 var time_parameter = undefined
@@ -33,10 +34,15 @@ function init_search_page() {
 
 function fire_angebote_search() {
     var queryString = $('#query').val()
+    leading_wildcard = $('.ui.checkbox.toggle').checkbox('is checked')
     if (search_input.length === 0 && (queryString.length === 0 && !location_coords)) {
         // ### graphically highlight
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben").focus().attr("style", "border: 1px solid red")
         console.log("Aborted angebote search cause of missing user input")
+        return
+    }
+    if (queryString === "*") {
+        console.warn("Please specifiy a word to search for")
         return
     }
     show_search_loading_sign()
@@ -49,13 +55,21 @@ function fire_angebote_search() {
         locationValue = encodeURIComponent(location_coords.longitude.toFixed(4) + ","+ location_coords.latitude.toFixed(4))
     }
     // Parse text search parameter and prepare lucene query
-    search_input = queryString.split(",") // split by tag delimiter // ### clean up value
+    text_input = queryString.split(",") // split by tag delimiter // ### clean up value
     var luceneQueryString = ""
-    for (var el in search_input) {
-        if (search_input.length === 1) {
-            luceneQueryString = search_input[el].trim()
-        } else if (search_input.length > 1) {
-            luceneQueryString += " " + search_input[el].trim()
+    for (var el in text_input) {
+        var searchValue = ""
+        if (text_input.length === 1) {
+            if (leading_wildcard) searchValue += "*"
+            searchValue += text_input[el].trim()
+            luceneQueryString = searchValue
+            search_input.push(searchValue)
+        // if more elements entered seperated by comma, ignore empty values " "
+        } else if (text_input.length > 1 && text_input[el].trim().length > 0) {
+            if (leading_wildcard) searchValue += "*"
+            searchValue += text_input[el].trim()
+            luceneQueryString += " " + searchValue
+            search_input.push(searchValue)
         }
     }
     // display text parameter
@@ -303,7 +317,6 @@ function render_spatial_list_item(element, $list) {
     var locationName = element.name
     var name = element.angebots_name
     var angebots_id = element.angebots_id
-    var contact = element.kontakt
     var distanceValue = "&nbsp;"
     if (element.search_distance) {
         distanceValue = 'Entfernung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm'
@@ -311,9 +324,10 @@ function render_spatial_list_item(element, $list) {
     var html_string = '<li class="read-more"><a href="/angebote/'+angebots_id+'">'
             + '<div id="' + angebots_id + '" class="concrete-assignment"><h3 class="angebot-name">"'
             + name + '" @ ' + locationName + '</h3>Vom <i>'+element.anfang+'</i> bis </i>'+element.ende+'</i>&nbsp;'
-        if (!is_empty(contact)) html_string += '<br/><span class="contact">Kontakt: ' + contact + '</span>' // , Angebot von '+element.creator+'
-        html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span>'
-        html_string += '</div></a><div class="air-distance">'+distanceValue+'</div></li>'
+        if (!is_empty(element.kontakt)) html_string += '<br/><span class="contact">Kontakt: ' + element.kontakt + '</span>'
+        html_string += '<span class="klick">weitere Details...</span>'
+        if (element.creator) html_string += '<span class="username">Info von <em>'+element.creator+'</em></span>'
+        html_string += '</div><div class="air-distance">'+distanceValue+'</div></li>'
     $list.append(html_string)
 }
 
@@ -328,9 +342,10 @@ function render_fulltext_list_item(element, $list) {
             + '<div id="' + element.id + '" class="concrete-assignment">'
             + '<h3>"' +element.name + '" wird an ' + standort_html + ' angeboten</h3>'
             + zb_html +' <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
-        if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>' // ', Angebot von '+element.creator+
-        html_string += '<span class="klick">Ausw&auml;hlen f&uuml;r mehr Infos</span></div></a>'
-            + '<div class="air-distance">&nbsp;</div></li>'
+        if (!is_empty(element.kontakt)) html_string += '<br/><span class="contact">Kontakt: ' + element.kontakt + '</span>'
+        html_string += '<span class="klick">weitere Details...</span>'
+        if (element.creator) html_string += '<span class="username">Info von <em>'+element.creator+'</em></span>'
+        html_string += '</div><div class="air-distance">&nbsp;</div></li>'
         $list.append(html_string)
     }
 }
