@@ -56,6 +56,7 @@ function fire_angebote_search() {
     }
     // Parse text search parameter and prepare lucene query
     text_input = queryString.split(",") // split by tag delimiter // ### clean up value
+    search_input = []
     var luceneQueryString = ""
     for (var el in text_input) {
         var searchValue = ""
@@ -380,6 +381,10 @@ function select_next_locationsearch_result() {
         next_idx = 0
     }
     select_locationsearch_parameter(next_idx)
+}
+
+function toggle_leading_wildcard() {
+    fire_angebote_search()
 }
 
 function toggle_location_parameter_display($filter_area) {
