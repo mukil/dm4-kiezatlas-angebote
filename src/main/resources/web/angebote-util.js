@@ -10,6 +10,7 @@ var URL_EINRICHTUNG_EDIT    = "/website/geo/edit/"
 var URL_EINRICHTUNG         = "/website/geo/"
 var URL_EINRICHTUNG_CREATE  = "/website/geo/"
 
+var TIMEZONE_SUFFIX = "UTC+01:00"
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
 
 // ---- Methods to CREATE/UPDATE Screen --- //
@@ -206,6 +207,39 @@ function logout() {
     $.post('/accesscontrol/logout', function(username) {
         if (!username) render_user_menu(false)
     })
+}
+
+// ---------- Parsing German Date Label Utilities ------------- //
+
+function remove_dots(string) {
+    return string.split(".").join("")
+}
+
+function remove_commas(string) {
+    return string.split(",").join("")
+}
+
+function remove_weekday_label(germanDateString) {
+    if (germanDateString.indexOf("Sonntag") !== -1) return germanDateString.replace("Sonntag", "")
+    if (germanDateString.indexOf("Montag") !== -1) return germanDateString.replace("Montag", "")
+    if (germanDateString.indexOf("Dienstag") !== -1) return germanDateString.replace("Dienstag", "")
+    if (germanDateString.indexOf("Mittwoch") !== -1) return germanDateString.replace("Mittwoch", "")
+    if (germanDateString.indexOf("Donnerstag") !== -1) return germanDateString.replace("Donnerstag", "")
+    if (germanDateString.indexOf("Freitag") !== -1) return germanDateString.replace("Freitag", "")
+    if (germanDateString.indexOf("Samstag") !== -1) return germanDateString.replace("Samstag", "")
+    return germanDateString
+}
+
+function convert_to_en_month(germanDateString) {
+    if (germanDateString.indexOf("Januar") !== -1) return germanDateString.replace("Januar", "January")
+    if (germanDateString.indexOf("Februar") !== -1) return germanDateString.replace("Februar", "February")
+    if (germanDateString.indexOf("März") !== -1) return germanDateString.replace("März", "March")
+    if (germanDateString.indexOf("Mai") !== -1) return germanDateString.replace("Mai", "May")
+    if (germanDateString.indexOf("Juni") !== -1) return germanDateString.replace("Juni", "June")
+    if (germanDateString.indexOf("Juli") !== -1) return germanDateString.replace("Juli", "July")
+    if (germanDateString.indexOf("Oktober") !== -1) return germanDateString.replace("Oktober", "October")
+    if (germanDateString.indexOf("Dezember") !== -1) return germanDateString.replace("Dezember", "December")
+    return germanDateString
 }
 
 // ---- Initialize script

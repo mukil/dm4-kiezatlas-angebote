@@ -118,7 +118,7 @@ function clear_angebot_form() {
 // ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
 
 function render_assignment_page() {
-    load_angebot_by_resource_path(function() {
+    load_angebot_by_resource_path(parse_angebots_id(), function() {
         render_angebot_shortinfo()
         load_angebote_places_and_dates(render_assignments_listing, false)
     })
@@ -139,7 +139,7 @@ function clear_assignment_dateform() {
 
 function init_datepicker() {
     // jQuery UI Datepicker Widget with German Local Dependency
-    // $.datepicker.setDefaults($.datepicker.regional["de"])
+    $.datepicker.setDefaults($.datepicker.regional["de"])
     // init our two datepicker fields
     fromDate = $( "#from" ).datepicker({
         defaultDate: "+1w",
@@ -166,9 +166,7 @@ function init_datepicker() {
 // ---- Create Assignments for selected_angebot to Geo Objects -----
 
 function do_save_assignment(e) {
-    // ### fixme: firefox can not parse german localized date strin
     // ### notify user when an assignment already exists..
-    // ### Insert default values to initialize if not specified
     show_saving_icon('#update-assignment icon')
     var fromInput = $('input#from').val()
     var toInput = $('input#to').val()
@@ -178,27 +176,36 @@ function do_save_assignment(e) {
     var toDate = -1
     // parse dates
     if (fromInput.length > 0) {
-        // fromDate = $.datepicker.parseDate("dd. MM yy", fromInput)
-        // we shift into the day about approx. 16minutes 20 seconds
-        fromDate = (new Date(fromInput).getTime() + 1000000)
+        console.log("Datepicker FROM Input", fromInput)
+        fromInput = remove_weekday_label(fromInput)
+        fromInput = remove_dots(fromInput)
+        fromInput = remove_commas(fromInput)
+        fromInput = convert_to_en_month(fromInput)
+        fromInput = fromInput + " " + TIMEZONE_SUFFIX
+        // Note: we always shift time forwad (into the next day) about approx. 1sec
+        fromDate = (new Date(fromInput).getTime() + 1000)
+        console.log("Parsed to FROM DATE", fromDate)
     }
     /** var oneDayValue = get_oneday_checkbox_value()
     if (oneDayValue) {
         console.log("   We could skip the From Date here..", oneDayValue)
     } **/
     if (toInput.length > 0) {
-        // toDate = $.datepicker.parseDate("dd. MM yy", toInput)
-        // we want to shift this value always about ca. 23hours 43minutes and 20seconds
-        toDate = (new Date(toInput).getTime() + (86400000 - 1000000))
+        console.log("Datepicker TO Input", toInput)
+        toInput = remove_weekday_label(toInput)
+        toInput = remove_dots(toInput)
+        toInput = remove_commas(toInput)
+        toInput = convert_to_en_month(toInput)
+        toInput = toInput + " " + TIMEZONE_SUFFIX
+        console.log("Cleaned up TO dateString", toInput)
+        // Note: we always shift back (into the previous day) about approx. 1sec
+        toDate = (new Date(toInput).getTime() - 1000)
+        console.log("Parsed to TO DATE", toDate)
     }
-    console.log("Shifted Datepicked delivered us from, to", fromInput, fromDate, toInput, toDate)
-    // Chromium has no problem to deliver us timestamps from a german locale
+    console.log("Shifted Datepicker delivered us FROM", fromInput, fromDate, "TO", toInput, toDate)
     if (!selected_angebot) throw new Error("Assertion failed: An angebot must be loaded before an assignment can be created.")
-    // Update
+    // Update assignment assoc
     if (selected_assignment_infos && (fromDate != selected_assignment_infos.von || toDate != selected_assignment_infos.bis)) {
-        console.log("Dates Changed - Update Assignment", fromDate, selected_assignment_infos.von,
-            "To:", toDate, selected_assignment_infos.bis)
-        // Do Update
         var assocModel = { childs: {} }
         if (additionalContact) {
             assocModel.childs["ka2.angebot.assignment_kontakt"] = additionalContact.trim()
@@ -207,8 +214,10 @@ function do_save_assignment(e) {
             assocModel.childs["ka2.angebot.assignment_zusatz"] = additionalInfo.trim()
         }
         restc.request("PUT", "/angebote/assignment/" +selected_assignment_infos.id + "/" + fromDate + "/" + toDate, assocModel)
+        console.log("Dates Changed - Update Assignment", fromDate, selected_assignment_infos.von,
+            "To:", toDate, selected_assignment_infos.bis)
     } else {
-        // Create
+        // Create assignment assoc
         if (!selected_angebot) throw Error("Saving Assignment Aborted, selected Angebotsinfo NOT SET")
         if (!selected_geo_object) throw Error("Saving Assignment Abortted, selected Einrichtung NOT SET")
         var assocModel = {
@@ -229,7 +238,6 @@ function do_save_assignment(e) {
         if (additionalInfo) {
             assocModel.childs["ka2.angebot.assignment_zusatz"] = additionalInfo.trim()
         }
-        // do create
         restc.request("POST", "/angebote/assignment/" + fromDate + "/" + toDate, assocModel)
     }
     // refresh GUI
