@@ -486,6 +486,15 @@ div.ui-datepicker {
     height: 21px;
     margin-right: 1em;
     padding-left: 1em;
+    margin-top: 0.5em;
+}
+
+.filter-area .parameter .name {
+    display: inline-block;
+}
+
+.filter-area .parameter.location select {
+    width: 90px;
 }
 
 .filter-area .parameter a.close {
@@ -941,9 +950,6 @@ ul.angebote li small {
     .search .tag-view a {
         margin-left: 5px;
     }
-    /** .search .filter-area .parameter.location {
-        line-height: 2.5em;
-    } **/
     .search .filter-area .parameter.location .coord-values,
     .search .filter-area .parameter.location .alt-count {
         display: none;
@@ -958,9 +964,15 @@ ul.angebote li small {
     .top-menu .ui.menu a img {
         border: none;
     }
+    .search .search-content {
+        padding-left: 1em;
+    }
     .search .list-area, .search .form-area {
-        padding: 1em 1em 0em 1em;
+        padding: 0em 0em 1em 0em;
         text-align: left;
+    }
+    .search #do-locating span {
+        display: none;
     }
     .list-area .results li.read-more {
         margin-right: 1em;
@@ -983,12 +995,12 @@ ul.angebote li small {
     .assignment .angebot-infos {
         display: none;
     }
-    .search #query {
+    .search form .ui.input input#query {
         margin-left: 0em;
         width: 200px;
     }
     .search .nearby-dialog.ui.input #nearby {
-        width: 190px;
+        width: 260px;
         min-width: 90px;
     }
     .search .form-area form {
@@ -1005,16 +1017,35 @@ ul.angebote li small {
     .assignment .right-side {
         margin-top: 0em;
     }
+    .search .filter-area .parameter.location {
+        display: flex;
+    }
+    .search .filter-area .location .name {
+        width: 80%;
+        height: 16px;
+        overflow: hidden;
+        padding-top: 2px;
+    }
 }
 
-@media (max-width:460px) {
-    .search #query {
+@media (max-width:500px) {
+    .search .slogan {
+        font-size: 1.7em;
+    }
+    .search form .ui.input input#query {
         margin-left: 0em;
         width: 160px;
     }
-    .search #nearby {
-        width: 150px;
+    .search .nearby-dialog.ui.input #nearby{
+        width: 220px;
     }
+}
+
+@media (max-width: 420px) {
+    .search .nearby-dialog.ui.input #nearby{
+        width: 160px;
+    }
+}
 
 /** CKEditor Overrides */
 

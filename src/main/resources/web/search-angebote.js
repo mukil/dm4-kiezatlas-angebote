@@ -391,12 +391,12 @@ function toggle_location_parameter_display($filter_area) {
     if (location_coords) {
         // ### geo-coded address value has no "name" attribute
         var $locationParameter = $('.filter-area .parameter.location')
-        var parameterHTML = 'N&auml;he '
+        var parameterHTML = '<div class="name">N&auml;he '
         if (location_coords.name) { // cleanup location name
             if (location_coords.name.indexOf(', Germany') !== -1) {
                 location_coords.name = location_coords.name.replace(', Germany', '')
             }
-            parameterHTML += ' \"' + location_coords.name + '\" '
+            parameterHTML += ' \"' + location_coords.name + '\"</div>'
         }
         // parameterHTML += '<span class="coord-values">(' + location_coords.longitude.toFixed(3)
            //     + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
