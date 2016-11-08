@@ -65,15 +65,16 @@ function fire_angebote_search(noupdate) {
     var luceneQueryString = ""
     for (var el in text_input) {
         var searchValue = ""
+        var inputValue = text_input[el]
         if (text_input.length === 1) {
-            if (leading_wildcard) searchValue += "*"
-            searchValue += text_input[el].trim()
+            if (leading_wildcard && !inputValue.startsWith("*")) searchValue += "*"
+            searchValue += inputValue.trim()
             luceneQueryString = searchValue
             search_input.push(searchValue)
         // if more elements entered seperated by comma, ignore empty values " "
-        } else if (text_input.length > 1 && text_input[el].trim().length > 0) {
-            if (leading_wildcard) searchValue += "*"
-            searchValue += text_input[el].trim()
+        } else if (text_input.length > 1 && inputValue.trim().length > 0) {
+            if (leading_wildcard && !inputValue.startsWith("*")) searchValue += "*"
+            searchValue += inputValue.trim()
             luceneQueryString += " " + searchValue
             search_input.push(searchValue)
         }
