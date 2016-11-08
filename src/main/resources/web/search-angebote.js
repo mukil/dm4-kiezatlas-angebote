@@ -28,11 +28,16 @@ function init_search_page() {
         // console.log("Tag selection input handler received", e)
         fire_angebote_search()
     })
+    if (window.history) {
+        window.onpopstate = function(event) {
+            render_search_frontpage()
+        }
+    }
 }
 
 // ----------------------------------  The Major Search Operations --------- //
 
-function fire_angebote_search() {
+function fire_angebote_search(noupdate) {
     var queryString = $('#query').val()
     leading_wildcard = $('.ui.checkbox.toggle').checkbox('is checked')
     if (search_input.length === 0 && (queryString.length === 0 && !location_coords)) {
@@ -75,6 +80,7 @@ function fire_angebote_search() {
     }
     // display text parameter
     render_query_parameter()
+    if (!noupdate) update_search_location_parameter()
     console.log("Search Query: " + luceneQueryString + ", Location", locationValue, "Radius", location_radius, "DateTime", dateTime)
     $.getJSON('/angebote/search?query=' + luceneQueryString + '&location=' + locationValue + '&radius='
             + location_radius + '&datetime=' + dateTime, function(results) {
@@ -146,15 +152,15 @@ function do_browser_location() {
 // ----------------------------------  Tagcloud Search View --------- //
 
 function load_and_render_tag_search_dialog() {
-    $.getJSON('/tag/with_related_count/ka2.angebot', function(result) {
+    // $.getJSON('/tag/with_related_count/ka2.angebot', function(result) {
+    $.getJSON('/angebote/tags', function(result) {
         var $tags = $('.tag-view')
         for (var r in result) {
             var tag = result[r]
             var name = tag["value"]
-            var tagHTML = '<a href="#stichwort/' + encodeURIComponent(name) +'" id="'
-                    + tag.id + '" class="' + tag["view_css_class"]
-                    +'" title="Finde Angebotsinfos unter dem Stichwort '
-                    + name + '" onclick="handle_tag_button_select(this)">' + name + '</a>'
+            var tagHTML = '<a onclick="handle_tag_button_select(this)" id="'
+                    + tag.id + '" class="few" ' // class="' + tag["view_css_class"] +'" '
+                + 'title="Finde Angebotsinfos unter dem Stichwort ' + name + '">' + name + '</a>'
             if (r < result.length - 1) tagHTML += ", "
             $tags.append(tagHTML)
         }
@@ -164,11 +170,21 @@ function load_and_render_tag_search_dialog() {
 // --------------------------- GUI methods for rendering all Search UI elements ------------ //
 
 function render_search_frontpage() {
-    fire_angebote_timesearch()
-    time_parameter = "Heute"
-    location_coords = undefined
-    search_input = []
-    render_query_parameter()
+    var queryParams = get_search_location_parameter()
+    if (queryParams.length > 0 && queryParams[0] !== "") {
+        search_input = queryParams
+        location_coords = undefined
+        // set search input to #query field..
+        $('#query').val(search_input.join(", "))
+        fire_angebote_search(true)
+        // update_search_location()
+    } else {
+        fire_angebote_timesearch()
+        time_parameter = "Heute"
+        location_coords = undefined
+        search_input = []
+        render_query_parameter()
+    }
 }
 
 function render_search_results(distinct_results) {
@@ -241,7 +257,7 @@ function render_search_results(distinct_results) {
     // update status gui
     // var message = (result_length === 1) ? "1 Angebot" : result_length + " Angebote"
     if (result_length === 0) {
-        var message = "F&uuml;r diese Suche haben wir leider keine Ergebnisse.<br/>"
+        var message = "F&uuml;r diese Suche konnte wir leider keine aktuellen Angebote finden.<br/>"
             + '<br/>Sie k&ouml;nnen uns aber gerne helfen neue oder aktuelle '
             + 'Angebote in unsere <a class="create-link" href=\"/sign-up/login\">Datenbank aufzunehmen</a>.</br>'
         $('.list-area .status').html(message)
@@ -343,7 +359,7 @@ function render_fulltext_list_item(element, $list) {
             + '<div id="' + element.id + '" class="concrete-assignment">'
             + '<h3>"' +element.name + '" wird an ' + standort_html + ' angeboten</h3>'
             + zb_html +' <i>'+first_assignment.anfang+'</i> bis </i>'+first_assignment.ende+'</i>, <b>' + first_assignment.name + '</b><br/>'
-        if (!is_empty(element.kontakt)) html_string += '<br/><span class="contact">Kontakt: ' + element.kontakt + '</span>'
+        if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
         html_string += '<span class="klick">weitere Details...</span>'
         if (element.creator) html_string += '<span class="username">Info von <em>'+element.creator+'</em></span>'
         html_string += '</div><div class="air-distance">&nbsp;</div></li>'
@@ -450,7 +466,7 @@ function render_text_parameter_display($filter_area) {
             if (text_param.length > 0) {
                 $filter_area.append("<div class=\"parameter text " + text_param + "\" title=\"Text Suchfilter\">"
                     + "\"<span class=\"search-value\">" + text_param + "</span>\""
-                    + "<a class=\"close\" title=\"Stichwortfilter entfernen\" onclick=\"javascript:remove_text_parameter('" + text_param + "', true)\" href=\"#\">x</a></div>")
+                    + "<a class=\"close\" title=\"Stichwortfilter entfernen\" onclick=\"javascript:remove_text_parameter('" + text_param + "', true)\">x</a></div>")
             }
         }
     }
@@ -468,6 +484,46 @@ function render_query_parameter() {
     if (!search_input && !location_coords && !time_parameter) {
         $('.list-area .status').html("Bitte gib einen Suchbegriff ein oder w&auml;hle einen Standort")
     }
+}
+
+function update_search_location_parameter() {
+    var newUrl = "/angebote?stichworte="
+    if (search_input.length >= 1) {
+        var newUrl = "?stichworte="
+        for (var s in search_input) {
+            newUrl += encodeURIComponent(search_input[s])
+            if (s < search_input.length) newUrl += ";"
+        }
+    } else {
+        console.log("Clearing location query parameters...", newUrl)
+        newUrl = "/angebote"
+    }
+    if (window.history && newUrl !== "/angebote") {
+        window.history.pushState({ data : search_input }, "", newUrl)
+    }
+}
+
+function get_search_location_parameter() {
+    var start = window.document.location.href.lastIndexOf("=")
+    var parameter = []
+    var containleadingWildcard = false
+    if (start > 0) {
+        var pathinfo = window.document.location.href.substr(start+1)
+        var args = pathinfo.split(";")
+        for (var p in args) { // clean up url param ### fixme: complete
+            var dm = args[p]
+            if (dm.indexOf("%20") !== -1) dm = dm.split("%20").join(" ")
+            if (dm.indexOf("*") !== -1) {
+                containleadingWildcard = true
+                dm = dm.split("*").join(" ")
+            }
+            parameter.push(dm)
+        }
+    }
+    if (containleadingWildcard) {
+        $('.ui.checkbox.toggle').checkbox('check')
+    }
+    return parameter
 }
 
 function show_search_loading_sign() {
@@ -519,6 +575,7 @@ function remove_text_parameter(name, fireSearch) {
         // paint new list of parameter
         $('#query').val(new_search_input.join(","))
         render_query_parameter()
+        // update_search_location()
         angebotsinfos = undefined
     }
     if (fireSearch) fire_angebote_search()
@@ -528,6 +585,7 @@ function remove_all_text_parameter(e) {
     search_input = []
     $('#query').val("")
     render_query_parameter()
+    update_search_location_parameter()
     angebotsinfos = undefined
 }
 

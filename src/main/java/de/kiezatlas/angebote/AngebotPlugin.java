@@ -16,6 +16,7 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.geomaps.GeomapsService;
 import de.deepamehta.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geospatial.GeospatialService;
+import de.deepamehta.tags.TaggingService;
 import de.deepamehta.thymeleaf.ThymeleafPlugin;
 import de.deepamehta.workspaces.WorkspacesService;
 import de.kiezatlas.KiezatlasService;
@@ -90,6 +91,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @Inject private KiezatlasService kiezService;
     @Inject private AccessControlService aclService;
     @Inject private GeospatialService spatialService;
+    @Inject private TaggingService tags;
 
     private Logger log = Logger.getLogger(getClass().getName());
 
@@ -515,6 +517,32 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     /**
+     * Builds up a list of tags related to angebotsinfos which are assigned to locations.
+     */
+    @GET
+    @Path("/tags")
+    public List<Topic> getAngeboteTags() {
+        List<Topic> result = new ArrayList<Topic>();
+        try {
+            List<Topic> tags = dm4.getTopicsByType(TaggingService.TAG);
+            for (Topic tag : tags) {
+                // 1) tag is related to angebotsinfos
+                List<RelatedTopic> angebote = getParentAngebotTopicsAggregating(tag);
+                for (RelatedTopic angebot : angebote) {
+                    // 2) that angebotsinfo has any kind of location assignment
+                    List<RelatedTopic> assignments = getAssignedGeoObjectTopics(angebot);
+                    if (assignments.size() >= 1 && !result.contains(tag)) {
+                        result.add(tag);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.warning("Exception raised during fetching tags");
+        }
+        return result;
+    }
+
+    /**
      * Builds up a list of search results (Geo Objects to be displayed in a map) by text query also if these
      * are not currently active in time.
      * @param query
@@ -527,11 +555,12 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             @QueryParam("location") String location, @QueryParam("radius") String radius,
             @QueryParam("datetime") long timestamp) {
         try {
-            String queryString = prepareLuceneQueryString(query, false, true, false);
+            log.info("Angebote Search Search Input \"" + query + "\"");
+            String queryString = prepareLuceneQueryString(query, true, true, false);
             log.info("Angebote Search \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
             List<AngebotsinfosAssigned> einrichtungsAngebote = new ArrayList<AngebotsinfosAssigned>();
             // 1) Spatial Query, searching Einrichtungen by location and assemble related angebotsinfos
-            if (!location.isEmpty() && location.contains(",")) {
+            if (location != null && !location.isEmpty() && location.contains(",")) {
                 double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
                 GeoCoordinate searchPoint = new GeoCoordinate(location.trim());
                 List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(searchPoint, r);
@@ -796,10 +825,25 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     private String prepareLuceneQueryString(String userQuery, boolean doAndSplit, boolean doWildcard, boolean doFuzzy) {
         if (userQuery.isEmpty()) return null;
-        String result = new String();
-        result = userQuery.trim();
-        if (doWildcard) result += "*";
-        return result;
+        String queryPhrase = new String();
+        if (doAndSplit) {
+            String[] terms = userQuery.split(" ");
+            int count = 1;
+            for (String term : terms) {
+                if (doWildcard && !term.isEmpty()) {
+                    queryPhrase += term + "* ";
+                } else if (!term.isEmpty()) {
+                    queryPhrase += term;
+                    if (terms.length < count) queryPhrase += " ";
+                }
+                count++;
+            }
+            queryPhrase = queryPhrase.trim();
+        } else {
+            queryPhrase = userQuery.trim();
+            if (doWildcard) queryPhrase += "*";
+        }
+        return queryPhrase;
     }
 
     private Angebotsinfos prepareAngebotsinfos(Topic angebot) {

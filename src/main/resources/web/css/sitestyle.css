@@ -2,16 +2,10 @@
 /** -- New Semantic UI Styles - 2.2 Custom Built Release -- **/
 @import url('/de.kiezatlas.website/css/semantic-ui/2.2/components/ka-website-custom.min.css');
 
-/** jQuery UI Autcomplete Overrides */
+/** jQuery UI Autcomplete Overrides
 .angebotsinfos.search .ui-state-focus {
-    border: 1px solid #eaca8f;
-    background: #FC3;
-    color: #27638C;
-}
-
 .angebotsinfos.search .ui-menu-item a {
-    color: #27638C;
-}
+} **/
 
 @-o-viewport {
     width: device-width;
@@ -92,6 +86,10 @@ a {
 .search .task-info,
 .assignments .task-info {
     margin: 0.7em;
+}
+
+.search #anbieter-info-link {
+    margin-left: 2.5em;
 }
 
 .assignment .angebots-infos {
@@ -210,6 +208,11 @@ a {
 
 .list-area .header.read-more {
     display: block;
+}
+
+.list-area .header.read-more h4 {
+    font-weight: normal;
+    margin-top: .5em;
 }
 
 .list-area .read-more,
@@ -838,6 +841,10 @@ ul.angebote li small {
     margin-bottom: .5em;
 }
 
+.search .tag-view a {
+    cursor: pointer;
+}
+
 .search .tag-view a.few {
     font-size: .8em;
 }
@@ -912,8 +919,17 @@ ul.angebote li small {
         border: 0px;
         text-align: left;
     }
+    .search #anbieter-info-link {
+        margin-left: 0em;
+    }
     .search .logoline {
         padding-left: 0em;
+    }
+}
+
+@media (max-width:780px) {
+    .detail .detail-area {
+        margin-top: 2em;
     }
 }
 
