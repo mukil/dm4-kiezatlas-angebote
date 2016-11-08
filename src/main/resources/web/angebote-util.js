@@ -201,6 +201,17 @@ function angebote_compare_by_end_latest_first(a, b) {
     return 0 //default return value (no sorting)
 }
 
+function value_sort_desc(a, b) {
+    var nameA = a.value
+    var nameB = b.value
+    //
+    if (nameA.toLowerCase() > nameB.toLowerCase()) // sort string descending
+      return 1
+    if (nameA.toLowerCase() < nameB.toLowerCase())
+      return -1
+    return 0 //default return value (no sorting)
+}
+
 // ---- Kiezatlas 2 Website Script Copy ----
 
 function logout() {

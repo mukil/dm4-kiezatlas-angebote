@@ -155,6 +155,7 @@ function do_browser_location() {
 function load_and_render_tag_search_dialog() {
     // $.getJSON('/tag/with_related_count/ka2.angebot', function(result) {
     $.getJSON('/angebote/tags', function(result) {
+        result.sort(value_sort_desc)
         var $tags = $('.tag-view')
         for (var r in result) {
             var tag = result[r]
