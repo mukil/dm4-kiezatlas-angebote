@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title text="Angebotsinfos revidieren - Kiezatlas"></title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="/de.kiezatlas/style/kiezatlas.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/button.min.css"/>
+
+        <script defer src="/de.kiezatlas.website/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script defer src="/de.deepamehta.accesscontrol/script/vendor/sha256.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script defer src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script defer src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="render_angebotsrevise_page()"></script>
+        <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
+
+    </head>
+    <body class="kiezatlas revise">
+
+        <div id="header">
+            <div class="welcome ui container">
+                <h3>Zuweisung der folgenden Angebotsinformationen zur Einrichtung <b class="einrichtungs-name">Y</b> aufheben</h3>
+                <p>Auf dieser Seite k&ouml;nnen Sie als unsere AnsprechpartnerIn f&uuml;r den Einrichtungsdatensatzes <b class="einrichtungs-name">Y</b> eine fehlerhafte oder ungewollte Zuweisungen von Angebotsinformation aufheben.</p>
+            </div>
+        </div>
+
+        <!-- Details Area -->
+        <div class="ui container">
+            <div class="commands">
+                <button class="ui basic green button" onclick="go_to_frontpage()">Zuweisung ist OK</button>
+                <button class="ui basic red button" onclick="do_revise_assignment()">Zuweisung aufheben</button>
+                <!--a class="remove-button ui button" href="#showremove" >Zuweisung aufheben</a><br/-->
+                <br/>
+                <span class="label hint">Hinweis: Diese Aktion kann nicht r&uuml;ckg&auml;ngig gemacht werden.</span>
+            </div>
+            <div id="info">
+                <br/><br/>
+                <span class="label">Name des Angebots</span><br/>
+                <h3 class="angebots-name"></h3>
+                <span class="label">F&uuml;r den Zeitraum vom </span><span class="von"></span> bis <span class="bis"></span><br/><br/>
+                <span class="label">Angebotsbeschreibung</span><br/>
+                <p class="angebots-beschreibung"></p>
+                <p>
+                    <span class="label">Kontakt</span>&nbsp;<span class="kontakt"></span><br/><br/>
+                    <span class="label">Ort</span>&nbsp;<span class="einrichtungs-name"></span><br/><br/>
+                    <span class="label">Webpage</span><br/>
+                    <a class="webpage"></a>
+                    <!-- Angelegt von <em class="creator"></em>. -->
+                </p>
+            </div>
+        </div>
+
+        <div id="bottom">
+            <p>
+                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
+                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+            </p>
+        </div>
+
+        <!-- Piwik -->
+        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Kiezatlas+2+Angebotsinfo+Revision')}" style="border:0" alt="" />
+
+    </body>
+</html>
+
