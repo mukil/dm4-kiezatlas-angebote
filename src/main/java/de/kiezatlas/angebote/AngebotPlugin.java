@@ -125,16 +125,33 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/revise/{secret}/{offerId}")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotRevisionView(@PathParam("offerId") long assignmentId, @PathParam("secret") String key) {
-        Association assoc = dm4.getAssociation(assignmentId);
-        if (assoc.getTypeUri().equals(ASSIGNMENT_EDGE)) {
-            log.info("Loaded Assignment Edge, checking Revision Key");
-            String revisionKey = (String) assoc.getProperty(ASSIGNMENT_REVISION_KEY_PROP);
-            if (!revisionKey.equals(key)) {
-                throw new WebApplicationException(new RuntimeException("Sorry, you are not authorized to revise this offer"), Response.Status.UNAUTHORIZED);
+    public Viewable getAngebotRevisionView(@PathParam("offerId") long assignmentId, @PathParam("secret") String key) {
+        try {
+            Association assoc = dm4.getAssociation(assignmentId);
+            if (assoc.getTypeUri().equals(ASSIGNMENT_EDGE)) {
+                log.info("Loaded Assignment Edge, checking Revision Key");
+                String revisionKey = (String) assoc.getProperty(ASSIGNMENT_REVISION_KEY_PROP);
+                if (!revisionKey.equals(key)) {
+                    throw new WebApplicationException(new RuntimeException("Sorry, you are not authorized to revise this offer"), Response.Status.UNAUTHORIZED);
+                }
             }
+            return view("revise");
+        } catch(RuntimeException ex) {
+            log.warning("Angebots Assignment could not be loaded " + ex.getCause().getLocalizedMessage());
         }
-        return getStaticResource("web/html/revise.html");
+        viewData("message", "Hinweis: Dieser Angebotszeitraum wurde bereits gelöscht.");
+        prepareGeneralPageData("message");
+        return view("message");
+    }
+
+    private void prepareGeneralPageData(String templateName) {
+        boolean isAuthenticated = isAuthenticated();
+        // boolean isPrivileged = isConfirmationWorkspaceMember();
+        // boolean isSiteManager = isAuthorizedSiteManager();
+        viewData("authenticated", isAuthenticated);
+        viewData("is_publisher", false);
+        viewData("is_site_manager", false);
+        viewData("template", templateName);
     }
 
     @GET

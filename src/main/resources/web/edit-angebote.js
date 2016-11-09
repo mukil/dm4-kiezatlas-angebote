@@ -97,7 +97,6 @@ function render_angebot_form() {
     var webpage = selected_angebot.webpage
     var descr = selected_angebot.beschreibung
     // tagging.init() does this var tags = selected_angebot.tags
-    //
     $('#angebot-name').val(name)
     $('#angebot-kontakt').val(contact)
     CKEDITOR.instances["angebot-beschreibung"].setData(descr)
@@ -134,7 +133,6 @@ function clear_assignment_dateform() {
     $('#do-delete').addClass("hidden")
     $('#additional-details').val('')
     $('#additional-kontakt').val('')
-    $('#override-block').addClass('hidden')
 }
 
 function init_datepicker() {
@@ -198,8 +196,8 @@ function do_save_assignment(e) {
         toInput = convert_to_en_month(toInput)
         toInput = toInput + " " + TIMEZONE_SUFFIX
         console.log("Cleaned up TO dateString", toInput)
-        // Note: we always shift back (into the previous day) about approx. 1sec
-        toDate = (new Date(toInput).getTime() - 1000)
+        // Note: we always shift time in secs to (nearly) the end of the selected day
+        toDate = (new Date(toInput).getTime() + (86400000 - 1000000))
         console.log("Parsed to TO DATE", toDate)
     }
     console.log("Shifted Datepicker delivered us FROM", fromInput, fromDate, "TO", toInput, toDate)
@@ -378,14 +376,14 @@ function render_assignment_form() {
         if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_kontakt")) {
             additionalContact = selected_assignment_edge.childs["ka2.angebot.assignment_kontakt"].value
             $('#additional-kontakt').val(additionalContact)
+        } else {
+            $('#additional-kontakt').val('')
         }
         if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_zusatz")) {
             additionalInfo = selected_assignment_edge.childs["ka2.angebot.assignment_zusatz"].value
             $('#additional-details').val(additionalInfo)
-        }
-        if (selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_kontakt")
-            || selected_assignment_edge.childs.hasOwnProperty("ka2.angebot.assignment_zusatz")) {
-            show_override_details_form()
+        } else {
+            $('#additional-details').val('')
         }
     } else {
         // clear old assignment rendering
@@ -396,13 +394,12 @@ function render_assignment_form() {
         $('#do-assign .text').text("Speichern")
         $('#do-delete').addClass("hidden")
         $('#do-override').removeClass('hidden')
+        $('#additional-details').val('')
+        $('#additional-kontakt').val('')
     }
 }
 
 function show_override_details_form() {
-    $('#override-block').removeClass('hidden')
-    $('#override-block').removeClass('disabled')
-    $('#do-override').addClass('hidden')
     $('#do-assign .text').html("Aktualisieren")
     $('#do-delete .text').html("Zuweisung l&ouml;schen")
 }

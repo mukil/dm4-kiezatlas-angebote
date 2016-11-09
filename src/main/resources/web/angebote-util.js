@@ -179,14 +179,12 @@ function angebote_compare_by_end_earliest_last(a, b) {
 }
 
 function angebote_compare_by_distance_nearest_first(a, b) {
-    if (!a.search_distance) return -1
-    if (!b.search_distance) return 1
-    var oldestEndA = (a.search_distance * 1000).toFixed(0)
-    var oldestEndB = (b.search_distance * 1000).toFixed(0)
-    if (oldestEndA > oldestEndB)
-        return -1
-    if (oldestEndA < oldestEndB)
-        return 1
+    if (!a.search_distance) return 1
+    if (!b.search_distance) return -1
+    var oldestEndA = (a.search_distance * 1000)
+    var oldestEndB = (b.search_distance * 1000)
+    if (oldestEndA < oldestEndB) return -1
+    if (oldestEndA > oldestEndB) return 1
     return 0 //default return value (no sorting)
 }
 
@@ -206,9 +204,9 @@ function value_sort_desc(a, b) {
     var nameB = b.value
     //
     if (nameA.toLowerCase() > nameB.toLowerCase()) // sort string descending
-      return 1
+        return 1
     if (nameA.toLowerCase() < nameB.toLowerCase())
-      return -1
+        return -1
     return 0 //default return value (no sorting)
 }
 

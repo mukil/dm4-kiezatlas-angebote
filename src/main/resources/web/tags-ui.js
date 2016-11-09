@@ -17,7 +17,7 @@ var tagging = new function() {
     this.fetchAllTagTopics = function(callback) {
         restc.request("GET", "/core/topic/by_type/dm4.tags.tag", undefined, function(response) {
             allReadableTags = response
-            console.log("Loaded all available tags", allReadableTags)
+            // console.log("Loaded all available tags", allReadableTags)
             if (callback) callback()
         })
     }
@@ -30,7 +30,7 @@ var tagging = new function() {
             // activate third party library
             _.setupJQueryUIAutocompleteField(nodeId)
         })
-        _.listenToInputFieldSelection(itemSelectionHandler)
+        if (itemSelectionHandler) _.listenToInputFieldSelection(itemSelectionHandler)
     }
 
     this.setupTags = function(topicTags) {

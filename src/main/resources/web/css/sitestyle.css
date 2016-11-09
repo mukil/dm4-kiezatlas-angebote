@@ -88,10 +88,6 @@ a {
     margin: 0.7em;
 }
 
-.search #anbieter-info-link {
-    margin-left: 2.5em;
-}
-
 .assignment .angebots-infos {
     color: #333;
 }
@@ -130,6 +126,7 @@ a {
     text-align: left;
 }
 
+.search .search-content,
 .search .logoline,
 .search .form-area,
 .search .filter-area,
@@ -410,6 +407,7 @@ div.ui-datepicker {
     margin-bottom: 0px;
     display: inline-block;
     margin-right: 1em;
+    font-weight: normal;
 }
 
 .filter-area h4 {
@@ -918,9 +916,6 @@ ul.angebote li small {
     .search .form-area {
         border: 0px;
         text-align: left;
-    }
-    .search #anbieter-info-link {
-        margin-left: 0em;
     }
     .search .logoline {
         padding-left: 0em;

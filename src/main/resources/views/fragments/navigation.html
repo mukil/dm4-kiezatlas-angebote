@@ -1,0 +1,130 @@
+
+<!--- Standard Horizontal Navigation (Wider Page > 900px) -->
+<div th:fragment="top (publisher)">
+
+    <div class="ui menu top fixed">
+        <h3 class="citymap-title"></h3>
+        <div th:class="${is_publisher} ? 'ui container fluid' : 'ui container'">
+            <a href="/">
+                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
+            </a>
+            <a th:if="${authenticated}" href="/angebote/my" class="item angebote">Meine Eintr&auml;ge</a>
+            <a th:if="!${#strings.contains(template, 'index')}" href="/" class="item">Startseite</a>
+            <div th:if="${#strings.contains(template, 'index')}" class="ui simple dropdown item">
+                Bezirke <i class="dropdown icon"></i>
+                <div class="menu" id="bezirksauswahl"></div>
+            </div>
+            <a th:if="${is_site_manager}" href="/website/sites"
+               th:class="${#strings.contains(template, 'site')} ? 'active item sites' : 'item sites'">Sites</a>
+            <a href="/angebote" class="item all-angebote">Angebote</a>
+            <a class="item star" title="Die aktuelle Kartenposition zu Ihren Standort-Favoriten hinzufügen" alt:="Icon: Favourite this location."
+               th:if="${#strings.contains(template, 'ka-index')}"><i class="icon star empty"></i></a>
+            <a th:if="!${authenticated}" href="/sign-up/login"
+               th:class="${#strings.contains(template, 'login')} ? 'active item login' : 'item login'">Login</a>
+            <a th:if="${authenticated}" href="/sign-up/login"
+               th:class="${#strings.contains(template, 'logout')} ? 'active item logout' : 'item logout'">Logout</a>
+            <div class="right menu">
+                <div class="ui search">
+                    <div class="ui icon input">
+                        <input class="prompt" type="text" placeholder="Suchanfrage" />
+                    </div>
+                    <button class="circular ui icon basic button tiny">
+                        <i class="icon search"></i>
+                    </button>
+                </div>
+                <!--div class="item" th:if="${#strings.contains(template, 'ka-index')}">
+                    <div class="ui small input focus">
+                        <input placeholder="Suche" type="text" id="topsearch" disabled="disabled"/>
+                    </div>
+                </div-->
+                <div th:if="${is_publisher}" class="ui simple dropdown item">
+                    <i class="setting icon"></i>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a th:class="${#strings.contains(template, 'confirmation')} ? 'active item' : 'item'"
+                           href="/website/geo/freischalten/">Freischalten</a>
+                        <!-- a href="/site/administration/" class="item">Listenansicht</a-->
+                        <!--a href="/website/sites/" class="item">Sites</a-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!--- Standard Vertical Navigation (Experimental) -->
+<div th:fragment="vertical (publisher)">
+
+    <div class="ui vertical menu">
+        <div th:if="${is_publisher}" class="item administration">
+            <div class="header">Administration</div>
+            <div class="menu">
+                <a href="/website/geo/freischalten/" class="item">Freischalten</a>
+                <a href="/site/administration/" class="item">Listenansicht</a>
+                <a href="/website/sites/" class="item">Sites</a>
+            </div>
+        </div>
+        <div th:if="${authenticated}" class="item entries">
+            <div class="header">Meine Eintr&auml;ge</div>
+            <div class="menu">
+                <a href="/angebote/my" class="item">Angebotsinfos</a>
+                <a href="/website/geo/create" class="item">Neue Einrichtung</a>
+            </div>
+        </div>
+        <div th:if="${authenticated}" class="item account">
+            <div class="header">Mein Account</div>
+            <div class="menu">
+                <a href="/sign-up/edit" class="item">Bearbeiten</a>
+                <a href="/sign-up/login" class="item">Logout</a>
+            </div>
+        </div>
+        <div th:if="!${authenticated}" class="item account">
+            <div class="header">Anmelden</div>
+            <div class="menu">
+                <a href="/sign-up/login" class="item">Login</a>
+                <a href="/sign-up/" class="item">Registrieren</a>
+            </div>
+        </div>
+        <div class="item general">
+            <div class="menu">
+                <a href="/" class="item">Startseite</a>
+                <!--a href="/#mitte" class="item">Bezirk Mitte</a-->
+                <a href="/angebote" class="item">Aktuelle Angebote</a>
+            </div>
+        </div>
+    </div>
+
+    <!--div class="ui container">
+        <div class="ui menu vertical left customized">
+            <div class="ui left pointing simple dropdown link item">
+                <i class="dropdown icon"></i>
+                    Administration
+                    <div class="menu">
+                        <a href="/website/geo/confirmation/" class="item">Freischalten</a>
+                        <a href="/site/administration/" class="item">Listenansicht</a>
+                        <a href="/website/geo/site/" class="item">Site-Infos</a>
+                    </div>
+            </div>
+            <div class="ui left pointing simple dropdown link item">
+                <i class="dropdown icon"></i>
+                Meine Eintr&auml;ge
+                <div class="menu">
+                    <a href="/angebote/my" class="item">Angebotsinfos</a>
+                    <a href="/website/geo/create" class="item">Neue Einrichtung</a>
+                </div>
+            </div>
+            <a href="/angebote" class="item">Gesamtstadtplan</a>
+            <div class="ui left pointing simple dropdown link item">
+                <i class="dropdown icon"></i>
+                Bezirke
+                <div class="menu">
+                    <a href="/#mitte" class="item">Mitte</a>
+                </div>
+            </div>
+            <a href="/angebote" class="item">Aktuelle Angebote</a>
+        </div>
+    </div-->
+
+
+</div>

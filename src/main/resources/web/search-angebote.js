@@ -205,7 +205,7 @@ function render_search_results(distinct_results) {
         if (intersection.length > 0) {
             // apply spatial sorting
             intersection.sort(angebote_compare_by_distance_nearest_first)
-            render_result_header(intersection, $listing, 'in der N&auml;he des Standorts')
+            render_result_header(intersection, $listing, '')
             for (var el in intersection) {
                 var element = intersection[el]
                 render_spatial_list_item(element, $listing)
@@ -416,8 +416,8 @@ function toggle_location_parameter_display($filter_area) {
             }
             parameterHTML += ' \"' + location_coords.name + '\"</div>'
         }
-        // parameterHTML += '<span class="coord-values">(' + location_coords.longitude.toFixed(3)
-           //     + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
+        parameterHTML += ' <span class="coord-values">(' + location_coords.longitude.toFixed(3)
+            + ', ' + location_coords.latitude.toFixed(3) + ')</span>'
         if (street_coordinates.length > 1) {
             parameterHTML += '<a class="prev close" title="Alternatives Ergebnis der Standortsuche nutzen" href="javascript:select_prev_locationsearch_result()">&#8592;</a>'
                 + '<a class="next close" title="Nächstes Ergebnis der Standortsuche nutzen" href="javascript:select_next_locationsearch_result()">&#8594;</a> '
@@ -541,6 +541,7 @@ function hide_search_loading_sign() {
 
 function remove_location_parameter() {
     location_coords = undefined
+    $('#nearby').val('')
     render_query_parameter()
     if (!search_input && !time_parameter) {
         angebotsinfos = undefined
