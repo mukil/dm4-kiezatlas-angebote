@@ -64,14 +64,9 @@
                     </li>
                 </ul>
             </div>
-            <p>
-                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
-                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
-            </p>
         </div>
 
-        <!-- Piwik -->
-        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Angebotsdetails ' + ${angebot.name})}" style="border:0" alt="" />
+        <div class="footer" th:include="fragments/navigation :: footer"></div>
 
     </body>
 </html>

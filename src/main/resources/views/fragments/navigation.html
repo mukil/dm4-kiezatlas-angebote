@@ -53,6 +53,44 @@
 
 </div>
 
+
+<div th:fragment="footer">
+    <div class="ba">
+        <h4>Die Angebotsdatenbank wurde erm&ouml;glicht durch die F&ouml;rderung und freundliche Unterst&uuml;tzung der folgenden Partner:</h4>
+        <!--p>
+            <a href="http://www.quartiersmanagement-berlin.de/">Soziale Stadt - Quartiersmanagement Berlin</a>, 
+            <a href="http://ec.europa.eu/regional_policy/de/funding/erdf/">Europ&auml;ischer Fonds f&uuml;r regionale Entwicklung</a>,
+            <a href="http://ec.europa.eu/regional_policy/de/funding/erdf/">Europ&auml;ischer Fonds f&uuml;r regionale Entwicklung</a>,
+            ...,
+            ...,
+            ...
+        </p-->
+        <div class="logos">
+            <img alt="" height="120" width="auto" src="/filerepo/images/eu-regional-development-fonds.png" />
+            <img alt="" height="120" width="auto" src="/filerepo/images/soziale-stadt.png" />
+            <img alt="" height="120" width="auto" src="/filerepo/images/berlin-baut-lebendige-quartiere.png" />
+            <img alt="" height="120" width="auto" src="/filerepo/images/burgwappen-wtf.png" />
+            <img alt="" height="120" width="auto" src="/filerepo/images/ba-mitte-senatsverwaltung-stad-und-umwelt.png" />
+        </div>
+    </div>
+    <div class="provider">
+        <div class="powered-by">
+            <p>
+                Kiezatlas ist ein Projekt der <a href="http://www.gska-berlin.de/">GskA mbH</a> - <a href="http://www.spinnenwerk.de/network/">Projekt Network</a>
+                , <a href="/open-source">Open Source Software</a> und eine Anwendung von <a href="http://www.deepamehta.de">DeepaMehta 4</a>.
+            </p>
+        </div>
+        <div class="logos">
+            <!--img alt="" src="/filerepo/images/logo_gmbh_sozkult_klein-cutted-white-bg.png" />
+            <img src="/de.kiezatlas.website/images/kiezatlas2-logo-240-white-bg.png"
+                 title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/-->
+        </div>
+        <!-- Piwik -->
+        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Angebote ' + ${template})}" style="border:0" alt="" />
+    </div>
+</div>
+
+
 <!--- Standard Vertical Navigation (Experimental) -->
 <div th:fragment="vertical (publisher)">
 

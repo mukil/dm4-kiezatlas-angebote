@@ -104,15 +104,17 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotListView() {
-        return getStaticResource("web/html/search.html");
+    public Viewable getAngebotListView() {
+        prepareGeneralPageData("search");
+        return view("search");
     }
 
     @GET
     @Path("/stichwort/{tagName}")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotListView(@PathParam("tagName") String tag) {
-        return getStaticResource("web/html/search.html");
+    public Viewable getAngebotListView(@PathParam("tagName") String tag) {
+        prepareGeneralPageData("search/" + tag);
+        return view("search");
     }
 
     @GET
@@ -279,8 +281,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/my")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngeboteView() {
-        return getStaticResource("web/html/my.html");
+    public Viewable getAngeboteView() {
+        prepareGeneralPageData("my");
+        return view("my");
     }
 
     @GET

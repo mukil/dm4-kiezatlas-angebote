@@ -3,7 +3,7 @@
     <head>
         <title>Meine Einträge - Kiezatlas 2</title>
 
-        <meta charset="utf-8">
+        <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
         <!--link rel="stylesheet" href="/de.kiezatlas.angebote/vendor/jquery/ui/css/ka-angebote/jquery-ui-1.9.2.custom.min.css"/-->
@@ -13,13 +13,13 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
         <!--link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/-->
 
-        <script defer src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <!--script src="/de.kiezatlas.angebote/vendor/jquery/ui/jquery-ui-1.9.2.widgets.min.js"></script-->
-        <script defer src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script>
-        <script defer src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
-        <script defer src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
-        <script defer src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
-        <script defer src="/de.kiezatlas.angebote/page_inits.js" onload="my_entries_page()"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/vendor/jquery/1.12.1.custom/jquery-ui.min.js"></script>
+        <script defer="true" src="/de.deepamehta.webclient/script/util/rest_client.js"></script>
+        <script defer="true" src="/de.deepamehta.webclient/script/util/js_utils.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="my_entries_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
     </head>
@@ -96,20 +96,15 @@
                         <a href="/" title="Zurück zur Startseite">Zur&uuml;ck</a>
                     </li>
                     <li>
-                        <a href="/angebote" title="Alle aktuelle Angebote anzeigen">Angebote</a>
+                        <a href="/angebote" title="Alle aktuelle Angebote anzeigen">Angebotssuche</a>
                     </li>
                 </ul>
-            </div>
-            <p>
-                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
-                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
-            </p>
+            </div>           
         </div>
 
         <div id="dialog-confirm" title="Eintrag löschen?">Willst Du diesen Datensatz entfernen?</div>
 
-        <!-- Piwik -->
-        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Meine+Eintraege')}" style="border:0" alt="" />
+        <div class="footer" th:include="fragments/navigation :: footer"></div>
 
     </body>
 </html>

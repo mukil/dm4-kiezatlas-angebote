@@ -26,6 +26,45 @@ html, body {
     color: #343434;
 }
 
+.footer {
+    position: relative;
+    background-image: url("/de.kiezatlas.website/images/website_pattern_dg.jpg");
+    background-color: rgb(52, 52, 52);
+    color: rgb(169, 169, 169);
+    min-height: 100px;
+}
+
+.footer h4 {
+    font-weight: normal;
+}
+
+.footer .provider,
+.footer .ba {
+    padding: 2em;
+}
+
+.footer .provider {
+    padding-bottom: 0em;
+    box-shadow: 0px -3px 25px 1px #a9a9a9;
+    -moz-box-shadow: 0px -3px 25px 1px #a9a9a9;
+    -webkit-box-shadow: 0px -3px 25px 1px #a9a9a9;
+    padding-top: 1em;
+}
+
+.footer .logos img {
+    vertical-align: top;
+    margin-right: 2em;
+    border: 1px solid #e9e9e9;
+    text-align: left;
+    /** max-height: 140px;
+    width: auto; **/
+}
+
+.footer .ba {
+    background-color: #fff;
+    color: #343434;
+}
+
 .header-message {
     margin-top: 5em;
     padding: 1em 2em;
@@ -402,7 +441,7 @@ div.ui-datepicker {
 
 /** Search Filter Parameter Option Style */
 
-.search h4,
+.search .results h4,
 .search .filter-area h4 {
     margin-bottom: 0px;
     display: inline-block;
@@ -410,12 +449,9 @@ div.ui-datepicker {
     font-weight: normal;
 }
 
+/** ### Deprecated... **/
 .filter-area h4 {
     margin-top: .5em;
-    font-weight: normal;
-}
-
-.search-results h4 {
     font-weight: normal;
 }
 
@@ -870,8 +906,7 @@ ul.angebote li small {
 /** --- Distinct footer area --- */
 
 #bottom {
-    position: relative;
-    top: 2em;
+    margin-top: 2em;
     font-size: 1.2em;
     text-align: center;
     padding: 1em;
@@ -880,6 +915,10 @@ ul.angebote li small {
 
 #bottom h4 {
     font-weight: normal;
+}
+
+.search .tag-view {
+    padding-bottom: 2em;
 }
 
 #bottom img.logo {
