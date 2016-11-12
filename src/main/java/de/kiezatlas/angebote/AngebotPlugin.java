@@ -312,8 +312,14 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @Override
     @Produces(MediaType.APPLICATION_JSON)
     public Angebotsinfos getAngebotsinfo(@PathParam("topicId") long topicId) {
-        Topic angebotsInfo = dm4.getTopic(topicId);
-        return prepareAngebotsinfos(angebotsInfo);
+        if (topicId != 0) {
+            Topic angebotsInfo = dm4.getTopic(topicId);
+            if (angebotsInfo.getTypeUri().equals(ANGEBOT)) {
+                return prepareAngebotsinfos(angebotsInfo);
+            }
+            return null;
+        }
+        return null;
     }
 
     @GET

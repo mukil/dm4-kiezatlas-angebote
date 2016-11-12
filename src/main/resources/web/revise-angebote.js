@@ -14,8 +14,8 @@ function do_revise_assignment() {
 
     function do_revise_call() {
         var result = restc.request('POST', '/angebote/assignment/' + selected_assignment_infos.id + "/delete")
-        console.log("Do Revise Call", result)
         $('.label.hint').text("OK, die Zuweisung dieses Angebots wurde erfolgreich aufgehoben.")
+        $('.revise .commands button').remove()
     }
 
     function do_privileged_revise_call() {
@@ -24,7 +24,6 @@ function do_revise_assignment() {
         if (username) {
             do_revise_call()
             restc.logout()
-            window.document.location = "/"
             go_to_frontpage()
         } else {
             $('.label.hint').text("Entschuldigung, bei der Aufhebung der Zuweisung ist ein Fehler aufgetreten.")

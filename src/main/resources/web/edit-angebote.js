@@ -2,9 +2,14 @@
 // -------------------------------------- Custom Angebote JS Client (Edit, Show, Assign) --------------- //
 
 function do_save_angebot_and_go_assign() {
-    do_save_angebot()
-    var resource = $('#assignment-link').attr("data-my-href")
-    window.document.location.replace(resource)
+    var topic = do_save_angebot()
+    if (topic && topic.id !== -1) {
+        console.log("Go Edit Assignments for Angebotsinfo Topic", topic)
+        window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + topic.id)
+    } else {
+        var resource = $('#assignment-link').attr("data-my-href")
+        window.document.location.assign(resource)
+    }
 }
 
 function do_save_angebot_and_go_home() {
@@ -65,7 +70,6 @@ function do_save_angebot() {
                 "dm4.tags.tag": tags
             }
         }
-        console.log("Saving Angebot Topic: ", topic_model)
         topic = restc.create_topic(topic_model)
     }
     hide_saving_icon('#do-save .icon')
@@ -280,7 +284,7 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
     }
     queryString = encodeURIComponent(queryString, "UTF-8")
     // ### hacking message display
-    $('.form-area div.einrichtungen').html("Suche nach Einrichtungen gestartet ...")
+    $('.form-area div.einrichtungen').html("Suche nach Orten gestartet ...")
     $.ajax({
         type: "GET", url: "/website/search/by_name?query=" + queryString,
         success: function(obj) {
@@ -297,8 +301,8 @@ function render_geo_object_search_results(results) {
     for (var i in results) {
         var obj = results[i]
         if (obj) {
-            var $element = $('<input type="radio" title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id
-                    + '" value="geo-'+obj.id+'"><label title="Auswahl der Einrichtung im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
+            var $element = $('<input type="radio" title="Auswahl der Orte im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id
+                    + '" value="geo-'+obj.id+'"><label title="Auswahl der Orte im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
                     + obj.name + ', <span class="label">' + obj.anschrift + '</span></label><br/>')
             $('.form-area div.einrichtungen').append($element)
         } else {
@@ -306,10 +310,9 @@ function render_geo_object_search_results(results) {
         }
     }
     if (results.length === 0) {
-        $('.form-area div.einrichtungen').append('<div>Haben Sie die gew&uuml;nschte Einrichtung nicht finden k&ouml;nnen? Dann k&ouml;nnen '
+        $('.form-area div.einrichtungen').append('<div>Haben Sie den gew&uuml;nschten Ort nicht finden k&ouml;nnen? Dann k&ouml;nnen '
             + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
-            + 'einen Ort <a href="' + URL_EINRICHTUNG_CREATE + '">neu im Kiezatlas eintragen</a>. Alternativ k&ouml;nnen wir Ihnen noch anbieten den Namen des Einrichtungsdatensatz '
-        + 'erst noch einmal &uuml;ber die Umkreis- bzw. Volltextsuche des <a href="/" target="_blank">Gesamtstadtplan</a> abzufragen.</div>')
+            + 'bitte einmalig den gesuchten, <a href="' + URL_EINRICHTUNG_CREATE + '">neuen Ort anlegen</a>.</div>')
     } else {
         $('.form-area .search-info').text(results.length + ' Ergebnisse')
     }
@@ -336,10 +339,11 @@ function render_assignments_listing() {
     // Display Assignments on Assignment Page
     $('.right-side div.einrichtungen').empty()
     if (geo_assignments.length === 0) {
-        $('.right-side .help').html('<p>Diesem Angebot sind noch keine Angebotszeiträume zugewiesen. Zur Zuweisung w&auml;hlen Sie '
-            + 'bitte</p><ol><li> eine Einrichtung als Veranstaltungsort und</li><li>einen Angebotszeitraum.</li></ol><p>Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
+        $('.right-side .help').html('<p>Diesem Angebot sind noch keine Angebotszeitr&auml;ume zugewiesen. Zur Zuweisung w&auml;hlen Sie '
+            + 'bitte</p><ol><li> einen Ort als Veranstaltungsort aus und</li><li>f&uuml;r diesen einen Angebotszeitraum.</li></ol><p>Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
             + ' nachtr&auml;glich jederzeit anpassen.</p><p>Bitte nehmen Sie zur Kenntnis das bei einer Zuweisung von '
-            + 'Angeboten die Inhaber_innen des Einrichtungsdatensatzes automatisch &uuml;ber das neue Angebot per Email benachrichtigt werden.</p>')
+            + 'Angeboten die Nutzer_innen eines Ortes automatisch &uuml;ber ihr Angebot per Email benachrichtigt werden und eine ungewollte Zuweisung von Angebotsinfos '
+        + 'unter Umst&auml;nden aufgehoben wird.</p>')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
         $('.right-side .help').empty()

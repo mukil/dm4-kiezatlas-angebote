@@ -338,7 +338,7 @@ function render_spatial_list_item(element, $list) {
     var angebots_id = element.angebots_id
     var distanceValue = "&nbsp;"
     if (element.search_distance) {
-        distanceValue = 'Entfernung ca. ' + (element.search_distance * 1000).toFixed(0) + 'm'
+        distanceValue = 'Entfernung ca. ' + (element.search_distance).toFixed(1) + 'km'
     }
     var html_string = '<li class="read-more"><a href="/angebote/'+angebots_id+'">'
             + '<div id="' + angebots_id + '" class="concrete-assignment"><h3 class="angebot-name">"'

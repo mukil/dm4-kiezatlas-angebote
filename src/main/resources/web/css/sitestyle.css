@@ -26,6 +26,16 @@ html, body {
     color: #343434;
 }
 
+.header-message {
+    margin-top: 5em;
+    padding: 1em 2em;
+}
+
+.header-message .username {
+    font-weight: bold;
+    color: #27638C;
+}
+
 .footer {
     position: relative;
     background-image: url("/de.kiezatlas.website/images/website_pattern_dg.jpg");
@@ -44,16 +54,17 @@ html, body {
 }
 
 .footer .provider {
-    padding-bottom: 0em;
     box-shadow: 0px -3px 25px 1px #a9a9a9;
     -moz-box-shadow: 0px -3px 25px 1px #a9a9a9;
     -webkit-box-shadow: 0px -3px 25px 1px #a9a9a9;
-    padding-top: 1em;
+    padding-top: .5em;
+    padding-bottom: 0em;
 }
 
 .footer .logos img {
     vertical-align: top;
     margin-right: 2em;
+    margin-top: .5em;
     border: 1px solid #e9e9e9;
     text-align: left;
     /** max-height: 140px;
@@ -65,14 +76,8 @@ html, body {
     color: #343434;
 }
 
-.header-message {
-    margin-top: 5em;
-    padding: 1em 2em;
-}
-
-.header-message .username {
-    font-weight: bold;
-    color: #27638C;
+.search .footer .ba {
+    text-align: center;
 }
 
 #marker-name b,
@@ -125,6 +130,11 @@ a {
 .search .task-info,
 .assignments .task-info {
     margin: 0.7em;
+}
+
+.detail .assignments h3 {
+    margin-bottom: 0em;
+    margin-top: 2em;
 }
 
 .assignment .angebots-infos {
@@ -214,6 +224,8 @@ a {
 .task-info .loading-indicator i.icon,
 .search .list-area .loading-indicator i.icon {
     opacity: .9;
+    left: -2em;
+    top: 0em;
 }
 
 .search .list-area .read-more p {
@@ -246,9 +258,15 @@ a {
     display: block;
 }
 
+.list-area h4.status,
 .list-area .header.read-more h4 {
     font-weight: normal;
     margin-top: .5em;
+}
+
+.list-area h4.status {
+    margin-top: 2em;
+    margin-left: 1em;
 }
 
 .list-area .read-more,
@@ -264,9 +282,14 @@ a {
     margin-top: 0px;
 }
 
+.search  a.read-more {
+    margin: 10px;
+}
+
 .list-area .results li.read-more {
     background-color: #EAEAEA;
     margin-right: 2em;
+    width: 98%;
 }
 
 .list-area .results li .air-distance {
@@ -287,10 +310,6 @@ a {
     cursor: pointer;
     text-decoration: underline;
     color: #666;
-}
-
-.search  a.read-more {
-    margin: 10px;
 }
 
 .assignment .left-side {
@@ -956,6 +975,9 @@ ul.angebote li small {
         border: 0px;
         text-align: left;
     }
+    .list-area .results li.read-more {
+        width: 96%;
+    }
     .search .logoline {
         padding-left: 0em;
     }
@@ -1021,8 +1043,9 @@ ul.angebote li small {
         padding: 0em 0em 1em 0em;
         text-align: left;
     }
-    .search #do-locating span {
-        display: none;
+    .search #do-locating {
+        margin-top: .5em;
+        display: block;
     }
     .list-area .results li.read-more {
         margin-right: 1em;
@@ -1050,7 +1073,7 @@ ul.angebote li small {
         width: 200px;
     }
     .search .nearby-dialog.ui.input #nearby {
-        width: 260px;
+        width: 315px;
         min-width: 90px;
     }
     .search .form-area form {

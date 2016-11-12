@@ -8,7 +8,7 @@ var URL_ANGEBOT_EDIT        = "/angebote/edit/"
 var URL_ANGEBOT_ASSIGNMENT  = "/angebote/zuordnen/"
 var URL_EINRICHTUNG_EDIT    = "/website/geo/edit/"
 var URL_EINRICHTUNG         = "/website/geo/"
-var URL_EINRICHTUNG_CREATE  = "/website/geo/"
+var URL_EINRICHTUNG_CREATE  = "/website/geo/create"
 
 var TIMEZONE_SUFFIX = "UTC+01:00"
 var WORKSPACE_COOKIE_NAME   = "dm4_workspace_id"
