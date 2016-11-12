@@ -91,19 +91,19 @@ function is_angebote_creator(id, callback) {
 }
 
 function go_edit_einrichtung_form(id) {
-    window.document.location.replace(URL_EINRICHTUNG_EDIT + id)
+    window.document.location.assign(URL_EINRICHTUNG_EDIT + id)
 }
 
 function go_edit_einrichtung(id) {
-    window.document.location.replace(URL_EINRICHTUNG + id)
+    window.document.location.assign(URL_EINRICHTUNG + id)
 }
 
 function go_edit_angebot(id) {
-    window.document.location.replace(URL_ANGEBOT_EDIT + id)
+    window.document.location.assign(URL_ANGEBOT_EDIT + id)
 }
 
 function go_edit_assignments(id) {
-    window.document.location.replace(URL_ANGEBOT_ASSIGNMENT + id)
+    window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
 }
 
 function go_to_angebot_assignment(id) {
