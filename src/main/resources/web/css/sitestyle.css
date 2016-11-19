@@ -981,6 +981,9 @@ ul.angebote li small {
     .search .logoline {
         padding-left: 0em;
     }
+    .header-message {
+        padding: 0em;
+    }
 }
 
 @media (max-width:780px) {

@@ -41,7 +41,6 @@ function fire_angebote_search(noupdate) {
     var queryString = $('#query').val()
     leading_wildcard = $('.ui.checkbox.toggle').checkbox('is checked')
     if (search_input.length === 0 && (queryString.length === 0 && !location_coords)) {
-        // ### graphically highlight
         $('#query').attr("placeholder", "Bitte Suchbegriff eingeben").focus().attr("style", "border: 1px solid red")
         console.log("Aborted angebote search cause of missing user input")
         return
@@ -379,7 +378,6 @@ function select_locationsearch_parameter(idx) {
         street_coords_idx = idx
     } else {
         location_coords = undefined
-        console.log("Clear Location Search Parameter")
     }
     time_parameter = undefined // clear "Heute"
     render_query_parameter()
@@ -497,7 +495,6 @@ function update_search_location_parameter() {
             if (s < search_input.length) newUrl += ";"
         }
     } else {
-        console.log("Clearing location query parameters...", newUrl)
         newUrl = "/angebote"
     }
     if (window.history && newUrl !== "/angebote") {
@@ -511,6 +508,9 @@ function get_search_location_parameter() {
     var containleadingWildcard = false
     if (start > 0) {
         var pathinfo = window.document.location.href.substr(start+1)
+        if (pathinfo.lastIndexOf("#") !== -1) {
+            pathinfo = pathinfo.substr(0, pathinfo.lastIndexOf("#"))
+        }
         var args = pathinfo.split(";")
         for (var p in args) { // clean up url param ### fixme: complete
             var dm = args[p]
@@ -521,7 +521,7 @@ function get_search_location_parameter() {
             }
             parameter.push(dm)
         }
-    }
+    } // else: clean up pathinfo about #query too
     if (containleadingWildcard) {
         $('.ui.checkbox.toggle').checkbox('check')
     }
@@ -597,6 +597,7 @@ function handle_tag_button_select(e) {
     remove_all_text_parameter(false)
     remove_time_parameter(false)
     $("#query").val(tagname + ", ")
+    scroll_to_element("query")
     fire_angebote_search()
 }
 

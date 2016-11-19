@@ -75,6 +75,7 @@ function fetch_angebote_workspace() {
         js.remove_cookie(WORKSPACE_COOKIE_NAME)
         js.set_cookie(WORKSPACE_COOKIE_NAME, result.id)
         console.log("Set Angebote Workspace Cookie", result.id)
+        // ### Remove Topicmap ID Cookie
     })
 }
 
@@ -100,6 +101,12 @@ function go_edit_einrichtung(id) {
 
 function go_edit_angebot(id) {
     window.document.location.assign(URL_ANGEBOT_EDIT + id)
+}
+
+function scroll_to_element(domId) {
+    try {
+        document.getElementById(domId).scrollIntoView()
+    } catch(e) { console.warn("Element could not be scrolled into viewport", domId, e) }
 }
 
 function go_edit_assignments(id) {
