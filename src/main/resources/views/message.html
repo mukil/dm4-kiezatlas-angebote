@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
         <link rel="stylesheet" href="/de.kiezatlas.website/css/sitestyle.css"/>
-
+        <meta th:replace="fragments/tracker" />
     </head>
     <body class="kiezatlas topic">
 
@@ -49,9 +49,6 @@
         <div id="bottom">
             <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" width="150" />
         </div>
-
-        <!--Piwik-->
-        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Kiezatlas+2+Message')}" style="border:0" alt="" />
 
     </body>
 </html>
