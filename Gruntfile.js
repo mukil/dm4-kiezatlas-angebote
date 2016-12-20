@@ -20,14 +20,27 @@ module.exports = function(grunt) {
                     ]
                 }
             },
-            jquery19: {
+            jquery19112: {
                 options: {
                     separator: ';',
                 },
                 files: {
-                    'src/main/resources/web/dist/vendor/jquery-1.9.1-ui-1.9.2-autocomplete.min.js': [
+                    'src/main/resources/web/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js': [
                         'src/main/resources/web/vendor/jquery/jquery-1.9.1.min.js',
-                        'src/main/resources/web/vendor/jquery/ui/wautocomplete/jquery-ui-1.9.2.custom.min.js'
+                        'src/main/resources/web/vendor/jquery/ui/jquery.ui.datepicker-de.js',
+                        'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/jquery-ui.min.js'
+                    ]
+                }
+            },
+			jqueryKiezatlasUI: {
+                options: {
+                    separator: ';',
+                },
+                files: {
+                    'src/main/resources/web/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css': [
+                        'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/jquery-ui.min.css',
+                        'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/jquery-ui.theme.min.css',
+                        'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/ui-kiezatlas-overrides.css'
                     ]
                 }
             }
