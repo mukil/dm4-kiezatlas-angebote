@@ -40,7 +40,7 @@ module.exports = function(grunt) {
                     'src/main/resources/web/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css': [
                         'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/jquery-ui.min.css',
                         'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/jquery-ui.theme.min.css',
-                        'src/main/resources/web/vendor/jquery/ui/1.12.1.custom/ui-kiezatlas-overrides.css'
+                        'src/main/resources/web/css/ui-kiezatlas-overrides.css'
                     ]
                 }
             }

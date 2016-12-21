@@ -28,7 +28,7 @@ To build dm4-kiezatlas-angebote successfully you'll need to build or install its
 
 To do so, check out the following plugins source code from github and run `mvn clean install` in all of them: [dm4-kiezatlas](http://github.com/mukil/dm4-kiezatlas), [dm4-geospatial](http://github.com/mukil/dm4-geospatial), [dm4-thymeleaf](http://github.com/jri/dm4-thymeleaf), [dm4-tags](http://github.com/mukil/dm4.tags).
 
-Then, to build and hot-deploy the sources use the following two commands:
+Now you can build and hot-deploy the sources of the dm4-kiezatlas-angebote plugin using the following two commands:
 ```
 grunt
 mvn clean package
