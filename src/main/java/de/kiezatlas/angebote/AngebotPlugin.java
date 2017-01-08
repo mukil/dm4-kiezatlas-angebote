@@ -337,7 +337,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     /**
-     * Fetch all assigned angebotsinfos for a given angebot.
+     * Fetch all assigned assignments for a given angebot.
      * @param topicId       ID (long) of the angebotsinfo.
      * @param justActive    A boolean flag, if set to "false", all assigned angebots are listed if set to "true" just
      * angebotsinfos assigned with a "To Date" in the future will be returned.
@@ -867,10 +867,13 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return new ArrayList(uniqueResults.values());
     }
 
-    private String prepareLuceneQueryString(String userQuery, boolean doAndSplit, boolean doWildcard, boolean doFuzzy) {
+    /** Find 1:1 copy in dm4-wiezatlas-website plugin */
+    private String prepareLuceneQueryString(String userQuery, boolean doSplitWildcards,
+                                            boolean doWildcard, boolean doExact) {
         if (userQuery.isEmpty()) return null;
         String queryPhrase = new String();
-        if (doAndSplit) {
+        // 1) split query input by whitespace and append a wildcard to each term
+        if (doSplitWildcards) {
             String[] terms = userQuery.split(" ");
             int count = 1;
             for (String term : terms) {
@@ -883,9 +886,19 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 count++;
             }
             queryPhrase = queryPhrase.trim();
-        } else {
+        }
+        // 2) trim and append a wildcard to the query input
+        if (doWildcard) {
+            queryPhrase = userQuery.trim() + "*";
+        }
+        // 3) remove (potential "?", introduced as trigger for exact search), quote query input and append fuzzy command
+        if (doExact) {
+            queryPhrase = userQuery.trim().replaceAll("\\?", "");
+            queryPhrase = "\"" + queryPhrase + "\"~0.9";
+        }
+        // 4) if none, return trimmed user query input
+        if (!doSplitWildcards && !doWildcard && !doWildcard) {
             queryPhrase = userQuery.trim();
-            if (doWildcard) queryPhrase += "*";
         }
         return queryPhrase;
     }
