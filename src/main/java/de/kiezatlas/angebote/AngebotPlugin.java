@@ -542,6 +542,24 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return results;
     }
 
+    /** Fetch all current angebotsinfos with location information to display them on a map. */
+    @GET
+    @Path("/locations")
+    public List<AngebotsinfosAssigned> getCurrentAngebotsinfosAssigned() {
+        List<Topic> offers = getAssignedAngeboteByTime(new Date().getTime());
+        List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
+        for (Topic angebot : offers) {
+            List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
+            for (RelatedTopic geoObject : geoObjects) {
+                log.info("> Fetched current Angebotsinfo \"" + angebot.getSimpleValue().toString() + "\", at "
+                    + geoObject.getSimpleValue());
+                Association assignment = getAssignmentAssociation(angebot, geoObject);
+                results.add(prepareAngebotsInfosAssigned(geoObject, angebot, assignment));
+            }
+        }
+        return results;
+    }
+
     /**
      * Builds up a list of tags related to angebotsinfos which are assigned to locations.
      */
@@ -925,12 +943,12 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return results;
     }
 
-    private AngebotsinfosAssigned prepareAngebotsinfosAssigned(Topic angebotsinfos, Topic einrichtung) {
-        Association assignment = getAssignmentAssociation(angebotsinfos, einrichtung);
-        return prepareAngebotsInfosAssigned(einrichtung, angebotsinfos, assignment);
+    private AngebotsinfosAssigned prepareAngebotsinfosAssigned(Topic geoObject, Topic angebot) {
+        Association assignment = getAssignmentAssociation(angebot, geoObject);
+        return prepareAngebotsInfosAssigned(geoObject, angebot, assignment);
     }
 
-    private AngebotsinfosAssigned prepareAngebotsInfosAssigned(Topic geoObject, Topic angebotTopic, Association assignment) {
+    private AngebotsinfosAssigned prepareAngebotsInfosAssigned(Topic geoObject, Topic angebot, Association assignment) {
         AngebotsinfosAssigned assignedAngebot = new AngebotsinfosAssigned();
         // Everything here must not be Null
         assignedAngebot.setLocationName(getGeoObjectName(geoObject));
@@ -938,20 +956,20 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         GeoCoordinate coordinates = kiezService.getGeoCoordinateByGeoObject(geoObject);
         assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
         assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address").getSimpleValue().toString());
-        assignedAngebot.setAngebotsName(angebotTopic.getChildTopics().getString(ANGEBOT_NAME));
-        assignedAngebot.setAngebotsId(angebotTopic.getId());
+        assignedAngebot.setAngebotsName(angebot.getChildTopics().getString(ANGEBOT_NAME));
+        assignedAngebot.setAngebotsId(angebot.getId());
         assignedAngebot.setAssignmentId(assignment.getId());
-        assignedAngebot.setAngebotsinfoCreator(getCreatorNameOrUndefined(angebotTopic.getId()));
+        assignedAngebot.setAngebotsinfoCreator(getCreatorNameOrUndefined(angebot.getId()));
         assignedAngebot.setAssignmentCreator(getCreatorNameOrUndefined(assignment.getId()));
         assignedAngebot.setStartDate(getAssignmentStartTime(assignment));
         assignedAngebot.setEndDate(getAssignmentEndTime(assignment));
         // Stuff that could be Null
         // ### Tags Missing
-        String angebotsKontakt = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
+        String angebotsKontakt = angebot.getChildTopics().getStringOrNull(ANGEBOT_KONTAKT);
         if (angebotsKontakt != null) assignedAngebot.setKontakt(angebotsKontakt);
-        String angebotsBeschreibung = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_BESCHREIBUNG);
+        String angebotsBeschreibung = angebot.getChildTopics().getStringOrNull(ANGEBOT_BESCHREIBUNG);
         if (angebotsBeschreibung != null) assignedAngebot.setDescription(angebotsBeschreibung);
-        String webpage = angebotTopic.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
+        String webpage = angebot.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
         if (webpage != null) assignedAngebot.setWebpage(webpage);
         // Additonal Kontakt overrides standard kontakt
         String assignmentKontakt = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);

@@ -36,6 +36,8 @@ html, body {
     color: #27638C;
 }
 
+/** ### Copy in "de.kiezatlas.website/css/sitestyle.css **/
+
 .footer {
     position: relative;
     background-image: url("/de.kiezatlas.website/images/website_pattern_dg.jpg");
