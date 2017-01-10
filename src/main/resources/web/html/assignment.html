@@ -9,9 +9,6 @@
         <link rel="stylesheet" href="/de.kiezatlas.angebote/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css"/>
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
-        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/button.min.css"/>
-        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/components/checkbox.min.css"/>
-
         <script defer src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
 
         <script defer src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
@@ -30,10 +27,9 @@
                     <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
                 </a>
                 <a class="item gesamt" href="/">Startseite</a>
-                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Eintr&auml;ge</a>
+                <a href="/angebote/my" class="angebote active item">Meine Eintr&auml;ge</a>
                 <a href="/angebote" class="all-angebote item">Angebote</a>
-                <a href="/sign-up/login" class="login item">Login</a>
-                <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
+                <a href="/sign-up/login" class="logout item">Logout</a>
             </div>
         </div>
 
@@ -98,7 +94,7 @@
                     </div>
 
                     <div class="ui input focus icon block-space">
-                        <button id="do-assign" class="ui green button" onclick="do_save_assignment()"
+                        <button id="do-assign" class="ui olive button" onclick="do_save_assignment()"
                                 title="Bestätigt diesen Veranstaltungszeitraum">
                             <i class="icon save"></i><span class="text">Speichern</span></button>
                         <button id="do-delete" class="ui red button hidden" onclick="do_delete_assignment()"

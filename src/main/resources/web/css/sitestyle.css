@@ -82,6 +82,8 @@ body.pushable > .pusher {
     margin: 2em;
     vertical-align: top;
     text-align: left;
+    max-width: 300px;
+    min-width: 200px;
 }
 
 .footer .block ul {
@@ -836,7 +838,6 @@ div.disabled {
 .angebot-area li {
     padding: 1em;
     margin: .5em 0em .5em 0em;
-    background-color: #FAFAFA;
     font-size: 1.2em;
 }
 
@@ -1000,6 +1001,21 @@ ul.angebote li small {
 #bottom img.logo {
     max-width: 150px;
     height: auto;
+}
+
+.revise .commands,
+.revise #contact {
+    margin-top: 3em;
+}
+
+.revise #email-body {
+    width: 600px;
+    height: 120px;
+    padding: .5em;
+}
+
+#dialog-confirm {
+    display: none;
 }
 
 @media (max-width: 1400px) {

@@ -13,8 +13,9 @@ function do_revise_assignment() {
     }
 
     function do_revise_call() {
-        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment_infos.id + "/delete")
+        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment_infos.id + '/delete')
         $('.label.hint').text("OK, die Zuweisung dieses Angebots wurde erfolgreich aufgehoben.")
+        // und der/die Anbieter_in benachrichtigt.
         $('.revise .commands button').remove()
     }
 
@@ -31,6 +32,17 @@ function do_revise_assignment() {
     }
 }
 
+function send_revise_message() {
+    var message = $('#email-body').val()
+    var assignmentId = $('.revise .info').attr("id")
+    if (message.length <= 3) {
+        $('.mail-status').text("Mail ist zu kurz, bitte geben Sie mindestens 3 Zeichen ein.")
+        return
+    } else {
+        console.log("Assignment Id", assignmentId, "Message", message)
+    }
+}
+
 function render_angebotsrevise_page() {
     var assocId = parse_angebots_id()
     selected_assignment_infos = JSON.parse($.ajax('/angebote/assignment/' + assocId, { async: false, dataType: 'json' }).responseText)
@@ -41,4 +53,8 @@ function render_angebotsrevise_page() {
     $('.angebots-beschreibung').html(selected_assignment_infos.beschreibung)
     $('.kontakt').html(selected_assignment_infos.kontakt)
     $('.webpage').attr("href", selected_assignment_infos.webpage).text(selected_assignment_infos.webpage)
+    // Set angebots assignment id
+    $('.anbieter-name').text(selected_assignment_infos.assignment_creator)
+    $('.revise .info').attr("id", selected_assignment_infos.id)
+    console.log("Revise Assignemnt Info", selected_assignment_infos)
 }

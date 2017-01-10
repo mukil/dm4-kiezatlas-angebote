@@ -494,6 +494,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                         + " (Start: " + new Date(startTime) + " End: " + new Date(endTime) + ")");
                     result.delete();
                     log.info("Succesfully DELETED assignment");
+                    // TODO: Send short email notice to anbieter_in
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

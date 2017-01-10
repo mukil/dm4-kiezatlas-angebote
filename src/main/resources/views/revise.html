@@ -9,9 +9,7 @@
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
-        <link rel="stylesheet" href="/de.kiezatlas.website/css/semantic-ui/2.2/button.min.css"/>
-
-        <script defer="true" src="/de.kiezatlas.website/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
 
         <script defer="true" src="/de.deepamehta.accesscontrol/script/vendor/sha256.js"></script>
@@ -31,16 +29,9 @@
 
         <!-- Details Area -->
         <div class="ui container">
-            <div class="commands">
-                <button class="ui basic green button" onclick="go_to_frontpage()">Zuweisung ist OK</button>
-                <button class="ui basic red button" onclick="do_revise_assignment()">Zuweisung aufheben</button>
-                <!--a class="remove-button ui button" href="#showremove" >Zuweisung aufheben</a><br/-->
-                <br/>
-                <span class="label hint">Hinweis: Diese Aktion kann nicht r&uuml;ckg&auml;ngig gemacht werden.</span>
-            </div>
-            <div id="info">
+            <div class="info" id="-1">
                 <br/><br/>
-                <span class="label">Name des Angebots</span><br/>
+                <span class="label">Es handelt sich hierbei um das Angebot</span><br/>
                 <h3 class="angebots-name"></h3>
                 <span class="label">F&uuml;r den Zeitraum vom </span><span class="von"></span> bis <span class="bis"></span><br/><br/>
                 <span class="label">Angebotsbeschreibung</span><br/>
@@ -53,6 +44,23 @@
                     <!-- Angelegt von <em class="creator"></em>. -->
                 </p>
             </div>
+            <!--div id="contact">
+                <h3>Anbieter_in kontaktieren</h3>
+                <span class="label">Nachricht</span><br/><br/>
+                <div class="label">Hallo <span class="anbieter-name"></span>,</div><br/>
+                <textarea name="message" id="email-body" placeholder="Nachricht der Email"/><br/>
+                <br/><br/>
+                <span class="mail-status"></span>
+                <br/>
+                <button class="ui button" onclick="send_revise_message()">Email senden</button>
+            </div-->
+            <div class="commands">
+                <button class="ui olive button" onclick="go_to_frontpage()">Zuweisung ist OK</button>
+                <button class="ui basic red button" onclick="do_revise_assignment()">Zuweisung aufheben</button>
+                <!--a class="remove-button ui button" href="#showremove" >Zuweisung aufheben</a><br/-->
+                <br/>
+                <span class="label hint">Hinweis: Eine Aufhebung kann nicht r&uuml;ckg&auml;ngig gemacht werden.</span>
+            </div>
         </div>
 
         <div id="bottom">
@@ -61,6 +69,9 @@
                      title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
             </p>
         </div>
+
+        <!-- Piwik -->
+        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Kiezatlas+2+Angebotsinfo+Revision')}" style="border:0" alt="" />
 
     </body>
 </html>

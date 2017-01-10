@@ -17,12 +17,12 @@ function render_angebots_item(item) {
     // console.log("Angebot Item", item, created, modified)
     $('ul.angebote').append('<li id="'+item.id+'"><a href="/angebote/'+item.id+'" title="View Angebotsinfo"><b>' + item.value + '</b></a>'
         + '<div class="list-commands">'
-            + '<div class="ui input focus edit-angebot"><button title="Angebotsinfos bearbeiten" class="ui mini button" '
+            + '<div class="ui input focus edit-angebot"><button title="Angebotsinfos bearbeiten" '
                 + 'onclick="go_edit_angebot('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
-            + '<div class="ui input focus edit-assignments"><button class="ui mini button" title="Hier kannst du deine '
+            + '<div class="ui input focus edit-assignments"><button title="Hier kannst du deine '
                 + 'Angebotsinfos Einrichtungen terminlich zuweisen" onclick="go_edit_assignments('+item.id+')">'
                 + '<i class="add to calendar icon" />Angebotszeiträume</button></div>'
-            + '<div class="ui input focus delete-angebot"><button class="ui red mini button" title="Achtung: Löscht diese '
+            + '<div class="ui input focus delete-angebot"><button title="Achtung: Löscht diese '
                 + 'Angebotsinfo" onclick="delete_my_angebot('+item.id+')"><i class="trash icon" /></button></div>'
         + '</div>'
         + '<br/><small>Erstellt am ' + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
