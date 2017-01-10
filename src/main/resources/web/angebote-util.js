@@ -55,20 +55,6 @@ function load_username(renderer) {
     })
 }
 
-function render_user_menu(state) {
-    // ### Show Administration Menu for "Confirmation" WS Members
-    if (state) {
-        $('.username').text(state)
-        $('.menu .login.item').hide()
-        $('.menu .angebote.item').attr('style', 'display: inline-block;')
-        $('.menu .logout.item').attr('style', 'display: inline-block;')
-    } else {
-        $('.menu .login.item').show()
-        $('.menu .angebote.item').hide()
-        $('.menu .logout.item').hide()
-    }
-}
-
 function fetch_angebote_workspace() {
     var angebote_workspace_uri = "de.kiezatlas.angebote_ws"
     $.getJSON('/core/topic/by_value/uri/' + angebote_workspace_uri, function(result){
@@ -221,7 +207,7 @@ function value_sort_desc(a, b) {
 
 function logout() {
     $.post('/accesscontrol/logout', function(username) {
-        if (!username) render_user_menu(false)
+        window.document.location.reload()
     })
 }
 

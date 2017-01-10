@@ -58,6 +58,11 @@
             <version>1.3.10</version>
         </dependency>
         <dependency>
+            <groupId>de.mikromedia</groupId>
+            <artifactId>dm48-webpages</artifactId>
+            <version>0.4.4-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.0</version>

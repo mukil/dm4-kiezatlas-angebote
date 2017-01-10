@@ -1,6 +1,7 @@
 
 function render_angebotsinfo_page() {
     var angebotsId = $('#angebot').attr("data")
+    $sidebarUi = $('.ui.sidebar').sidebar('setting', 'dimPage', false)
     load_angebot_by_resource_path(angebotsId, function(status, selected_angebot) {
         if (status === "ok") {
             render_angebot_detail_area()
@@ -19,9 +20,7 @@ function render_angebotsinfo_page() {
             // render_angebot_detail_area()
         }
     })
-    load_username(function(res) {
-        render_user_menu(res)
-    })
+    // load_username()
 }
 
 function render_angebot_detail_area() {

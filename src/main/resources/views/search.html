@@ -17,6 +17,7 @@
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-locating.js"></script>
         <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/checkbox.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/sidebar.min.js"></script>
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="init_search_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
@@ -25,85 +26,80 @@
     </head>
     <body class="kiezatlas angebotsinfos search">
 
-        <div class="top-menu ui menu top fixed">
-            <div class="ui container">
-                <a href="/">
-                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
-                </a>
-                <a class="item gesamt" href="/">Startseite</a>
-                <a href="/angebote/my" style="display: none;" class="angebote item">Meine Eintr&auml;ge</a>
-                <a href="/angebote" class="all-angebote active item">Angebote</a>
-                <a href="/sign-up/login" class="login item">Login</a>
-                <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
-            </div>
-        </div>
+        <div class="top-menu" th:include="fragments/navigation :: top (publisher=${is_publisher})"></div>
 
-        <div class="headline white-styled-area-bottom-line">
+        <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
 
-            <div class="logoline">
-                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
-                <div class="slogan">Angebotsinfos im Kiezatlas</div>
-            </div>
+        <div class="pusher">
 
-            <div class="form-area">
+            <div class="headline white-styled-area-bottom-line">
 
-                <form action="javascript:_void()" id="fulltext-search-form" accept-charset="UTF-8">
-                    <div id="search-input-one" class="ui search icon input" style="display: inline-block;">
-                        <!--label for="query" class="label">Suche nach Angeboten</label-->
-                        <input id="query" title="Volltextsuche in allen Angebotsinformationen"
-                               name="search" placeholder="Name, Beschreibung, Stichwörter des Angebots" type="text"/>
-                    </div>
-                    <button class="circular ui icon button basic" title="Suchanfrage starten"
-                            onclick="fire_angebote_search()" id="do-text-search">
-                        <i class="search icon"></i>
-                    </button>
-                    <div class="ui toggle checkbox" title="Aktiviere Suche in Wortmitte und Wortende">
-                        <input id="leading-wildcard" type="checkbox" onchange="toggle_leading_wildcard()" />
-                        <label>&nbsp;</label>
-                    </div>
-                </form>
-
-                <form action="javascript:_void()" id="location-search-form" accept-charset="UTF-8">
-                    <div class="nearby-dialog ui search input">
-                        <!-- label for="nearby" class="label">In der N&auml;he von</label -->
-                        <input id="nearby" title="Textbasierte Suche nach Anschrift und Geo-Koordinaten" name="nearby" class=""
-                               type="text" placeholder="Straße Hnr., PLZ , Anschrift in der Nähe von..." />
-                    </div>
-                    <button id="do-nearby" title="Standort suchen" class="circular ui icon button basic"
-                            onclick="javascript:do_search_streetcoordinates()">Go</button>
-                    <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="circular ui icon button basic"
-                            onclick="javascript:do_browser_location()"><i class="location arrow icon"></i><span>Standort nutzen</span></button>
-                </form>
-
-            </div>
-
-        </div>
-
-        <div class="search-content">
-
-            <div class="filter-area">
-                <div class="query-parameter"></div>
-            </div>
-
-            <div id="listing" class="list-area">
-                <h4 class="status"></h4>
-                <div class="ui input icon loading-indicator">
-                    <i class="loading hidden spinner icon"></i>
+                <div class="logoline">
+                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
+                    <div class="slogan">Angebotsinfos im Kiezatlas</div>
                 </div>
-                <ul class="results"></ul>
+
+                <div class="form-area">
+
+                    <form action="javascript:_void()" id="fulltext-search-form" accept-charset="UTF-8">
+                        <div id="search-input-one" class="ui search icon input" style="display: inline-block;">
+                            <!--label for="query" class="label">Suche nach Angeboten</label-->
+                            <input id="query" title="Volltextsuche in allen Angebotsinformationen"
+                                   name="search" placeholder="Name, Beschreibung, Stichwörter des Angebots" type="text"/>
+                        </div>
+                        <button class="circular ui icon button basic" title="Suchanfrage starten"
+                                onclick="fire_angebote_search()" id="do-text-search">
+                            <i class="search icon"></i>
+                        </button>
+                        <div class="ui toggle checkbox" title="Aktiviere Suche in Wortmitte und Wortende">
+                            <input id="leading-wildcard" type="checkbox" onchange="toggle_leading_wildcard()" />
+                            <label>&nbsp;</label>
+                        </div>
+                    </form>
+
+                    <form action="javascript:_void()" id="location-search-form" accept-charset="UTF-8">
+                        <div class="nearby-dialog ui search input">
+                            <!-- label for="nearby" class="label">In der N&auml;he von</label -->
+                            <input id="nearby" title="Textbasierte Suche nach Anschrift und Geo-Koordinaten" name="nearby" class=""
+                                   type="text" placeholder="Straße Hnr., PLZ , Anschrift in der Nähe von..." />
+                        </div>
+                        <button id="do-nearby" title="Standort suchen" class="circular ui icon button basic"
+                                onclick="javascript:do_search_streetcoordinates()">Go</button>
+                        <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="circular ui icon button basic"
+                                onclick="javascript:do_browser_location()"><i class="location arrow icon"></i><span>Standort nutzen</span></button>
+                    </form>
+
+                </div>
+
             </div>
 
-            <a class="ui button tiny basic" href="/angebote/my" id="anbieter-info-link"
-               title="Sie sind Anbieter &ouml;ffentlicher und sozial-kultureller Angebote?">
-                Infos f&uuml;r Anbieterinnen und Anbieter
-            </a>
-        </div>
+            <div class="search-content">
 
-        <div id="bottom" class="white-styled-area">
-            <div class="tag-view"><h4 class="label">Angebotssuche nach Stichworten</h4><br/></div>
-        </div>
+                <div class="filter-area">
+                    <div class="query-parameter"></div>
+                </div>
 
-        <div class="footer" th:include="fragments/navigation :: footer"></div>
+                <div id="listing" class="list-area">
+                    <h4 class="status"></h4>
+                    <div class="ui input icon loading-indicator">
+                        <i class="loading hidden spinner icon"></i>
+                    </div>
+                    <ul class="results"></ul>
+                </div>
+
+                <a class="ui button tiny basic" href="/angebote/my" id="anbieter-info-link"
+                   title="Sie sind Anbieter &ouml;ffentlicher und sozial-kultureller Angebote?">
+                    Infos f&uuml;r Anbieterinnen und Anbieter
+                </a>
+            </div>
+
+            <div id="bottom" class="white-styled-area">
+                <div class="tag-view"><h4 class="label">Angebotssuche nach Stichworten</h4><br/></div>
+            </div>
+
+            <div class="footer" th:include="fragments/navigation :: footer-links (publisher=${is_publisher})"></div>
+
+        </div>
 
     </body>
 </html>

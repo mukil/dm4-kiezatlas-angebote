@@ -26,6 +26,9 @@ import static de.kiezatlas.angebote.AngebotService.ANGEBOT_CREATOR_EDGE;
 import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
 import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
+import de.mikromedia.webpages.Webpage;
+import de.mikromedia.webpages.WebpageService;
+import de.mikromedia.webpages.Website;
 import java.io.InputStream;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -83,6 +86,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     private final static String PROP_URI_MODIFIED = "dm4.time.modified";
 
     private static final String ASSIGNMENT_REVISION_KEY_PROP = "revision_key";
+    private final String DM4_HOST_URL = System.getProperty("dm4.host.url");
 
     // -------------------------------------------------------------------------------------------- Instance Variables
 
@@ -91,6 +95,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @Inject private KiezatlasService kiezService;
     @Inject private AccessControlService aclService;
     @Inject private GeospatialService spatialService;
+    @Inject private WebpageService webpages;
     @Inject private TaggingService tags;
 
     private Logger log = Logger.getLogger(getClass().getName());
@@ -137,6 +142,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                     throw new WebApplicationException(new RuntimeException("Sorry, you are not authorized to revise this offer"), Response.Status.UNAUTHORIZED);
                 }
             }
+            prepareGeneralPageData("revise");
             return view("revise");
         } catch(RuntimeException ex) {
             log.warning("Angebots Assignment could not be loaded " + ex.getCause().getLocalizedMessage());
@@ -144,16 +150,6 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         viewData("message", "Hinweis: Dieser Angebotszeitraum wurde bereits gelöscht.");
         prepareGeneralPageData("message");
         return view("message");
-    }
-
-    private void prepareGeneralPageData(String templateName) {
-        boolean isAuthenticated = isAuthenticated();
-        // boolean isPrivileged = isConfirmationWorkspaceMember();
-        // boolean isSiteManager = isAuthorizedSiteManager();
-        viewData("authenticated", isAuthenticated);
-        viewData("is_publisher", false);
-        viewData("is_site_manager", false);
-        viewData("template", templateName);
     }
 
     @GET
@@ -171,6 +167,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         Topic angebot = dm4.getTopic(id);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
             viewData("angebot", prepareAngebotsinfos(angebot));
+            prepareGeneralPageData("detail");
             return view("detail");
         }
         throw new RuntimeException("Requested topic is not an angebotsinfo");
@@ -718,8 +715,43 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return sortAngebotsinfosAssignedDescByToDate(angebotsinfos);
     }
 
-
     // ------------------------------------------------------------------------ Private Utility Methods
+
+    private void prepareGeneralPageData(String templateName) {
+        String username = aclService.getUsername();
+        viewData("authenticated", (username != null));
+        viewData("username", username);
+        viewData("template", templateName);
+        viewData("hostUrl", DM4_HOST_URL);
+        // boolean isPrivileged = kiezService.isConfirmationWorkspaceMember();
+        boolean isSiteManager = kiezService.isKiezatlasWorkspaceMember();
+        viewData("is_publisher", false);
+        viewData("is_site_manager", isSiteManager);
+        prepareWebsiteViewData(webpages.getStandardWebsite());
+        // viewData("website", websitePrefix);
+    }
+
+    /**
+     * Prepares the most basic data used across all our Thymeleaf page templates.
+     * @param website
+     */
+    private void prepareWebsiteViewData(Topic website) {
+        if (website != null) {
+            Website site = new Website(website, dm4);
+            viewData("siteName", site.getName());
+            viewData("siteCaption", site.getCaption());
+            viewData("siteAbout", site.getAboutHTML());
+            viewData("siteId", website.getId());
+            viewData("footerText", site.getFooter());
+            viewData("customSiteCss", site.getStylesheetPath());
+            viewData("menuItems", site.getActiveMenuItems());
+            List<Webpage> pages = webpages.getPublishedWebpages(website);
+            // sort webpages on websites frontpage by modification time
+            viewData("webpages", webpages.getWebpagesSortedByTimestamp(pages, true)); // false=creationDate
+        } else {
+            log.warning("Preparing webpage template failed because the website was not given");
+        }
+    }
 
     private void isAuthorized() {
         String username = aclService.getUsername();

@@ -1,7 +1,9 @@
 
+var $sidebarUi = undefined
+
 function angebot_assignments_page() {
     $("#name-search").on("keyup", handle_name_search_input)
-    load_username(render_user_menu)
+    // load_username()
     has_angebote_membership(function(state) {
         if (state) {
             render_assignment_page()
@@ -20,7 +22,7 @@ function angebot_assignments_page() {
 }
 
 function edit_angebot_page() {
-    load_username(render_user_menu)
+    // load_username()
     has_angebote_membership(function(state) {
         if (state) {
             // parse topic id from path
@@ -50,7 +52,7 @@ function edit_angebot_page() {
 
 function my_entries_page() {
     load_username(function(response) {
-        render_user_menu(response, true)
+        // render_user_menu(response, true)
         console.log("logged in", response)
         if (!response) {
             $('.task-info').html("<p class=\"message\">Auf der folgenden Seite kannst Du Dich <a href=\"/sign-up/login\">einloggen</a>.</p>")
@@ -70,5 +72,6 @@ function my_entries_page() {
             })
         }
     })
+    $sidebarUi = $('.ui.sidebar').sidebar('setting', 'dimPage', false)
     load_users_einrichtungen()
 }

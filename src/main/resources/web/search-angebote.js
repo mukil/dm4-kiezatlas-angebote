@@ -17,9 +17,8 @@ var show_intersecting = true // flag if, by default the client should only
     // ... show search result items contained in all queries (spatial, time and fulltext)
 // var show_inactive_offers = false// flag if, offers without an active assignment should be included
 
-
 function init_search_page() {
-    load_username(render_user_menu)
+    // load_username()
     // load tag cloud
     load_and_render_tag_search_dialog()
     // do search by time
@@ -33,6 +32,7 @@ function init_search_page() {
             render_search_frontpage()
         }
     }
+    $sidebarUi = $('.ui.sidebar').sidebar('setting', 'dimPage', false)
 }
 
 // ----------------------------------  The Major Search Operations --------- //

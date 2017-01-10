@@ -16,6 +16,7 @@
         <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
 
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/sidebar.min.js"></script>
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
         <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="my_entries_page()"></script>
@@ -25,86 +26,70 @@
     </head>
     <body class="kiezatlas angebotsinfos start">
 
-        <div class="top-menu ui menu top fixed">
-            <div class="ui container">
-                <a href="/">
-                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
-                </a>
-                <a class="gesamt item" href="/">Startseite</a>
-                <a href="/angebote/my" style="display: none;" class="angebote active item">Meine Eintr&auml;ge</a>
-                <a href="/angebote" class="all-angebote item">Angebote</a>
-                <a href="/sign-up/login" class="login item">Login</a>
-                <!--div class="right menu administration" style="display: none;">
-                    <div class="ui simple dropdown item">
-                        <i class="setting icon"></i>Admin
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <a class="item" href="/website/geo/confirmation/">Neueintragungen</a>
-                            <a href="/site/administration/" class="item">Listenansicht</a>
-                            <a href="/website/sites" class="item">Sites</a>
-                        </div>
-                    </div>
-                </div-->
-                <a href="/sign-up/login" style="display: none;" class="logout item">Logout</a>
+        <div class="top-menu" th:include="fragments/navigation :: top (publisher=${is_publisher})"></div>
+
+        <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
+
+        <div class="pusher">
+
+            <div class="white-styled-area header-message">
+                <p>Hi <span class="username"></span>!</p>
+                <p>
+                    Im Kiezatlas gibt es jetzt die M&ouml;glichkeit Informationen zu <b>Angeboten</b> und <b>Orten selbstst&auml;ndig einzutragen</b>. Dazu kurz das Wichtigste.
+                </p>
+                <p>
+                    Angebotsinfos sind <em>Vorlagen für konkrete Termine bzw. Veranstaltungszeitr&auml;ume</em> eines Angebots. Das hat den Vorteil das diese wie eine Art "Basisinformation" zu einem Angebot nur einmal eingetragen werden m&uuml;ssen aber mehreren Veranstaltungsorten &uuml;ber verschiedene Zeitr&auml;ume zugewiesen werden k&ouml;nnen.
+                    <!-- Termine sind bei uns erst einmal nur <em>Angebotszeitr&auml;ume</em> (von Tag bis Tag) -->
+                </p>
+                <p>
+                    Ein Angebot wird &ouml;ffentlich such- und sichtbar sobald die Angebotsinfos mit einem Ort im Kiezatlas terminlich verbunden sind (siehe unten, <em>Angebotszeitr&auml;me verwalten</em>).
+                </p>
+                <p>
+                    Bei neuen Orten verh&auml;hlt sich das etwas anders, diese m&uuml;ssen vor der Benutzung und Veröffentlichung einmalig freigeschaltet werden.
+                    Diese Freischaltung &uuml;bernimmt eine/r <em>Kiez-AdministratorInnen</em> und du erh&auml;ltst automatisch eine Benachrichtigung (via Email) sobald dies geschehen ist.
+                </p>
             </div>
-        </div>
 
-        <div class="white-styled-area header-message">
-            <p>Hi <span class="username"></span>!</p>
-            <p>
-                Im Kiezatlas gibt es jetzt die M&ouml;glichkeit Informationen zu <b>Angeboten</b> und <b>Orten selbstst&auml;ndig einzutragen</b>. Dazu kurz das Wichtigste.
-            </p>
-            <p>
-                Angebotsinfos sind <em>Vorlagen für konkrete Termine bzw. Veranstaltungszeitr&auml;ume</em> eines Angebots. Das hat den Vorteil das diese wie eine Art "Basisinformation" zu einem Angebot nur einmal eingetragen werden m&uuml;ssen aber mehreren Veranstaltungsorten &uuml;ber verschiedene Zeitr&auml;ume zugewiesen werden k&ouml;nnen.
-                <!-- Termine sind bei uns erst einmal nur <em>Angebotszeitr&auml;ume</em> (von Tag bis Tag) -->
-            </p>
-            <p>
-                Ein Angebot wird &ouml;ffentlich such- und sichtbar sobald die Angebotsinfos mit einem Ort im Kiezatlas terminlich verbunden sind (siehe unten, <em>Angebotszeitr&auml;me verwalten</em>).
-            </p>
-            <p>
-                Bei neuen Orten verh&auml;hlt sich das etwas anders, diese m&uuml;ssen vor der Benutzung und Veröffentlichung einmalig freigeschaltet werden.
-                Diese Freischaltung &uuml;bernimmt eine/r <em>Kiez-AdministratorInnen</em> und du erh&auml;ltst automatisch eine Benachrichtigung (via Email) sobald dies geschehen ist.
-            </p>
-        </div>
+            <div class="task-info"></div>
 
-        <div class="task-info"></div>
+            <div class="angebot-area">
+                <h3>Meine Angebotsinfos</h3>
+                <ul class="angebote"></ul>
+                <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
+                    <div class="ui input block-space-bottom">
+                        <button type="submit" class="ui small button">Neues Angebot</button>
+                    </div>
+                </form>
+            </div>
 
-        <div class="angebot-area">
-            <h3>Meine Angebotsinfos</h3>
-            <ul class="angebote"></ul>
-            <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
-                <div class="ui input block-space-bottom">
-                    <button type="submit" class="ui small button">Neues Angebot</button>
+            <div class="einrichtungs-area">
+                <h3>Meine Orte</h3>
+                <ul class="einrichtungen"></ul>
+                <form method="GET" action="/website/geo/create" id="angebot-form" accept-charset="UTF-8">
+                    <div class="ui input block-space-bottom">
+                        <button type="submit" class="ui small button">Neuer Ort</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="bottom">
+                <div class="menu">
+                    <ul>
+                        <li>
+                            <a href="/" title="Zurück zur Startseite">Zur&uuml;ck</a>
+                        </li>
+                        <li>
+                            <a href="/angebote" title="Alle aktuelle Angebote anzeigen">Angebotssuche</a>
+                        </li>
+                    </ul>
                 </div>
-            </form>
-        </div>
-        
-        <div class="einrichtungs-area">
-            <h3>Meine Orte</h3>
-            <ul class="einrichtungen"></ul>
-            <form method="GET" action="/website/geo/create" id="angebot-form" accept-charset="UTF-8">
-                <div class="ui input block-space-bottom">
-                    <button type="submit" class="ui small button">Neuer Ort</button>
-                </div>
-            </form>
-        </div>
+            </div>
 
-        <div id="bottom">
-            <div class="menu">
-                <ul>
-                    <li>
-                        <a href="/" title="Zurück zur Startseite">Zur&uuml;ck</a>
-                    </li>
-                    <li>
-                        <a href="/angebote" title="Alle aktuelle Angebote anzeigen">Angebotssuche</a>
-                    </li>
-                </ul>
-            </div>           
+            <div id="dialog-confirm" title="Eintrag löschen?">Willst Du diesen Datensatz entfernen?</div>
+
+            <div class="footer" th:include="fragments/navigation :: footer-links (publisher=${is_publisher})"></div>
+
         </div>
-
-        <div id="dialog-confirm" title="Eintrag löschen?">Willst Du diesen Datensatz entfernen?</div>
-
-        <div class="footer" th:include="fragments/navigation :: footer"></div>
 
     </body>
 </html>
