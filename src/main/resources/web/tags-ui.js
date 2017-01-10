@@ -9,15 +9,14 @@ var tagging = new function() {
     var _ = this
     var nodeId = 'angebot-tags'
     var domElement = undefined
-    var topicTags = undefined // tags the selected topic already carries
-    var allReadableTags = []
+    var cachedTags = undefined  // tags the selected topic already carries
+    var availableTags = []      // complete list of tags available in the system
     var REF_PREFIX = "ref_id:"  // duplicate of webclient.js // dm4c
     var DEL_PREFIX = "del_id:"  // duplicate of webclient.js // dm4c
 
     this.fetchAllTagTopics = function(callback) {
         restc.request("GET", "/core/topic/by_type/dm4.tags.tag", undefined, function(response) {
-            allReadableTags = response
-            // console.log("Loaded all available tags", allReadableTags)
+            availableTags = response
             if (callback) callback()
         })
     }
@@ -44,6 +43,8 @@ var tagging = new function() {
             if (commaCount < topicTags.length) inputFieldValue += ", "
             commaCount++
         }
+        // cached loaded tag topics
+        cachedTags = topicTags
         // console.log("Setup Tags to Edit", topicTags)
         $('#' + nodeId).val(inputFieldValue)
     }
@@ -56,7 +57,7 @@ var tagging = new function() {
         // create all new and collect existing tag (topics)
         for (var label in enteredTags) {
             var name = enteredTags[label]
-            var tag = _.getMatchingTagTopic(name, allReadableTags)
+            var tag = _.getMatchingTagTopic(name, availableTags)
             if (!tag) {
                 // create new topic
                 var tag_model = {
@@ -70,14 +71,12 @@ var tagging = new function() {
                 resultingTags.push(tag)
             }
         }
-        // identify all tags (which were formerly there but are not in our input-field anymore these are)
-        // to to be removed by reference
-        for (var el in topicTags) {
-            /** var element = topicTags[el].object.value
-            var elementId = topicTags[el].object.id **/
-            var element = topicTags[el].label
-            var elementId = topicTags[el].id
-            if (_.getMatchingTagTopic(element, resultingTags) == undefined) { // if
+        // identify all tags (which were formerly there but are not in our input-field anymore)
+        // to be removed by reference
+        for (var el in cachedTags) {
+            var element = cachedTags[el].label
+            var elementId = cachedTags[el].id
+            if (!_.getMatchingTagTopic(element, resultingTags)) { // if
                 new_model.push(DEL_PREFIX + elementId)
             }
         }
@@ -89,7 +88,6 @@ var tagging = new function() {
             }
         }
         return new_model
-
     }
 
     this.setupJQueryUIAutocompleteField = function(identifier) {
@@ -106,13 +104,13 @@ var tagging = new function() {
             minLength: 0,
             source: function( request, response ) {
                 // delegate back to autocomplete, but extract the last term
-                response( $.ui.autocomplete.filter( allReadableTags, extractLast( request.term ) ) )
+                response( $.ui.autocomplete.filter( availableTags, extractLast( request.term ) ) )
             },
             focus: function(event, ui) {
                 // prevent value inserted on focus
                 return false;
             },
-            select: function( event, ui ) {
+            select: function(event, ui) {
                 var tag = ui.item
                 var terms = split( this.value )
                 // remove the current input
