@@ -8,11 +8,11 @@
             <a href="/" class="home" title="zur Startseite">
                 <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" height="40" class="mobile-logo" />
             </a>
-            <a th:if="!${#strings.contains(template, 'page')}"
+            <a th:if="!${#strings.contains(template, 'page') or !#strings.contains(template, 'login') or !#strings.contains(template, 'sign-up')}"
                class="item open-sidebar" onclick="$sidebarUi.sidebar('toggle');">Men&uuml;</a>
             <a th:if="${authenticated}" href="/angebote/my" class="item angebote">Meine Eintr&auml;ge</a>
             <a th:if="!${#strings.contains(template, 'index')}" href="/" class="item">Startseite</a>
-            <a href="/angebote" th:if="!${#strings.contains(template, 'search')}"
+            <a href="/angebote"
                th:class="${#strings.contains(template, 'search')} ? 'active item all-angebote' : 'item all-angebote'">Angebote</a>
             <div th:if="${#strings.contains(template, 'index')}" class="ui simple dropdown item">
                 Bezirke <i class="dropdown icon"></i>
