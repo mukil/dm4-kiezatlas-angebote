@@ -8,8 +8,8 @@ import de.deepamehta.core.service.EventListener;
  *
  * @author malted
  */
-public interface AngebotAssignedListener extends EventListener {
+public interface RemovedAngebotListener extends EventListener {
     
-    void angebotsInfoAssigned(Topic angebotsInfo, Topic geoObject, Association assignment);
+    void angebotsInfoAssignmentRemoved(Topic angebotsInfo, Topic geoObject, Association assignment, String username);
     
 }

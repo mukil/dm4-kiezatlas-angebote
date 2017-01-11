@@ -1,4 +1,17 @@
 
+function do_confirm_revision() {
+    $("#dialog-confirm").dialog({ resizable: false, height: "auto", width: 340, modal: true,
+        title: "Angebotszeitraum aufheben", buttons: {
+            "Ja, aufheben": function() {
+                do_revise_assignment()
+            },
+            "Nein": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    })
+}
+
 function do_revise_assignment() {
     var username = restc.get_username()
     if (username) {
@@ -13,10 +26,13 @@ function do_revise_assignment() {
     }
 
     function do_revise_call() {
-        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment_infos.id + '/delete')
-        $('.label.hint').text("OK, die Zuweisung dieses Angebots wurde erfolgreich aufgehoben.")
-        // und der/die Anbieter_in benachrichtigt.
+        var result = restc.request('POST', '/angebote/assignment/' + selected_assignment_infos.id + '/delete', undefined, undefined)
+        console.log("Delete Assignment Result", result)
+        $('.label.hint').text("OK, die Zuweisung dieses Angebots wurde erfolgreich aufgehoben und der/die Anbieter_in benachrichtigt.")
         $('.revise .commands button').remove()
+        restc.logout()
+        $("#dialog-confirm").dialog("close");
+        // go_to_frontpage()
     }
 
     function do_privileged_revise_call() {
@@ -24,9 +40,8 @@ function do_revise_assignment() {
         username = restc.get_username()
         if (username) {
             do_revise_call()
-            restc.logout()
-            go_to_frontpage()
         } else {
+            $("#dialog-confirm").dialog("close");
             $('.label.hint').text("Entschuldigung, bei der Aufhebung der Zuweisung ist ein Fehler aufgetreten.")
         }
     }
@@ -39,7 +54,12 @@ function send_revise_message() {
         $('.mail-status').text("Mail ist zu kurz, bitte geben Sie mindestens 3 Zeichen ein.")
         return
     } else {
-        console.log("Assignment Id", assignmentId, "Message", message)
+        restc.request('POST', '/angebote/assignment/' + assignmentId + '/contact', message, function(response) {
+            console.log("Send Mail:", response)
+            $('.mail-status').text("OK! Ihre Nachricht wurde verschickt")
+            $('#sendmail').remove()
+            $('#contact textarea').remove()
+        }, undefined, "text")
     }
 }
 

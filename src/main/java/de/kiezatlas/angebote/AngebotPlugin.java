@@ -255,10 +255,26 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     /**
      * Custom event fired by dm4-kiezatlas-angebote module when a user assigns their angebot to an Einrichtung.
      */
-    static DeepaMehtaEvent ANGEBOT_ASSIGNED_LISTENER = new DeepaMehtaEvent(AngebotAssignedListener.class) {
+    static DeepaMehtaEvent ANGEBOT_ASSIGNED_LISTENER = new DeepaMehtaEvent(AssignedAngebotListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((AngebotAssignedListener) listener).angebotsInfoAssigned((Topic) params[0], (Topic) params[1], (Association) params[2]);
+            ((AssignedAngebotListener) listener).angebotsInfoAssigned((Topic) params[0], (Topic) params[1], (Association) params[2]);
+        }
+    };
+
+    static DeepaMehtaEvent ANGEBOT_ASSIGNMENT_REMOVE_LISTENER = new DeepaMehtaEvent(RemovedAngebotListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((RemovedAngebotListener) listener).angebotsInfoAssignmentRemoved((Topic) params[0], (Topic) params[1],
+                    (Association) params[2], (String) params[3]);
+        }
+    };
+
+    static DeepaMehtaEvent CONTACT_ANBIETERIN_LISTENER = new DeepaMehtaEvent(ContactAnbieterListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((ContactAnbieterListener) listener).contactAngebotsAnbieter((Topic) params[0], (Topic) params[1], (Association) params[2],
+                    (String) params[3], (String) params[4], (String) params[5]);
         }
     };
 
@@ -418,6 +434,39 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return model;
     }
 
+    @POST
+    @Path("/assignment/{id}/contact")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response contactAngebotsAnbieter(@PathParam("id") long assocId, String messageBody) {
+        Association assignment = dm4.getAssociation(assocId);
+        Topic angebot = null;
+        Topic geoObject = null;
+        log.info("Attempt to contact anbieter of Angebot with message \n" + messageBody + "");
+        String messageValue = messageBody.substring(1, messageBody.length() - 1); // strips quotations marks
+        String errorMessage = null;
+        try {
+            if (assignment.getTypeUri().equals(ASSIGNMENT_EDGE)) {
+                Topic player1 = dm4.getTopic(assignment.getPlayer1().getId());
+                Topic player2 = dm4.getTopic(assignment.getPlayer2().getId());
+                if (player1.getTypeUri().equals(ANGEBOT)) {
+                    angebot = player1;
+                    geoObject = player2;
+                } else if (player2.getTypeUri().equals(ANGEBOT)) {
+                    angebot = player2;
+                    geoObject = player1;
+                }
+                log.info("Identified \""+angebot.getSimpleValue()+"\" at " + geoObject.getSimpleValue());
+                Topic angebotsCreator = getAngebotsinfoCreator(angebot);
+                notifyAngebotsAnbieterin(assignment, messageValue, angebotsCreator.getSimpleValue().toString());
+                return Response.ok("OK").build();
+            }
+        } catch (Exception e) {
+            errorMessage = e.getLocalizedMessage();
+            throw new RuntimeException(e);
+        }
+        return Response.serverError().build();
+    }
+
     // ------------------------------------------------------------------------------------- CRUD Angebots-Assignments
 
     /** Creates an association of type "ka2.angebot.assignment" with two properties (timestamp "from" and "to").
@@ -492,9 +541,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                     long endTime = getAssignmentToTime(result);
                     log.info("DELETE " + angebotsName + " assignment from institution " + einrichtungsName
                         + " (Start: " + new Date(startTime) + " End: " + new Date(endTime) + ")");
+                    notifyAboutAngebotsAssignmentRemoval(result);
                     result.delete();
                     log.info("Succesfully DELETED assignment");
-                    // TODO: Send short email notice to anbieter_in
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -659,6 +708,16 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         }
         log.info("Filtered " + result.size() + " items out for " + new Date(nowDate).toGMTString());
         return result;
+    }
+
+    @Override
+    public String getAssignmentZusatzinfo(Association assignmentEdge) {
+        return assignmentEdge.getChildTopics().getStringOrNull(ASSIGNMENT_ZUSATZINFO);
+    }
+
+    @Override
+    public String getAssignmentKontakt(Association assignmentEdge) {
+        return assignmentEdge.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
     }
 
     @Override
@@ -831,11 +890,24 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return angebot;
     }
 
-    /** Move this to website service */
     private void notifyAboutAngebotsAssignment(Association assignmentEdge) {
         Topic geoObject = getAssignedGeoObjectTopic(assignmentEdge).loadChildTopics();
         Topic angebot = getAssignedAngebotsinfoTopic(assignmentEdge).loadChildTopics();
         dm4.fireEvent(ANGEBOT_ASSIGNED_LISTENER, angebot, geoObject, assignmentEdge);
+    }
+
+    private void notifyAboutAngebotsAssignmentRemoval(Association assignmentEdge) {
+        Topic geoObject = getAssignedGeoObjectTopic(assignmentEdge).loadChildTopics();
+        Topic angebot = getAssignedAngebotsinfoTopic(assignmentEdge).loadChildTopics();
+        dm4.fireEvent(ANGEBOT_ASSIGNMENT_REMOVE_LISTENER, angebot, geoObject, assignmentEdge,
+                aclService.getUsername());
+    }
+
+    private void notifyAngebotsAnbieterin(Association assignmentEdge, String message, String usernameTo) {
+        Topic geoObject = getAssignedGeoObjectTopic(assignmentEdge).loadChildTopics();
+        Topic angebot = getAssignedAngebotsinfoTopic(assignmentEdge).loadChildTopics();
+        dm4.fireEvent(CONTACT_ANBIETERIN_LISTENER, angebot, geoObject, assignmentEdge, message,
+                aclService.getUsername(), usernameTo);
     }
 
     private void setAssignmentFromTime(Association result, long fromDate) {
@@ -1018,12 +1090,12 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         String webpage = angebot.getChildTopics().getStringOrNull(ANGEBOT_WEBPAGE);
         if (webpage != null) assignedAngebot.setWebpage(webpage);
         // Additonal Kontakt overrides standard kontakt
-        String assignmentKontakt = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_KONTAKT);
+        String assignmentKontakt = getAssignmentKontakt(assignment);
         if (assignmentKontakt != null) {
             assignedAngebot.setKontakt(assignmentKontakt);
         }
         // Adds to Description
-        String assignmentZusatzinfo = assignment.getChildTopics().getStringOrNull(ASSIGNMENT_ZUSATZINFO);
+        String assignmentZusatzinfo = getAssignmentZusatzinfo(assignment);
         if (assignmentZusatzinfo != null) {
             assignedAngebot.setAdditionalInfo(assignmentZusatzinfo);
         }

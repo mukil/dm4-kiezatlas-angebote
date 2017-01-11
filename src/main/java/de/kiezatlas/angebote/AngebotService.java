@@ -88,6 +88,10 @@ public interface AngebotService {
      */
     List<RelatedTopic> getAssignmentsByGeoObjectIds(String payloadListing);
 
+    String getAssignmentZusatzinfo(Association assignmentEdge);
+
+    String getAssignmentKontakt(Association assignmentEdge);
+
     long getAssignmentStartTime(Association assignmentEdge);
 
     long getAssignmentEndTime(Association assignmentEdge);
