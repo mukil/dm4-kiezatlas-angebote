@@ -664,7 +664,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                         // if no assignment exists, angebotsinfo (resp. einrichtung with all its..) is not a result
                         if (offers != null && offers.size() > 0) {
                             for (Topic offer : offers) {
-                                AngebotsinfosAssigned relatedOffer = prepareAngebotsinfosAssigned(offer, inst);
+                                AngebotsinfosAssigned relatedOffer = prepareAngebotsinfosAssigned(inst, offer);
                                 double distanceOfLocation = geomapsService.getDistance(searchPoint, instGeoCoord);
                                 relatedOffer.setLocationSearchDistance(distanceOfLocation);
                                 einrichtungsAngebote.add(relatedOffer);
