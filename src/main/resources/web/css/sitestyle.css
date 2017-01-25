@@ -47,15 +47,18 @@ body.pushable > .pusher {
 /** ### Copy in "de.kiezatlas.website/css/sitestyle.css **/
 
 .footer {
+    color: rgb(169, 169, 169);
+    min-height: 100px;
+    font-size: .9em
+}
+
+.footer .wrapper {
     box-shadow: 0px -3px 25px 1px #a9a9a9;
     -moz-box-shadow: 0px -3px 25px 1px #a9a9a9;
     -webkit-box-shadow: 0px -3px 25px 1px #a9a9a9;
     position: relative;
     background-image: url("/de.kiezatlas.website/images/website_pattern_dg.jpg");
     background-color: rgb(52, 52, 52);
-    color: rgb(169, 169, 169);
-    min-height: 100px;
-    font-size: .9em
 }
 
 .footer h4 {
@@ -76,6 +79,12 @@ body.pushable > .pusher {
     flex: 1;
     margin: auto;
     max-width: 1127px;
+}
+
+.footer .powered-by {
+    margin: auto;
+    max-width: 1100px;
+    padding: 1em 3em;
 }
 
 .footer h3 {
@@ -104,12 +113,6 @@ body.pushable > .pusher {
 .footer a {
     color: rgb(169, 169, 169);
     text-decoration: none;
-}
-
-.footer .powered-by {
-    max-width: 66%;
-    margin: auto;
-    padding-bottom: 2em;
 }
 
 .footer .powered-by a,

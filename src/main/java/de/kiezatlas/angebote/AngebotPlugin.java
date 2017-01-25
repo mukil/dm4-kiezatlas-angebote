@@ -787,6 +787,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         boolean isSiteManager = kiezService.isKiezatlasWorkspaceMember();
         viewData("is_publisher", false);
         viewData("is_site_manager", isSiteManager);
+        viewData("website", "standard");
         prepareWebsiteViewData(webpages.getStandardWebsite());
         // viewData("website", websitePrefix);
     }
