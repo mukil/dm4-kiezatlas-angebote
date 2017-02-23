@@ -90,11 +90,11 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     // -------------------------------------------------------------------------------------------- Instance Variables
 
-    @Inject private GeomapsService geomapsService;
-    @Inject private WorkspacesService workspaceService;
-    @Inject private KiezatlasService kiezService;
+    @Inject private GeomapsService geomaps;
+    @Inject private WorkspacesService workspaces;
+    @Inject private KiezatlasService kiezatlas;
     @Inject private AccessControlService aclService;
-    @Inject private GeospatialService spatialService;
+    @Inject private GeospatialService spatial;
     @Inject private WebpageService webpages;
     @Inject private TaggingService tags;
 
@@ -654,18 +654,18 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             if (location != null && !location.isEmpty() && location.contains(",")) {
                 double r = (radius.isEmpty() || radius.equals("0")) ? 1.0 : Double.parseDouble(radius);
                 GeoCoordinate searchPoint = new GeoCoordinate(location.trim());
-                List<Topic> geoCoordinateTopics = spatialService.getTopicsWithinDistance(searchPoint, r);
+                List<Topic> geoCoordinateTopics = spatial.getTopicsWithinDistance(searchPoint, r);
                 log.info("> Spatial Resultset Size " + geoCoordinateTopics.size() + " Geo Coordinate Topics");
                 for (Topic geoCoordinate : geoCoordinateTopics) {
                     GeoCoordinate instGeoCoord = new GeoCoordinate(geoCoordinate.getSimpleValue().toString().replace(" ", ","));
-                    Topic inst = kiezService.getGeoObjectByGeoCoordinate(geoCoordinate);
+                    Topic inst = kiezatlas.getGeoObjectByGeoCoordinate(geoCoordinate);
                     if (inst != null) {
                         List<RelatedTopic> offers = getAngeboteTopicsByGeoObject(inst);
                         // if no assignment exists, angebotsinfo (resp. einrichtung with all its..) is not a result
                         if (offers != null && offers.size() > 0) {
                             for (Topic offer : offers) {
                                 AngebotsinfosAssigned relatedOffer = prepareAngebotsinfosAssigned(inst, offer);
-                                double distanceOfLocation = geomapsService.getDistance(searchPoint, instGeoCoord);
+                                double distanceOfLocation = geomaps.getDistance(searchPoint, instGeoCoord);
                                 relatedOffer.setLocationSearchDistance(distanceOfLocation);
                                 einrichtungsAngebote.add(relatedOffer);
                             }
@@ -784,7 +784,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         viewData("template", templateName);
         viewData("hostUrl", DM4_HOST_URL);
         // boolean isPrivileged = kiezService.isConfirmationWorkspaceMember();
-        boolean isSiteManager = kiezService.isKiezatlasWorkspaceMember();
+        boolean isSiteManager = kiezatlas.isKiezatlasWorkspaceMember();
         viewData("is_publisher", false);
         viewData("is_site_manager", isSiteManager);
         viewData("website", "standard");
@@ -832,7 +832,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     private boolean isAngeboteWorkspaceMember(String username) {
         if (username != null && !username.equals("")) {
-            Topic ws = workspaceService.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+            Topic ws = workspaces.getWorkspace(WORKSPACE_ANGEBOTE_URI);
             log.info("Checking \"Angebote\" membership for Username=" + username);
             return aclService.isMember(username, ws.getId());
         }
@@ -1072,7 +1072,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         // Everything here must not be Null
         assignedAngebot.setLocationName(getGeoObjectName(geoObject));
         assignedAngebot.setLocationId(geoObject.getId());
-        GeoCoordinate coordinates = kiezService.getGeoCoordinateByGeoObject(geoObject);
+        GeoCoordinate coordinates = kiezatlas.getGeoCoordinateByGeoObject(geoObject);
         assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
         assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address").getSimpleValue().toString());
         assignedAngebot.setAngebotsName(angebot.getChildTopics().getString(ANGEBOT_NAME));
@@ -1137,12 +1137,12 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                             mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_PARENT),
                             mf.newTopicRoleModel(usernameTopic.getId(), ROLE_TYPE_CHILD)));
                         Topic privateWs = dm4.getAccessControl().getPrivateWorkspace(usernameTopic.getSimpleValue().toString());
-                        workspaceService.assignToWorkspace(creatorAssignment, privateWs.getId());
+                        workspaces.assignToWorkspace(creatorAssignment, privateWs.getId());
                         // 2) System Assignment
                         Association systemAssignment = dm4.createAssociation(mf.newAssociationModel(SIMPLE_ASSOCIATION,
                             mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_PARENT),
                             mf.newTopicRoleModel(usernameTopic.getId(), ROLE_TYPE_CHILD)));
-                        workspaceService.assignToWorkspace(systemAssignment, dm4.getAccessControl().getSystemWorkspaceId());
+                        workspaces.assignToWorkspace(systemAssignment, dm4.getAccessControl().getSystemWorkspaceId());
                         log.info("Created custom Username <--> Angebotsinfo assignments in the respective workspaces");
                         return null;
                     }
