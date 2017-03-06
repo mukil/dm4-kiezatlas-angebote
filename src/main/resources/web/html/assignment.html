@@ -38,7 +38,10 @@
                 <h3>
                     An welchen Orten findet das Angebot <span class="angebot-name"></span>statt?<br/>
                 </h3>
-                <p><span class="label">Bitte w&auml;hle einen Ort &uuml;ber das Suchfeld</span> <!--span class="help">?<span--></p>
+                <p>
+                    <span class="label">Bitte w&auml;hle einen Ort &uuml;ber das Suchfeld</span>
+                    <!--span class="help">?<span-->
+                </p>
                 <!-- GeoObjectTopic.lookupInstitution(alias, as) -->
             </div>
 
@@ -48,8 +51,27 @@
                         <input id="name-search" type="text" placeholder="Name des Ortes oder der Einrichtung" />
                         <input id="do-search" type="submit" class="btn" value="Ort suchen" />
                     </div>
-                    <span class="search-info"></span>
                 </form>
+                <div class="search-hint">
+                    <span class="label search-info"></span>
+                    <label class="">&nbsp;Filtern nach Bezirk</label>
+                    <select id="district-filter" onchange="set_search_district_filter()">
+                        <option value="none">Keine Einschr&auml;nkung</option>
+                        <option value="7293">Charlottenburg-Wilmersdorf</option>
+                        <option value="7278">Friedrichshain-Kreuzberg</option>
+                        <option value="7302">Lichtenberg</option>
+                        <option value="1707925">Marzahn-Hellersdorf</option>
+                        <option value="7275">Mitte</option>
+                        <option value="7287">Neuk&ouml;lln</option>
+                        <option value="7290">Pankow</option>
+                        <option value="1707928">Reinickendorf</option>
+                        <option value="7296">Spandau</option>
+                        <option value="7299">Steglitz-Zehlendorf</option>
+                        <option value="7281">Tempelhof-Sch&ouml;neberg</option>
+                        <option value="7284">Treptow-K&ouml;penick</option>
+                    </select>
+                    <br/>
+                </div>
                 <div class="geo-objects-area">
                     <div class="einrichtungen"></div>
                 </div>

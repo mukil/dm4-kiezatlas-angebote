@@ -277,16 +277,28 @@ function do_delete_assignment() {
 
 // -------------------------- GUI Methods for Angebote Assignment and Editing ------------------- //
 
+var districtId = undefined
+
 function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
     var queryString = $("#name-search").val()
-    if (queryString.indexOf("*") === -1) {
-        queryString += "*"
-    }
     queryString = encodeURIComponent(queryString, "UTF-8")
+    if (queryString.length === 0) {
+        $("#name-search").attr("placeholder", "Bitte geben Sie einen Ortsnamen ein")
+        $("#name-search").focus()
+    }
     // ### hacking message display
-    $('.form-area div.einrichtungen').html("Suche nach Orten gestartet ...")
+    var searchResource = "/website/search?search="
+    if (districtId) {
+        console.log("Search could make use of district filter", districtId)
+        searchResource = "/website/search/" + districtId + "?search="
+        var selection = document.getElementById('district-filter')
+        var districtName = selection.options[selection.selectedIndex].text
+        $('.form-area div.einrichtungen').html("Suche nach Orten in Bezirk " + districtName + " gestartet ...")
+    } else {
+        $('.form-area div.einrichtungen').html("Berlinweite Suche nach Orten gestartet ...")
+    }
     $.ajax({
-        type: "GET", url: "/website/search/by_name?query=" + queryString,
+        type: "GET", url: searchResource + queryString,
         success: function(obj) {
             renderer(obj)
         },
@@ -296,8 +308,18 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
     })
 }
 
+function set_search_district_filter() {
+    var $selection = $('#district-filter')
+    districtId = $selection.val()
+    if (districtId === "none") {
+        districtId = undefined
+    }
+    do_search_geo_objects_by_name(render_geo_object_search_results)
+}
+
 function render_geo_object_search_results(results) {
     $('.form-area div.einrichtungen').empty()
+    console.log("Geo Objects Search Results", results)
     for (var i in results) {
         var obj = results[i]
         if (obj) {
@@ -314,7 +336,8 @@ function render_geo_object_search_results(results) {
             + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
             + 'bitte einmalig den gesuchten, <a href="' + URL_EINRICHTUNG_CREATE + '">neuen Ort anlegen</a>.</div>')
     } else {
-        $('.form-area .search-info').text(results.length + ' Ergebnisse')
+        $('.form-area .search-info').text(results.length + " Suchergebnisse.")
+        $('.form-area .search-hint').show()
     }
     // equip all buttons with a click handler each (at once)
     $('input[name=group]').on('click', select_geo_object)

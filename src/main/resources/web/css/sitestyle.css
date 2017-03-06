@@ -149,6 +149,10 @@ h3 {
     color: #27638C;
 }
 
+.form-area .search-hint {
+    margin-top: 10px;
+}
+
 .assignment .geo-objects-area .label,
 .assignment label,
 span.label,
