@@ -117,6 +117,14 @@ function clear_angebot_form() {
     $('#angebot-tags').val('')
 }
 
+function render_user_assignment_page(topicId) {
+    if (topicId) {
+        load_user_place_assignments(topicId, render_user_assignments, false)
+    } else {
+        console.error("Cannot load user assignments for undefined geo object")
+    }
+    // init_datepicker()
+}
 
 // ---- Methods used for ASSIGNMENT screen (angebote to a geo object) --- //
 
@@ -323,9 +331,9 @@ function render_geo_object_search_results(results) {
     for (var i in results) {
         var obj = results[i]
         if (obj) {
-            var $element = $('<input type="radio" title="Auswahl der Orte im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id
-                    + '" value="geo-'+obj.id+'"><label title="Auswahl der Orte im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
-                    + obj.name + ', <span class="label">' + obj.anschrift + '</span></label><br/>')
+            var $element = $('<div class="result-item"><label title="Auswahl der Orte im Bezirk ' + obj.bezirk_name + '" for="'+obj.id+'">'
+                    + '<input type="radio" title="Auswahl der Orte im Bezirk ' + obj.bezirk_name + '" name="group" id="' + obj.id+ '" value="geo-'+obj.id+'">'
+                    + obj.name + ', <span class="label">' + obj.anschrift + '</span></label></div>')
             $('.form-area div.einrichtungen').append($element)
         } else {
             console.warn("Error during rendering Geo Objects Assignment", obj)
@@ -356,6 +364,29 @@ function render_angebot_shortinfo() {
     var $links = $('<a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Infos ansehen</a>&nbsp'
         + '<a href="' + URL_ANGEBOT_EDIT + selected_angebot.id + '" class="read-more offer-edit">Vorlage bearbeiten</a>')
     $('.angebotsinfos .offer-area .links').html($links)
+}
+
+function render_user_assignments() {
+    // Display Assignments on Assignment Page
+    $('.right-side div.einrichtungen').empty()
+    if (geo_assignments.length === 0) {
+        $('.right-side .help').html('<p>Diesem Angebot sind noch keine Benutzer zugewiesen. Zur Zuweisung w&auml;hlen Sie '
+            + 'bitte &uuml;ber die linke Seite des Bildschirms einen Ortsdatensatz aus.</p>')
+    } else {
+        // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
+        $('.right-side .help').empty()
+    }
+    // ### show address or districts, too
+    for (var i in geo_assignments) {
+        var obj = geo_assignments[i]
+        console.log("Assigned user is", obj)
+        // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
+        var $element = $('<div id="' + obj.id + '" class="concrete-assignment" '
+            + ' title="Zum bearbeiten dieser Zuweisung bitte Klicken"><h3>' + obj.value + '</h3></div>')
+        $('.right-side div.einrichtungen').append($element)
+    }
+    // equip all buttons with a click handler each (at once)
+    $('.right-side .einrichtungen').on('click', select_user_assignment)
 }
 
 function render_assignments_listing() {
@@ -455,13 +486,19 @@ function handle_name_search_input(e) {
 }
 
 function select_geo_object(e) {
-    var geo_object = restc.get_topic_by_id(e.target.id)
-    // update gui state
-    selected_geo_object = geo_object
-    selected_assignment_infos = undefined
-    clear_assignment_dateform()
-    render_assignment_form()
-    render_assignment_place_name(selected_geo_object.value)
+    // 1) selecting assigned username topic
+    if (window.document.location.href.indexOf("ansprechpartner") !== -1) {
+        render_user_assignment_page(e.target.id)
+    } else {
+        // 2) selecting assigned angebote topic
+        var geo_object = restc.get_topic_by_id(e.target.id)
+        // update gui state
+        selected_geo_object = geo_object
+        selected_assignment_infos = undefined
+        clear_assignment_dateform()
+        render_assignment_form()
+        render_assignment_place_name(selected_geo_object.value)
+    }
 }
 
 function render_assignment_place_name(name) {
@@ -482,6 +519,28 @@ function select_assignment(event) {
         selected_assignment_infos = get_assignment_edge(id)
         selected_assignment_edge = restc.get_association_by_id(id, true) // include children=True
         render_assignment_form()
+    } else {
+        throw Error("Could not detect click on Element")
+        console.warn("Could not detect click on Element", element, event)
+    }
+}
+
+
+function select_user_assignment(event) {
+    var element = event.target
+    var id = (element.localName === "div") ? element.id : ""
+    if (element.localName === "h3" || element.localName === "p") {
+        id = element.parentNode.id
+    } else if (element.localName === "div") {
+        id = element.id
+    } else if (element.localName === "i") {
+        id = element.parentNode.parentNode.id
+    }
+    if (id) {
+        console.log("Selected geo object assigned username", id, "render form...")
+        /** selected_assignment_infos = get_assignment_edge(id)
+        selected_assignment_edge = restc.get_association_by_id(id, true) // include children=True
+        render_assignment_form() **/
     } else {
         throw Error("Could not detect click on Element")
         console.warn("Could not detect click on Element", element, event)

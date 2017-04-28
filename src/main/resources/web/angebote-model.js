@@ -38,6 +38,28 @@ function load_angebot_by_resource_path(id, callback) {
     }
 }
 
+function load_user_place_assignments(geoObjectId, renderer) {
+    $.ajax({
+        type: "GET", url: "/website/list/assignments/" + geoObjectId,
+        success: function(response) {
+            if (response) {
+                geo_assignments = response
+                // console.log("Loaded Angebot Geo Assignments ", geo_assignments)
+                if (renderer) renderer(response)
+            } else {
+                $('#user').html('Bitte <a href="/sign-up/login">loggen</a> sie sich ein um Zuordnungen zu bearbeiten.')
+                $('.task-info').addClass('disabled')
+                $('div.angebot-area').addClass('disabled')
+                geo_assignments = []
+            }
+        },
+        error: function(x, s, e) {
+            geo_assignments = []
+            console.warn("ERROR", "x: ",x, " s: ", s," e: ", e)
+        }
+    })
+}
+
 function load_angebote_places_and_dates(renderer, justActive) {
     $.ajax({
         type: "GET", url: "/angebote/list/assignments/" + selected_angebot.id + "/" + justActive,

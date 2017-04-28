@@ -438,6 +438,10 @@ a {
     margin-top: 1em;
 }
 
+.geo-objects-area .einrichtungen .result-item {
+    padding-bottom: 1em;
+}
+
 .concrete-assignment {
     cursor: pointer;
 }
