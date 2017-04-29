@@ -314,6 +314,7 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
             throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
         }
     })
+    return queryString
 }
 
 function set_search_district_filter() {
@@ -339,7 +340,7 @@ function render_geo_object_search_results(results) {
             console.warn("Error during rendering Geo Objects Assignment", obj)
         }
     }
-    if (results.length === 0) {
+    if (results.length === 0 && URL_EINRICHTUNG_CREATE) {
         $('.form-area div.einrichtungen').append('<div>Haben Sie den gew&uuml;nschten Ort nicht finden k&ouml;nnen? Dann k&ouml;nnen '
             + 'Sie es entweder mit einer leicht ver&auml;nderten Suchanfrage erneut versuchen oder '
             + 'bitte einmalig den gesuchten, <a href="' + URL_EINRICHTUNG_CREATE + '">neuen Ort anlegen</a>.</div>')
@@ -364,29 +365,6 @@ function render_angebot_shortinfo() {
     var $links = $('<a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Infos ansehen</a>&nbsp'
         + '<a href="' + URL_ANGEBOT_EDIT + selected_angebot.id + '" class="read-more offer-edit">Vorlage bearbeiten</a>')
     $('.angebotsinfos .offer-area .links').html($links)
-}
-
-function render_user_assignments() {
-    // Display Assignments on Assignment Page
-    $('.right-side div.einrichtungen').empty()
-    if (geo_assignments.length === 0) {
-        $('.right-side .help').html('<p>Diesem Angebot sind noch keine Benutzer zugewiesen. Zur Zuweisung w&auml;hlen Sie '
-            + 'bitte &uuml;ber die linke Seite des Bildschirms einen Ortsdatensatz aus.</p>')
-    } else {
-        // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
-        $('.right-side .help').empty()
-    }
-    // ### show address or districts, too
-    for (var i in geo_assignments) {
-        var obj = geo_assignments[i]
-        console.log("Assigned user is", obj)
-        // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
-        var $element = $('<div id="' + obj.id + '" class="concrete-assignment" '
-            + ' title="Zum bearbeiten dieser Zuweisung bitte Klicken"><h3>' + obj.value + '</h3></div>')
-        $('.right-side div.einrichtungen').append($element)
-    }
-    // equip all buttons with a click handler each (at once)
-    $('.right-side .einrichtungen').on('click', select_user_assignment)
 }
 
 function render_assignments_listing() {
@@ -488,7 +466,7 @@ function handle_name_search_input(e) {
 function select_geo_object(e) {
     // 1) selecting assigned username topic
     if (window.document.location.href.indexOf("ansprechpartner") !== -1) {
-        render_user_assignment_page(e.target.id)
+        list.show_assigned_usernames(e.target.id) // calls function in 'ka-admin.js' module (dm4-kiezatlas-website)
     } else {
         // 2) selecting assigned angebote topic
         var geo_object = restc.get_topic_by_id(e.target.id)
@@ -525,33 +503,11 @@ function select_assignment(event) {
     }
 }
 
-
-function select_user_assignment(event) {
-    var element = event.target
-    var id = (element.localName === "div") ? element.id : ""
-    if (element.localName === "h3" || element.localName === "p") {
-        id = element.parentNode.id
-    } else if (element.localName === "div") {
-        id = element.id
-    } else if (element.localName === "i") {
-        id = element.parentNode.parentNode.id
-    }
-    if (id) {
-        console.log("Selected geo object assigned username", id, "render form...")
-        /** selected_assignment_infos = get_assignment_edge(id)
-        selected_assignment_edge = restc.get_association_by_id(id, true) // include children=True
-        render_assignment_form() **/
-    } else {
-        throw Error("Could not detect click on Element")
-        console.warn("Could not detect click on Element", element, event)
-    }
-}
-
 function get_assignment_edge(assocId) {
     if (!geo_assignments) throw new Error("Client was not initialized correctly, assignments undefined");
     for (var e in geo_assignments) {
         var sel = geo_assignments[e]
         if (sel.id == assocId) return sel // compares DOM id (String) with a Number
     }
-    throw new Error("No Assignment for ID: " +  assocId)
+    throw Error("No Assignment for ID: " +  assocId)
 }

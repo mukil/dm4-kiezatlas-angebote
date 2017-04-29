@@ -21,11 +21,6 @@ function angebot_assignments_page() {
     })
 }
 
-function user_assignments_page() {
-    $("#name-search").on("keyup", handle_name_search_input)
-    // load_username()
-}
-
 function edit_angebot_page() {
     // load_username()
     has_angebote_membership(function(state) {
