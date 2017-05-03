@@ -200,6 +200,11 @@ a {
     margin: 0.7em;
 }
 
+.detail h3.assignments  {
+    margin-top: 2em;
+    color: #a9a9a9;
+}
+
 .detail .assignments h3 {
     margin-bottom: 0em;
     margin-top: 2em;

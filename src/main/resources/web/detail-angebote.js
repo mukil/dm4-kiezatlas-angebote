@@ -32,22 +32,26 @@ function render_angebot_detail_area() {
         tags += '<a class="ui tiny button basic" href="/angebote?stichworte='+selected_angebot.tags[t].label+'" '
             +'title="Zeige aktuelle Angebote mit dem Tag '+selected_angebot.tags[t].label+'">'
             + selected_angebot.tags[t].label + '</a>'
-        if (t < selected_angebot.tags.length - 1) tags += ", "
+        // if (t < selected_angebot.tags.length - 1) tags += ", "
     }
     $('.angebot-name').text(name)
     var angebotHTML = ''
     if (selected_angebot.beschreibung) {
-        angebotHTML = '<span class="label">Angebotsinfos</span><br/>' + selected_angebot.beschreibung + '<br/>'
+        angebotHTML = selected_angebot.beschreibung + '<br/>'
+    } else {
+        angebotHTML = '<p><span class="label">Kein Beschreibungstext f&uuml;r dieses Angebot vorhanden</span></p>'
     }
     if (selected_angebot.kontakt) {
         angebotHTML += '<span class="label">Kontakt</span><br/>' + selected_angebot.kontakt + '<br/>'
+    } else {
+        angebotHTML += '<p><span class="label">Kein Kontakt angegeben</span></p>'
     }
     if (selected_angebot.webpage && selected_angebot.webpage.indexOf("http://") !== -1) {
         angebotHTML += '<br/><br/><span class="label">Webseite</span><br/>'
             + '<a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
     }
     if (tags !== "") {
-        angebotHTML += '<br/><span class="label">Tags</span><br/><br/>' + tags
+        angebotHTML += '<br/><span class="label">Stichw&ouml;rter</span><br/><br/>' + tags
     }
     $('.angebot-infos p.body').html(angebotHTML)
     $('.task-info .loading').addClass("hidden")
@@ -58,8 +62,8 @@ function render_angebot_assignment() {
     var $einrichtungen = $('.geo-objects-area .einrichtungen')
         $einrichtungen.empty()
     if (geo_assignments.length === 0) {
-        $('.help').html('Diesem Angebot ist aktuell noch kein Angebotszeitr&auml;um zugewiesen.')
-        $('h3.assignments').html("Diesem Angebot ist aktuell noch kein Angebotszeitr&auml;um zugewiesen")
+        $('.help').html('F&uuml;r dieses Angebot ist uns aktuell kein Zeitraum bekannt')
+        $('h3.assignments').html("F&uuml;r dieses Angebot ist uns aktuell kein Zeitraum bekannt")
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
     }
