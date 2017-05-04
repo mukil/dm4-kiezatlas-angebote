@@ -72,7 +72,7 @@ function my_entries_page() {
                         $shortcuts.append('<a href="/website/list/ansprechpartner">AnsprechpartnerInnen verwalten</a>')
                     }
                 }
-                if (info.bezirke.length > 0 || info.bezirksregion.length > 0) {
+                if (info.bezirke.length > 0 || info.bezirksregionen.length > 0) {
                     $shortcuts.append('<a href="/website/list/filter">Gro&szlig;e Listenansicht</a>')
                 }
                 $('.task-info').append($shortcuts)
@@ -87,7 +87,6 @@ function my_entries_page() {
                 } else {
                     load_users_angebote()
                 }
-                console.log("Angebote membership")
             })
         }
     })

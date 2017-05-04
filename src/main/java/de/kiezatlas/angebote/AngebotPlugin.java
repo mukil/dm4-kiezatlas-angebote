@@ -779,7 +779,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     public boolean isAngeboteWorkspaceMember(String username) {
         if (username != null && !username.equals("")) {
             Topic ws = workspaces.getWorkspace(WORKSPACE_ANGEBOTE_URI);
-            log.info("Checking \"Angebote\" membership for Username=" + username);
+            log.fine("Checking \"Angebote\" membership for Username=" + username);
             return aclService.isMember(username, ws.getId());
         }
         return false;
