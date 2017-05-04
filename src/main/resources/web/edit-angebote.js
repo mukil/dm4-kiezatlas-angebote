@@ -287,6 +287,10 @@ function do_delete_assignment() {
 
 var districtId = undefined
 
+function do_submit_search_form() {
+    do_search_geo_objects_by_name(render_geo_object_search_results)
+}
+
 function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
     var queryString = $("#name-search").val()
     queryString = encodeURIComponent(queryString, "UTF-8")
