@@ -945,7 +945,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             ? player1.getSimpleValue().toString() : player2.getSimpleValue().toString();
     }
 
-    private List<Topic> searchInAngebotsinfoChildsByText(String query) {
+    @Override
+    public List<Topic> searchInAngebotsinfoChildsByText(String query) {
         HashMap<Long, Topic> uniqueResults = new HashMap<Long, Topic>();
         List<Topic> namen = dm4.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
         List<Topic> beschreibungen = dm4.searchTopics(query, "ka2.angebot.beschreibung");

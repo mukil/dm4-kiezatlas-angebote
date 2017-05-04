@@ -30,6 +30,8 @@ public interface AngebotService {
     public static final String PROP_ANGEBOT_START_TIME      = "ka2.angebot.start_time";
     public static final String PROP_ANGEBOT_END_TIME        = "ka2.angebot.end_time";
 
+    List<Topic> searchInAngebotsinfoChildsByText(String query);
+
     /**
      * @return      Details for a specific "Angebotsinfo" topic Id.
      */

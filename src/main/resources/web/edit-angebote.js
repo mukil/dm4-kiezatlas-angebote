@@ -296,9 +296,11 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
     }
     // ### hacking message display
     var searchResource = "/website/search?search="
+    var queryHash = queryString
     if (districtId) {
         console.log("Search could make use of district filter", districtId)
         searchResource = "/website/search/" + districtId + "?search="
+        queryHash += ";bezirk=" + districtId
         var selection = document.getElementById('district-filter')
         var districtName = selection.options[selection.selectedIndex].text
         $('.form-area div.einrichtungen').html("Suche nach Orten in Bezirk " + districtName + " gestartet ...")
@@ -314,7 +316,7 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
             throw Error ("ERROR", "x: " + x + " s: " + s + " e: " + e)
         }
     })
-    return queryString
+    return queryHash
 }
 
 function set_search_district_filter() {
