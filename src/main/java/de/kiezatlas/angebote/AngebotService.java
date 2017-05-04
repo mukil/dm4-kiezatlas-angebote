@@ -32,6 +32,8 @@ public interface AngebotService {
 
     List<Topic> searchInAngebotsinfoChildsByText(String query);
 
+    boolean isAngeboteWorkspaceMember(String username);
+
     /**
      * @return      Details for a specific "Angebotsinfo" topic Id.
      */

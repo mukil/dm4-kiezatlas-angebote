@@ -188,7 +188,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
      */
     @GET
     @Path("/{id}/creator")
-    public String hasAngeboteWorkspaceMembership(@PathParam("id") long id) {
+    public String hasAngeboteWorkspaceAssignment(@PathParam("id") long id) {
         String username = aclService.getUsername();
         if (id > 0) {
             Topic angebot = dm4.getTopic(id);
@@ -775,6 +775,16 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return sortAngebotsinfosAssignedDescByToDate(angebotsinfos);
     }
 
+    @Override
+    public boolean isAngeboteWorkspaceMember(String username) {
+        if (username != null && !username.equals("")) {
+            Topic ws = workspaces.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+            log.info("Checking \"Angebote\" membership for Username=" + username);
+            return aclService.isMember(username, ws.getId());
+        }
+        return false;
+    }
+
     // ------------------------------------------------------------------------ Private Utility Methods
 
     private void prepareGeneralPageData(String templateName) {
@@ -826,15 +836,6 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             Topic usernameTopic = getAngebotsinfoCreator(angebot);
             log.info("Checking if user=" + username + " is \"creator\" of Angebotsinfo " + angebot.getSimpleValue());
             return username.equals(usernameTopic.getSimpleValue().toString());
-        }
-        return false;
-    }
-
-    private boolean isAngeboteWorkspaceMember(String username) {
-        if (username != null && !username.equals("")) {
-            Topic ws = workspaces.getWorkspace(WORKSPACE_ANGEBOTE_URI);
-            log.info("Checking \"Angebote\" membership for Username=" + username);
-            return aclService.isMember(username, ws.getId());
         }
         return false;
     }

@@ -649,6 +649,10 @@ div.ui-datepicker {
     color: #a9a9a9;
 }
 
+#district-filter {
+    padding: .3em;
+}
+
 .filter-area .parameter select {
     background-color: #fff;
     margin-right: .5em;
