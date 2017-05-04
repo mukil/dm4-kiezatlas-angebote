@@ -679,6 +679,33 @@ div.ui-datepicker {
     margin-left: 5px;
 }
 
+
+.task-info .shortcuts {
+    color: #002856;
+    margin: 1em;
+    display: inline-block;
+    margin-left: 0px;
+    padding: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.task-info .shortcuts a {
+    text-decoration: none;
+    margin-right: 1em;
+    padding: .45em;
+    background-color: #fff;
+    font-size: 1.2em;
+    border: 1px solid #27638C;
+}
+
+.task-info .shortcuts a:hover {
+    background-color: #002856;
+    color: #fff;
+}
+
 .block-space {
     display: block;
     margin-top: 1em;

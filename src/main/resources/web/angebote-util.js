@@ -30,6 +30,12 @@ restc.get_username = function() {
     // Note: response 204 No Content yields to undefined result
 }
 
+restc.load_view_permissions = function(callback) {
+    $.getJSON('/website/menu', function(results) {
+        callback(results)
+    })
+}
+
 function _void() {}
 
 

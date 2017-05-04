@@ -302,7 +302,7 @@ function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_obj
     var searchResource = "/website/search?search="
     var queryHash = queryString
     if (districtId) {
-        console.log("Search could make use of district filter", districtId)
+        // console.log("Search could make use of district filter", districtId)
         searchResource = "/website/search/" + districtId + "?search="
         queryHash += ";bezirk=" + districtId
         var selection = document.getElementById('district-filter')
