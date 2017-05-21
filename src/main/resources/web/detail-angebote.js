@@ -37,21 +37,22 @@ function render_angebot_detail_area() {
     $('.angebot-name').text(name)
     var angebotHTML = ''
     if (selected_angebot.beschreibung) {
-        angebotHTML = selected_angebot.beschreibung + '<br/>'
+        angebotHTML = '<span class="label description">Angebotsbeschreibung</span><br/>'
+        angebotHTML += selected_angebot.beschreibung + '<br/>'
     } else {
-        angebotHTML = '<p><span class="label">Kein Beschreibungstext f&uuml;r dieses Angebot vorhanden</span></p>'
+        angebotHTML = '<p><span class="label">Keine Beschreibung f&uuml;r dieses Angebot vorhanden.</span></p>'
     }
     if (selected_angebot.kontakt) {
-        angebotHTML += '<span class="label">Kontakt</span><br/>' + selected_angebot.kontakt + '<br/>'
+        angebotHTML += '<span class="label contact">AnsprechpartnerIn</span><br/>' + selected_angebot.kontakt + '<br/>'
     } else {
-        angebotHTML += '<p><span class="label">Kein Kontakt angegeben</span></p>'
+        angebotHTML += '<p><span class="label contact">Kein Kontakt angegeben</span></p>'
     }
     if (selected_angebot.webpage && selected_angebot.webpage.indexOf("http://") !== -1) {
-        angebotHTML += '<br/><br/><span class="label">Webseite</span><br/>'
+        angebotHTML += '<br/><br/><span class="label webpage">Weitere Informationen unter</span><br/>'
             + '<a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
     }
     if (tags !== "") {
-        angebotHTML += '<br/><span class="label">Stichw&ouml;rter</span><br/><br/>' + tags
+        angebotHTML += '<br/><span class="label tags">Stichw&ouml;rter</span><p class="tags">' + tags + '</p>'
     }
     $('.angebot-infos p.body').html(angebotHTML)
     $('.task-info .loading').addClass("hidden")
@@ -62,8 +63,8 @@ function render_angebot_assignment() {
     var $einrichtungen = $('.geo-objects-area .einrichtungen')
         $einrichtungen.empty()
     if (geo_assignments.length === 0) {
-        $('.help').html('F&uuml;r dieses Angebot ist uns aktuell kein Zeitraum bekannt')
-        $('h3.assignments').html("F&uuml;r dieses Angebot ist uns aktuell kein Zeitraum bekannt")
+        $('.help').html('F&uuml;r dieses Angebot liegen uns aktuell keine Veranstaltungszeitr&auml;ume vor.')
+        $('h3.assignments').html("F&uuml;r dieses Angebot liegen uns aktuell keine Veranstaltungszeitr&auml;ume vor.")
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
     }

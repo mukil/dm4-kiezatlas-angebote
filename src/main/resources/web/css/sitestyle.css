@@ -190,12 +190,17 @@ a {
 .start .angebot-area {
     margin-left: 2em;
     margin-top: 0em;
-    margin-botto: 2em;
+    margin-bottom: 2em;
 }
 
 .detail .detail-area {
     margin-top: 5em;
     margin-left: 2em;
+}
+
+.angebot-infos span.name,
+.angebot-infos span.description {
+    display: none;
 }
 
 .list-area,
@@ -688,13 +693,14 @@ div.ui-datepicker {
 .task-info .shortcuts {
     color: #002856;
     margin: 1em;
-    display: inline-block;
+    display: inline;
     margin-left: 0px;
     padding: 5px;
     padding-left: 8px;
     padding-right: 8px;
     vertical-align: top;
     text-align: left;
+    margin-bottom: 2em;
 }
 
 .task-info .shortcuts a {
@@ -751,7 +757,9 @@ body.angebotsinfos.edit .form-area {
 
 .angebotsinfos.edit .task-info h3 {
     margin: 0em;
-    margin-left: 1em;
+    margin-left: .5em;
+    padding-bottom: .5em;
+    padding-top: 1em;
 }
 
 .angebotsinfos #do-search,
@@ -1266,4 +1274,14 @@ ul.angebote li small {
     max-width: 640px;
     min-height: 140px;
     margin-top: 35px;
+}
+
+@media print {
+    .angebot-infos span.description { display: inline-block; }
+    .detail .ui.basic.button, .top-menu .ui.fixed.menu,
+    .footer, #bottom, .detail .tags, .detail .tags a { display: none; }
+    .angebot-infos .label, .detail .angebot-name, .detail h3.assignments { color: #555; }
+    .angebot-infos {
+        font-size: 1.2em;
+    }
 }
