@@ -71,17 +71,22 @@ function render_angebot_assignment() {
     // ### show address or districts, too
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
+        var streetNr = obj.address
+        if (streetNr) {
+            streetNr = streetNr.replace(' Deutschland', '')
+        }
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
         var elementHTML = '<a class="read-more" href="' + URL_EINRICHTUNG + obj.location_id+'">'
-            + '<div id="' + obj.id + '" class="concrete-assignment"><h3>'+ obj.name + ' ' + obj.address+'</h3><p>'
+            + '<div id="' + obj.id + '" class="concrete-assignment"><h3>'+ obj.name + '</h3><p>'
+            elementHTML += '<span class="anschrift label">Anschrift: </span>' + streetNr + '<br/>'
         if (obj.hasOwnProperty("kontakt")) {
-            elementHTML += '<span class="label">Kontakt:</span> ' + obj.kontakt
+            elementHTML += '<span class="label">Kontakt vor Ort: </span> ' + obj.kontakt
             if (obj.hasOwnProperty("zusatzinfo")) elementHTML += ", "
         }
         if (obj.hasOwnProperty("zusatzinfo")) {
-            elementHTML += '<span class="label">Zusatz:</span> ' + obj.zusatzinfo
+            elementHTML += '<span class="label">Zusatz: </span> ' + obj.zusatzinfo
         }
-        elementHTML += '<br/><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div></a>'
+            elementHTML += '<br/><span class="label">Vom </span><i>' + obj.anfang + '</i><span class="label"> bis zum </span><i>' + obj.ende + '</i></p></div></a>'
         var $element = $(elementHTML)
         $einrichtungen.append($element)
     }

@@ -208,8 +208,8 @@ function do_save_assignment(e) {
         toInput = convert_to_en_month(toInput)
         toInput = toInput + " " + TIMEZONE_SUFFIX
         console.log("Cleaned up TO dateString", toInput)
-        // Note: we always shift time in secs to (nearly) the end of the selected day
-        toDate = (new Date(toInput).getTime() + (86400000 - 1000000))
+        // Note: we always shift time one hour and 1 sec back to (nearly) the end of the selected day
+        toDate = (new Date(toInput).getTime() + (86400000 - 3601000))
         console.log("Parsed to TO DATE", toDate)
     }
     console.log("Shifted Datepicker delivered us FROM", fromInput, fromDate, "TO", toInput, toDate)

@@ -75,7 +75,9 @@ function my_entries_page() {
                 if (info.bezirke.length > 0 || info.bezirksregionen.length > 0) {
                     $shortcuts.append('<a href="/website/list/filter">Gro&szlig;e Listenansicht</a>')
                 }
-                $('.task-info').append($shortcuts)
+                if (info.confirmation || (info.bezirke.length > 0 || info.bezirksregionen.length > 0)) {
+                    $('.task-info').append('<p>&nbsp;</p>').append($shortcuts)
+                }
             })
             //
             has_angebote_membership(function(state) {
