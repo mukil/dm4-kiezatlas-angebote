@@ -178,8 +178,13 @@ var tagging = new function() {
     }
 
     this.fireItemSelected = function(item) {
-        var custom = new CustomEvent('selection', { detail: item })
-        domElement.dispatchEvent(custom)
+        var custom = document.createEvent("CustomEvent");
+        custom.initCustomEvent('selection', false, false, { detail: item })
+        if (domElement) {
+            domElement.dispatchEvent(custom)
+        } else {
+            console.log('DOM Error, fireItemSelected cannot dispatch customEvent')
+        }
     }
 
 }
