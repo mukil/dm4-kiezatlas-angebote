@@ -1280,7 +1280,8 @@ ul.angebote li small {
     .angebot-infos span.description { display: inline-block; }
     .detail .ui.basic.button, .top-menu .ui.fixed.menu,
     .footer, #bottom, .detail .tags, .detail .tags a { display: none; }
-    .angebot-infos .label, .detail .angebot-name, .detail h3.assignments { color: #555; }
+    .angebot-infos .label, .detail .angebot-name { color: #555; }
+    .detail h3.assignments { color: #27638C; }
     .angebot-infos {
         font-size: 1.2em;
     }

@@ -63,8 +63,8 @@ function render_angebot_assignment() {
     var $einrichtungen = $('.geo-objects-area .einrichtungen')
         $einrichtungen.empty()
     if (geo_assignments.length === 0) {
-        $('.help').html('F&uuml;r dieses Angebot liegen uns aktuell keine Veranstaltungszeitr&auml;ume vor.')
-        $('h3.assignments').html("F&uuml;r dieses Angebot liegen uns aktuell keine Veranstaltungszeitr&auml;ume vor.")
+        $('.help').html('F&uuml;r dieses Angebot sind uns aktuell keine Veranstaltungszeitr&auml;ume bekannt.')
+        $('h3.assignments').html("F&uuml;r dieses Angebot sind uns aktuell keine Veranstaltungszeitr&auml;ume bekannt.")
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
     }

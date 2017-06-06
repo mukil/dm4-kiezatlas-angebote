@@ -68,7 +68,7 @@ function my_entries_page() {
                     if (info.bezirke.length > 0) {
                         $shortcuts.append('<a href="/website/list/bezirksregionen">StadtteilkoordinatorInnen</a>')
                     }
-                    if (info.bezirksregionen.length > 0) {
+                    if ((info.bezirksregionen.length > 0) || (info.bezirke.length > 0)) {
                         $shortcuts.append('<a href="/website/list/ansprechpartner">AnsprechpartnerInnen verwalten</a>')
                     }
                 }
