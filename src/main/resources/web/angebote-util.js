@@ -84,15 +84,15 @@ function is_angebote_creator(id, callback) {
 }
 
 function go_edit_einrichtung_form(id) {
-    window.document.location.assign(URL_EINRICHTUNG_EDIT + id)
+    window.document.location = URL_EINRICHTUNG_EDIT + id
 }
 
 function go_edit_einrichtung(id) {
-    window.document.location.assign(URL_EINRICHTUNG + id)
+    window.document.location = URL_EINRICHTUNG + id
 }
 
 function go_edit_angebot(id) {
-    window.document.location.assign(URL_ANGEBOT_EDIT + id)
+    window.document.location = URL_ANGEBOT_EDIT + id
 }
 
 function scroll_to_element(domId) {
@@ -102,7 +102,7 @@ function scroll_to_element(domId) {
 }
 
 function go_edit_assignments(id) {
-    window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + id)
+    window.document.location = URL_ANGEBOT_ASSIGNMENT + id
 }
 
 function go_to_angebot_assignment(id) {
@@ -249,6 +249,23 @@ function convert_to_en_month(germanDateString) {
     if (germanDateString.indexOf("Dezember") !== -1) return germanDateString.replace("Dezember", "December")
     return germanDateString
 }
+
+function get_month_from_en(germanDateString) {
+    if (germanDateString.indexOf("January") !== -1) return 0
+    if (germanDateString.indexOf("February") !== -1) return 1
+    if (germanDateString.indexOf("March") !== -1) return 2
+    if (germanDateString.indexOf("April") !== -1) return 3
+    if (germanDateString.indexOf("May") !== -1) return 4
+    if (germanDateString.indexOf("June") !== -1) return 5
+    if (germanDateString.indexOf("July") !== -1) return 6
+    if (germanDateString.indexOf("August") !== -1) return 7
+    if (germanDateString.indexOf("September") !== -1) return 8
+    if (germanDateString.indexOf("October") !== -1) return 9
+    if (germanDateString.indexOf("November") !== -1) return 10
+    if (germanDateString.indexOf("December") !== -1) return 11
+    return undefined
+}
+
 
 // ---- Initialize script
 

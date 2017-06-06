@@ -184,6 +184,8 @@ function do_save_assignment(e) {
     var additionalContact = $('#additional-kontakt').val()
     var fromDate = -1
     var toDate = -1
+    var fromInputDate = { year: 0, month: 0, day: 0 }
+    var toInputDate = { year: 0, month: 0, day: 0 }
     // parse dates
     if (fromInput.length > 0) {
         console.log("Datepicker FROM Input", fromInput)
@@ -191,10 +193,15 @@ function do_save_assignment(e) {
         fromInput = remove_dots(fromInput)
         fromInput = remove_commas(fromInput)
         fromInput = convert_to_en_month(fromInput)
-        fromInput = fromInput + " " + TIMEZONE_SUFFIX
+        var fromInputSplit = fromInput.trim().split(" ")
+        fromInputDate.day = fromInputSplit[0]
+        fromInputDate.month = get_month_from_en(fromInputSplit[1])
+        fromInputDate.year = fromInputSplit[2]
+        // fromInput = fromInput + " " + TIMEZONE_SUFFIX
         // Note: we always shift time forwad (into the next day) about approx. 1sec
-        fromDate = (new Date(fromInput).getTime() + 1000)
-        console.log("Parsed to FROM DATE", fromDate)
+        // fromDate = (new Date(fromInput).getTime() + 1000)
+        fromDate = (new Date(fromInputDate.year, fromInputDate.month, fromInputDate.day).getTime() + 1000)
+        console.log("Parsed to FROM DATE", fromDate, fromInputSplit)
     }
     /** var oneDayValue = get_oneday_checkbox_value()
     if (oneDayValue) {
@@ -206,13 +213,18 @@ function do_save_assignment(e) {
         toInput = remove_dots(toInput)
         toInput = remove_commas(toInput)
         toInput = convert_to_en_month(toInput)
-        toInput = toInput + " " + TIMEZONE_SUFFIX
-        console.log("Cleaned up TO dateString", toInput)
+        var toInputSplit = toInput.trim().split(" ")
+        toInputDate.day = toInputSplit[0]
+        toInputDate.month = get_month_from_en(toInputSplit[1])
+        toInputDate.year = toInputSplit[2]
+        // toInput = toInput + " " + TIMEZONE_SUFFIX
+        // console.log("Cleaned up TO dateString", toInput, toInputSplit)
         // Note: we always shift time one hour and 1 sec back to (nearly) the end of the selected day
-        toDate = (new Date(toInput).getTime() + (86400000 - 3601000))
+        // toDate = (new Date(toInput).getTime() + (86400000 - 3601000))
+        toDate = (new Date(toInputDate.year, toInputDate.month, toInputDate.day).getTime() + (86400000 - 3601000))
         console.log("Parsed to TO DATE", toDate)
     }
-    console.log("Shifted Datepicker delivered us FROM", fromInput, fromDate, "TO", toInput, toDate)
+    // console.log("Shifted Datepicker delivered us FROM", fromInput, fromDate, "TO", toInput, toDate)
     if (!selected_angebot) throw new Error("Assertion failed: An angebot must be loaded before an assignment can be created.")
     // Update assignment assoc
     if (selected_assignment_infos && (fromDate != selected_assignment_infos.von || toDate != selected_assignment_infos.bis)) {
@@ -224,8 +236,7 @@ function do_save_assignment(e) {
             assocModel.childs["ka2.angebot.assignment_zusatz"] = additionalInfo.trim()
         }
         restc.request("PUT", "/angebote/assignment/" +selected_assignment_infos.id + "/" + fromDate + "/" + toDate, assocModel)
-        console.log("Dates Changed - Update Assignment", fromDate, selected_assignment_infos.von,
-            "To:", toDate, selected_assignment_infos.bis)
+        console.log("Dates Changed - Update Assignment From:", fromDate, selected_assignment_infos.name, "To:", toDate)
     } else {
         // Create assignment assoc
         if (!selected_angebot) throw Error("Saving Assignment Aborted, selected Angebotsinfo NOT SET")
