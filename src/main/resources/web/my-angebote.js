@@ -21,7 +21,7 @@ function render_angebots_item(item) {
                 + 'onclick="go_edit_angebot('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
             + '<div class="ui input focus edit-assignments"><button title="Hier kannst du deine '
                 + 'Angebotsinfos Einrichtungen terminlich zuweisen" onclick="go_edit_assignments('+item.id+')">'
-                + '<i class="add to calendar icon" />Angebotszeiträume</button></div>'
+                + '<i class="add to calendar icon" />Angebotszeiträume veröffentlichen</button></div>'
             + '<div class="ui input focus delete-angebot"><button title="Achtung: Löscht diese '
                 + 'Angebotsinfo" onclick="delete_my_angebot('+item.id+')"><i class="trash icon" /></button></div>'
         + '</div>'
