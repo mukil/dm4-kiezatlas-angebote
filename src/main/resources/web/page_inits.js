@@ -4,6 +4,7 @@ var $sidebarUi = undefined
 function angebot_assignments_page() {
     $("#name-search").on("keyup", handle_name_search_input)
     // load_username()
+    defunct_iepagecache()
     has_angebote_membership(function(state) {
         if (state) {
             render_assignment_page()
@@ -21,8 +22,19 @@ function angebot_assignments_page() {
     })
 }
 
+function defunct_iepagecache() {
+    window.addEventListener("beforeunload", function(e) {
+      // see https://msdn.microsoft.com/de-de/library/dn265017(v=vs.85).aspx
+    })
+    window.addEventListener("onpageshow", function(e) {
+      // see https://msdn.microsoft.com/de-de/library/dn265017(v=vs.85).aspx
+    })
+    console.log("trying to deactivate ie11 ajax page caching, fixme at server-side")
+}
+
 function edit_angebot_page() {
     // load_username()
+    defunct_iepagecache()
     has_angebote_membership(function(state) {
         if (state) {
             // parse topic id from path
@@ -51,6 +63,7 @@ function edit_angebot_page() {
 }
 
 function my_entries_page() {
+    defunct_iepagecache()
     load_username(function(response) {
         // render_user_menu(response, true)
         // console.log("logged in", response)

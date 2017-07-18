@@ -531,6 +531,10 @@ div.ui-datepicker {
     position: relative;
 }
 
+.angebot-area h3 {
+    margin-top: 3em;
+}
+
 .list-area,
 .form-area {
     position: relative;

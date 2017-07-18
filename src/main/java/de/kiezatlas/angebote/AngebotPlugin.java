@@ -1102,7 +1102,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         assignedAngebot.setLocationId(geoObject.getId());
         GeoCoordinate coordinates = kiezatlas.getGeoCoordinateByGeoObject(geoObject);
         assignedAngebot.setLocationCoordinates(coordinates.lat, coordinates.lon);
-        assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address").getSimpleValue().toString());
+        assignedAngebot.setLocationAddress(geoObject.getChildTopics().getTopic("dm4.contacts.address"));
         assignedAngebot.setAngebotsName(angebot.getChildTopics().getString(ANGEBOT_NAME));
         assignedAngebot.setAngebotsId(angebot.getId());
         assignedAngebot.setAssignmentId(assignment.getId());

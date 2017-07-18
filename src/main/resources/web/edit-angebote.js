@@ -4,7 +4,6 @@
 function do_save_angebot_and_go_assign() {
     var topic = do_save_angebot()
     if (topic && topic.id !== -1) {
-        console.log("Go Edit Assignments for Angebotsinfo Topic", topic)
         window.document.location.assign(URL_ANGEBOT_ASSIGNMENT + topic.id)
     } else {
         var resource = $('#assignment-link').attr("data-my-href")
@@ -376,7 +375,7 @@ function render_angebot_shortinfo() {
     }
     $('.angebot-name').text('"' + selected_angebot.name + '" ')
     $('#navigation li.edit a').attr("href", URL_ANGEBOT_EDIT + selected_angebot.id)
-    var html_string = '<br/>' + selected_angebot.beschreibung + '<br/>'
+    var html_string = selected_angebot.beschreibung + '<br/>'
         + '<span class="label">Kontakt:</span> ' + selected_angebot.kontakt
     $('.angebot-infos p.body').html(html_string)
     var $links = $('<a href="' + URL_ANGEBOT_DETAIL + selected_angebot.id + '" class="read-more offer-edit">Infos ansehen</a>&nbsp'
@@ -388,11 +387,10 @@ function render_assignments_listing() {
     // Display Assignments on Assignment Page
     $('.right-side div.einrichtungen').empty()
     if (geo_assignments.length === 0) {
-        $('.right-side .help').html('<p>Diesem Angebot sind noch keine Angebotszeitr&auml;ume zugewiesen. Zur Zuweisung w&auml;hlen Sie '
-            + 'bitte</p><ol><li> einen Ort als Veranstaltungsort aus und</li><li>f&uuml;r diesen einen Angebotszeitraum.</li></ol><p>Sie k&ouml;nnen vorhandene Angebotszeitr&auml;ume '
-            + ' nachtr&auml;glich jederzeit anpassen.</p><p>Bitte nehmen Sie zur Kenntnis das bei einer Zuweisung von '
-            + 'Angeboten die Nutzer_innen eines Ortes automatisch &uuml;ber ihr Angebot per Email benachrichtigt werden und eine ungewollte Zuweisung von Angebotsinfos '
-        + 'unter Umst&auml;nden aufgehoben wird.</p>')
+        $('.right-side .help').html('<p>Dieses Angebot ist aktuell noch keinem Veranstaltungsort zugewiesen. Zur Veröffentlichung geben Sie '
+            + 'bitte</p><ol><li> einen Ort (über das Suchfeld links) und</li><li>f&uuml;r diesen einen Angebotszeitraum (Datum, Von - Bis) an.</li></ol><p>Sie k&ouml;nnen Angebotszeitr&auml;ume '
+            + ' nachtr&auml;glich jederzeit ändern und das Angebot auch mehreren Orten zuweisen. Mit dem anlegen eines Angebotszeitraums wird ihre Angebotsinfo im Kiezatlas öffentlich und ist für Besucher_innen z.B.: über die <a href="/angebote">Angebotssuche</a> auffindbar.</p>'
+            + ' <p>Unser/e Ansprechpartner_in für den jeweiligen Veranstaltungsort wird von uns über neue Angebotszeiträume benachrichtigt und hat die Möglichkeit Sie zu kontaktieren und ggf. das Angebot zu revidieren.</p>')
     } else {
         // $('.help').html('Um einen Zeitraum zu aktualisieren w&auml;hlen Sie diesen bitte aus.')
         $('.right-side .help').empty()

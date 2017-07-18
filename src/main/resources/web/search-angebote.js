@@ -363,7 +363,7 @@ function render_fulltext_list_item(element, $list) {
         if (!is_empty(element.kontakt)) html_string += '<span class="contact">Kontakt: ' + element.kontakt + '</span>'
         html_string += '<span class="klick">weitere Details...</span>'
         if (element.creator) html_string += '<span class="username">Info von <em>'+element.creator+'</em></span>'
-        html_string += '</div><div class="air-distance">&nbsp;</div></li>'
+        html_string += '</div></li>'
         $list.append(html_string)
     }
 }

@@ -1,6 +1,7 @@
 package de.kiezatlas.angebote.model;
 
 import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.Topic;
 import java.text.DateFormat;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -45,9 +46,10 @@ public class AngebotsinfosAssigned implements JSONEnabled {
         }
     }
 
-    public void setLocationAddress(String addressString) {
+    public void setLocationAddress(Topic address) {
         try {
-            json.put("address", addressString);
+            String addressValue = address.getSimpleValue().toString();
+            json.put("address", addressValue);
         } catch (JSONException ex) {
             throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
         }
