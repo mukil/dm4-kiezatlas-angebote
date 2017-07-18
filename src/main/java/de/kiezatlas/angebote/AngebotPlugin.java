@@ -381,7 +381,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     /**
      * Why respective where do we need this method?
      * Switched rendering of assignments in angebote-ui to getAngebotsinfoAssignments()
-     * @param topicId
+     * @param topicId   ID of an angebotsinfo
      * @return A list of assigned angebotinsofs for the logged in user.
      */
     @GET
@@ -403,6 +403,32 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 }
             } else {
                 log.info("Angebot \"" + angebot.getSimpleValue() + "\" is not yet assigned to Geo Object ");
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Switched rendering of assignments in angebote-ui to getAngebotsinfoAssignments()
+     * @param geoObjectId   ID of a geo object
+     * @return A list of assigned angebotsinfos assigned to the geo object.
+     */
+    @GET
+    @Path("/list/assignments/geo/{geoObjectId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<AngebotsinfosAssigned> getAngebotsinfos(@PathParam("geoObjectId") long geoObjectId) {
+        List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
+        if (geoObjectId == 0) return results;
+        Topic einrichtung = dm4.getTopic(geoObjectId);
+        if (einrichtung.getTypeUri().equals(GEO_OBJECT)) {
+            List<RelatedTopic> all = einrichtung.getRelatedTopics("ka2.angebot.assignment");
+            Iterator<RelatedTopic> iterator = all.iterator();
+            while (iterator.hasNext()) {
+                Topic angebot = iterator.next();
+                Association assignment = getAssignmentAssociation(angebot, einrichtung);
+                if (isAssignmentActiveNow(assignment)) {
+                    results.add(prepareAngebotsInfosAssigned(einrichtung, angebot, assignment));
+                }
             }
         }
         return results;
