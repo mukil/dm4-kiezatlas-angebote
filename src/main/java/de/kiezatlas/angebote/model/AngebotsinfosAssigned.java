@@ -49,6 +49,7 @@ public class AngebotsinfosAssigned implements JSONEnabled {
     public void setLocationAddress(Topic address) {
         try {
             String addressValue = address.getSimpleValue().toString();
+            json.put("address_id", getAggregatedAddressTopicId(address));
             json.put("address", addressValue);
         } catch (JSONException ex) {
             throw new RuntimeException("Constructing a AngebotsInfoAssigned failed", ex);
@@ -364,6 +365,20 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public long getId() {
         return Long.parseLong(getAngebotsId());  // ### should be getAssignmentId()...
+    }
+
+    /** Aggregated used to "cluster" geo objects on the map which share the same address. **/
+    private String getAggregatedAddressTopicId(Topic addressTopic) {
+        if (addressTopic == null) {
+            return "-1:-1";
+        }
+        Topic street = addressTopic.getChildTopics().getTopicOrNull("dm4.contacts.street");
+        Topic postalCode = addressTopic.getChildTopics().getTopicOrNull("dm4.contacts.postal_code");
+        String result = "";
+        result += (street != null) ? street.getId() : "-1";
+        result += ":";
+        result += (postalCode != null) ? postalCode.getId() : "-1";
+        return result;
     }
 
 }
