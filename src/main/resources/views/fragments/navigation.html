@@ -10,7 +10,8 @@
             </a>
             <a th:if="!${#strings.contains(template, 'page') or !#strings.contains(template, 'login') or !#strings.contains(template, 'sign-up')}"
                class="item open-sidebar" onclick="$sidebarUi.sidebar('toggle');">Men&uuml;</a>
-            <a th:if="${authenticated}" href="/angebote/my" class="item angebote">Meine Eintr&auml;ge</a>
+            <a th:if="${authenticated}" href="/angebote/my"
+               th:class="${#strings.contains(template, 'my')} ? 'item all-angebote active' : 'item all-angebote'">Meine Eintr&auml;ge</a>
             <a th:if="!${#strings.contains(template, 'index')}" href="/" class="item">Startseite</a>
             <a href="/angebote"
                th:class="${#strings.contains(template, 'search')} ? 'active item all-angebote' : 'item all-angebote'">Angebote</a>
