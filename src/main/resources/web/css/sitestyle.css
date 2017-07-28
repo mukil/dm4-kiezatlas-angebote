@@ -901,6 +901,15 @@ div.disabled {
     margin-right: 2em;
 }
 
+.einrichtungs-area li.in-trash {
+    text-decoration: line-through;
+    opacity: .6;
+}
+
+.einrichtungs-area li.unconfirmed {
+    opacity: .6;
+}
+
 .einrichtungs-area li,
 .angebot-area li {
     padding: 1em;

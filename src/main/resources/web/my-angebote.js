@@ -37,21 +37,21 @@ function load_users_einrichtungen() {
 }
 
 function render_einrichtungs_item(item) {
-    var created_val = new Date(item['childs']['dm4.time.created']['value'])
-    var modified_val = new Date(item['childs']['dm4.time.modified']['value'])
-    var created = $.datepicker.formatDate("dd. MM yy", created_val)
-    var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
-    // console.log("Einrichtung", item, created, modified)
-    $('ul.einrichtungen').append('<li id="'+item.id+'"><a href="/website/geo/'+item.id+'" title="View Einrichtungspage"><b>' + item.value + '</b></a>'
+    var isInTrash = (item.class.indexOf('in-trash') != -1)
+    var isUnconfirmed = (item.class.indexOf('in-trash') != -1)
+    var itemTitle = "Ortsdatensatz anzeigen"
+    if (isInTrash) itemTitle = 'Ortsdatensatz liegt zur Löschung im Papierkorb'
+    if (isUnconfirmed) itemTitle = 'Ortsdatensatz ist aktuell nicht öffentlich'
+    // console.log("Einrichtung", item, isInTrash)
+    $('ul.einrichtungen').append('<li id="'+item.id+'" class="'+item.class+'" title="' + itemTitle + '">'
+        + '<a href="/website/geo/'+item.id+'"><b>' + item.name + '</b></a>'
         + '<div class="list-commands">'
             + '<div class="ui input focus edit-angebot"><button title="Einrichtungsdatensatz ansehen" '
                 + 'onclick="go_edit_einrichtung('+item.id+')"><i class="edit icon" />Ansehen</button></div>'
             + '<div class="ui input focus edit-angebot"><button title="Einrichtungsdatensatz bearbeiten" '
                 + 'onclick="go_edit_einrichtung_form('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
-            // + '<div class="ui input focus delete-angebot"><button title="Einrichtungsdatensatz entfernen" '
-               //  + 'onclick="delete_my_einrichtung('+item.id+')"><i class="trash icon" /></button></div>'
         + '</div>'
-        + '<br/><small>Erstellt am ' + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
+        + '<br/><small>Erstellt am ' + item.created_string + ', zuletzt bearbeitet am '+ item.last_modified_string + '</small></li>')
 }
 
 function delete_my_angebot(id) {
@@ -69,19 +69,3 @@ function delete_my_angebot(id) {
         }
     })
 }
-
-/** function delete_my_einrichtung(id) {
-    console.log("Try to delete institution", id)
-     $("#dialog-confirm").dialog({ resizable: false, height: "auto", width: 340, modal: true,
-        buttons: {
-            "Ja, löschen": function() {
-                restc.request("DELETE", "/website/geo/" + id)
-                $('ul.einrichtungen').empty()
-                load_users_einrichtungen()
-            },
-            "Nein": function() {
-                $( this ).dialog( "close" );
-            }
-        }
-    })
-} **/
