@@ -15,7 +15,7 @@ var tagging = new function() {
     var DEL_PREFIX = "del_id:"  // duplicate of webclient.js // dm4c
 
     this.fetchAllTagTopics = function(callback) {
-        restc.request("GET", "/core/topic/by_type/dm4.tags.tag", undefined, function(response) {
+        restc.request("GET", "/angebote/tags/all", undefined, function(response) {
             availableTags = response
             if (callback) callback()
         })

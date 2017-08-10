@@ -7,6 +7,7 @@ import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
 import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
 import java.util.List;
+import javax.ws.rs.core.Response;
 
 
 
@@ -53,7 +54,7 @@ public interface AngebotService {
      * 
      * @return      List of all "Angebotsinfos" for the requesting user.
      */
-    List<Topic> getUsersAngebotsinfoTopics();
+    List<Topic> getUsersAngebotsinfoResponse();
 
     /**
      * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").

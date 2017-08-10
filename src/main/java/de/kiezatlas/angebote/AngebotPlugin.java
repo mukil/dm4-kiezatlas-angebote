@@ -1,6 +1,8 @@
 package de.kiezatlas.angebote;
 
 import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
 import de.deepamehta.core.Association;
 
 import de.deepamehta.core.RelatedTopic;
@@ -13,6 +15,7 @@ import de.deepamehta.accesscontrol.AccessControlService;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
+import de.deepamehta.core.service.event.ServiceResponseFilterListener;
 import de.deepamehta.geomaps.GeomapsService;
 import de.deepamehta.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geospatial.GeospatialService;
@@ -51,6 +54,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -62,7 +66,8 @@ import org.codehaus.jettison.json.JSONObject;
 @Consumes("application/json")
 @Produces("application/json")
 public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
-                                                              PostCreateTopicListener {
+                                                              PostCreateTopicListener,
+                                                              ServiceResponseFilterListener {
 
     // ----------------------------------------------------------------------------------------------------- Constants
 
@@ -303,21 +308,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @Path("/my/json")
     @Produces(MediaType.APPLICATION_JSON)
     @Override
-    public List<Topic> getUsersAngebotsinfoTopics() {
-        List<Topic> all = dm4.getTopicsByType(ANGEBOT);
-        ArrayList<Topic> my = new ArrayList<Topic>();
-        Iterator<Topic> iterator = all.iterator();
-        String usernameAlias = aclService.getUsername();
-        while (iterator.hasNext()) {
-            Topic angebot = iterator.next();
-            RelatedTopic usernameTopic = getAngebotsinfoCreator(angebot);
-            if (usernameTopic != null && (usernameTopic.getSimpleValue().toString().equals(usernameAlias))) {
-                my.add(angebot);
-            } else if (usernameTopic == null) {
-                log.warning("Angebotsinfo \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
-            }
-        }
-        return sortTopicsDescByModificationDate(my);
+    public List<Topic> getUsersAngebotsinfoResponse() {
+        return getUsersAngebotsinfoTopics();
     }
 
     @GET
@@ -633,6 +625,13 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return results;
     }
 
+    @GET
+    @Path("/tags/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Topic> getAllTagTopics() {
+        return dm4.getTopicsByType("dm4.tags.tag");
+    }
+
     /**
      * Builds up a list of tags related to angebotsinfos which are assigned to locations.
      */
@@ -812,6 +811,23 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     // ------------------------------------------------------------------------ Private Utility Methods
+
+    private List<Topic> getUsersAngebotsinfoTopics () {
+        List<Topic> all = dm4.getTopicsByType(ANGEBOT);
+        ArrayList<Topic> my = new ArrayList<Topic>();
+        Iterator<Topic> iterator = all.iterator();
+        String usernameAlias = aclService.getUsername();
+        while (iterator.hasNext()) {
+            Topic angebot = iterator.next();
+            RelatedTopic usernameTopic = getAngebotsinfoCreator(angebot);
+            if (usernameTopic != null && (usernameTopic.getSimpleValue().toString().equals(usernameAlias))) {
+                my.add(angebot);
+            } else if (usernameTopic == null) {
+                log.warning("Angebotsinfo \"" + angebot.getSimpleValue() + "\" hat keinen Username assoziiert!");
+            }
+        }
+        return my;
+    }
 
     private void prepareGeneralPageData(String templateName) {
         String username = aclService.getUsername();
@@ -1147,6 +1163,19 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     // --------------------------------------------------------------------------------------------------------- Hooks
+
+    @Override
+    public void serviceResponseFilter(ContainerResponse response) {
+        MultivaluedMap headers = response.getHttpHeaders();
+        ContainerRequest request = response.getContainerRequest();
+        if (request.getPath().equals("website/geo/my/json") ||
+            request.getPath().equals("angebote/my/json") ||
+            request.getPath().equals("angebote/tags/all") ||
+            request.getPath().equals("angebote/membership/")) {
+            log.info("Add No-Cache Directive to response (" + request.getPath() + ")");
+            headers.putSingle("Cache-Control", "no-cache, max-age=0, no-store, must-revalidate");
+        }
+    }
 
     /**
      * Associates each Angebot to the currently logged in username who issued the creation (request).
