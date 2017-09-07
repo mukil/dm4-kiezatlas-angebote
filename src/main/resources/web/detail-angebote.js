@@ -40,7 +40,7 @@ function render_angebot_detail_area() {
         angebotHTML = '<span class="label description">Angebotsbeschreibung</span><br/>'
         angebotHTML += selected_angebot.beschreibung + '<br/>'
     } else {
-        angebotHTML = '<p><span class="label">Keine Beschreibung f&uuml;r dieses Angebot vorhanden.</span></p>'
+        angebotHTML = '<p><span class="label">Keine weitere Beschreibung f&uuml;r dieses Angebot vorhanden.</span></p>'
     }
     if (selected_angebot.kontakt) {
         angebotHTML += '<span class="label contact">AnsprechpartnerIn</span><br/>' + selected_angebot.kontakt + '<br/>'

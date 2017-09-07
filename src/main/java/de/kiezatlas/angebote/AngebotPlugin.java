@@ -1169,6 +1169,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         MultivaluedMap headers = response.getHttpHeaders();
         ContainerRequest request = response.getContainerRequest();
         if (request.getPath().equals("website/geo/my/json") ||
+            (request.getPath().startsWith("angebote") && request.getPath().contains("json")) ||
             request.getPath().equals("angebote/my/json") ||
             request.getPath().equals("angebote/tags/all") ||
             request.getPath().equals("angebote/membership/")) {

@@ -210,6 +210,13 @@ a {
     margin: 0.7em;
 }
 
+.detail-area .assignments,
+.detail-area .angebot-name {
+    border-bottom: 1px solid #fff;
+    padding: .5em;
+    margin-bottom: 0em;
+}
+
 .detail h3.assignments  {
     margin-top: 2em;
     color: #555;
@@ -399,14 +406,14 @@ a {
     display: inline-block;
     margin-right: 5%;
     margin-left: 2em;
-    margin-top: 6em;
+    margin-top: 3em;
 }
 
 .assignment .right-side {
     width: 40%;
     display: inline-block;
     vertical-align: top;
-    margin-top: 6em;
+    margin-top: 3em;
     padding-left: 1em;
 }
 
@@ -451,6 +458,18 @@ a {
     padding: 1em;
     border: 1px solid #27638C;
     margin-top: 1em;
+}
+
+.angebotsinfos.assignment .left-side,
+.angebotsinfos.assignment .right-side {
+    margin-top: 6em;
+}
+
+.angebotsinfos .body,
+.geo-objects-area {
+    padding: 1em;
+    padding-top: 0em;
+    margin-top: 0em;
 }
 
 .geo-objects-area .einrichtungen .result-item {

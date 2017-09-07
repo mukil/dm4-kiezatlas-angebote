@@ -135,7 +135,7 @@ function get_random_int_inclusive(min, max) {
 function autocorrect_url(current_url) {
     if (current_url.length <= 4) return true
     var PROTOCOL_START = "http"
-    if (!current_url.startsWith("http")) {
+    if (!current_url.indexOf("http") === 0) {
         $('#angebot-webpage').val(PROTOCOL_START + '://' + current_url)
         console.log('Wir haben ein HTTP hinzugef&uuml;gt', current_url)
     }
@@ -174,6 +174,16 @@ function angebote_compare_by_end_earliest_last(a, b) {
         return -1
     if (oldestEndA > oldestEndB)
         return 1
+    return 0 //default return value (no sorting)
+}
+
+function angebote_compare_by_last_modified(a, b) {
+    var oldestEndA = a.childs["dm4.time.modified"].value
+    var oldestEndB = b.childs["dm4.time.modified"].value
+    if (oldestEndA < oldestEndB) // sort string ascending
+        return 1
+    if (oldestEndA > oldestEndB)
+        return -1
     return 0 //default return value (no sorting)
 }
 

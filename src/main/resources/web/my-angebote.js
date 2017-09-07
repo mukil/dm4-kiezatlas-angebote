@@ -3,6 +3,7 @@
 
 function load_users_angebote() {
     var result = restc.request("GET", "/angebote/my/json")
+    result.sort(angebote_compare_by_last_modified)
     for (var el in result) {
         var item = result[el]
         render_angebots_item(item)
