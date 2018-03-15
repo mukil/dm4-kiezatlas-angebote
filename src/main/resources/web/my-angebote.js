@@ -38,8 +38,8 @@ function load_users_einrichtungen() {
 }
 
 function render_einrichtungs_item(item) {
-    var isInTrash = (item.class.indexOf('in-trash') != -1)
-    var isUnconfirmed = (item.class.indexOf('in-trash') != -1)
+    var isInTrash = (item.class) ? (item.class.indexOf('in-trash') != -1) : false
+    var isUnconfirmed = (item.class) ? (item.class.indexOf('in-trash') != -1) : false
     var itemTitle = "Ortsdatensatz anzeigen"
     if (isInTrash) itemTitle = 'Ortsdatensatz liegt zur Löschung im Papierkorb'
     if (isUnconfirmed) itemTitle = 'Ortsdatensatz ist aktuell nicht öffentlich'
