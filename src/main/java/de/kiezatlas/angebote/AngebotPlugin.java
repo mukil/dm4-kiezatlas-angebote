@@ -13,6 +13,7 @@ import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.accesscontrol.AccessControlService;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedObject;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.event.ServiceResponseFilterListener;
@@ -602,7 +603,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @Path("/filter/{now}")
     public AngeboteSearchResults getAngebotsinfosByTimestamp(@PathParam("now") long timestamp) {
         AngeboteSearchResults results = new AngeboteSearchResults();
-        List<Topic> offers = getAssignedAngeboteByTime(timestamp);
+        List<RelatedTopic> offers = getAssignedAngeboteByTime(timestamp);
         results.setTimelyResults(prepareAngebotsinfoSearchResult(offers));
         return results;
     }
@@ -611,7 +612,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/locations")
     public List<AngebotsinfosAssigned> getCurrentAngebotsinfosAssigned() {
-        List<Topic> offers = getAssignedAngeboteByTime(new Date().getTime());
+        List<RelatedTopic> offers = getAssignedAngeboteByTime(new Date().getTime());
         List<AngebotsinfosAssigned> results = new ArrayList<AngebotsinfosAssigned>();
         for (Topic angebot : offers) {
             List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
@@ -702,7 +703,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             // 2) Search fulltext in angebotsinfos directly
             List<Angebotsinfos> fulltextAngebote = new ArrayList<Angebotsinfos>();
             if (queryString != null) {
-                List<Topic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
+                List<RelatedTopic> angebotsinfos = searchInAngebotsinfoChildsByText(queryString);
                 log.info("> Fulltext Resultset Size " + angebotsinfos.size() + " Angebotsinfos");
                 fulltextAngebote.addAll(prepareAngebotsinfoSearchResult(angebotsinfos)); // adds just new ones to resultset
             }
@@ -717,15 +718,15 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     @Override
-    public List<Topic> getAssignedAngeboteByTime(@PathParam("now") long nowDate) {
+    public List<RelatedTopic> getAssignedAngeboteByTime(@PathParam("now") long nowDate) {
         List<Association> assocs = dm4.getAssociationsByType(ANGEBOT_ASSIGNMENT);
-        List<Topic> result = new ArrayList<Topic>();
+        List<RelatedTopic> result = new ArrayList<RelatedTopic>();
         Iterator<Association> iterator = assocs.iterator();
         while (iterator.hasNext()) {
             Association assoc = iterator.next();
             if (isAssignmentActiveNow(assoc)) {
-                Topic angebotTopic = assoc.getTopic(ROLE_TYPE_PARENT);
-                Topic geoObjectTopic = assoc.getTopic(ROLE_TYPE_CHILD);
+                RelatedTopic angebotTopic = (RelatedTopic) assoc.getPlayer(ROLE_TYPE_PARENT);
+                RelatedTopic geoObjectTopic = (RelatedTopic) assoc.getPlayer(ROLE_TYPE_CHILD);
                 if (angebotTopic != null && geoObjectTopic != null) {
                     result.add(angebotTopic);
                 }
@@ -989,8 +990,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     @Override
-    public List<Topic> searchInAngebotsinfoChildsByText(String query) {
-        HashMap<Long, Topic> uniqueResults = new HashMap<Long, Topic>();
+    public List<RelatedTopic> searchInAngebotsinfoChildsByText(String query) {
+        HashMap<Long, RelatedTopic> uniqueResults = new HashMap<Long, RelatedTopic>();
         List<Topic> namen = dm4.searchTopics(query, "ka2.angebot.name"); // Todo: check index modes
         List<Topic> beschreibungen = dm4.searchTopics(query, "ka2.angebot.beschreibung");
         List<Topic> stichwoerter = dm4.searchTopics(query, "dm4.tags.label");
@@ -1008,7 +1009,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         while (iterator.hasNext()) {
             Topic next = iterator.next();
             List<RelatedTopic> relatedParents = getParentAngebotTopics(next);
-            for (Topic geoObject : relatedParents) {
+            for (RelatedTopic geoObject : relatedParents) {
                 if (!uniqueResults.containsKey(geoObject.getId())) {
                     uniqueResults.put(geoObject.getId(), geoObject);
                 }
@@ -1081,7 +1082,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
      * @param angebotsinfos
      * @return A list of Angebotsinfos of which each has at least one location and thereiwth (angebotszeitraum) assigned.
      */
-    private List<Angebotsinfos> prepareAngebotsinfoSearchResult(List<Topic> angebotsinfos) {
+    private List<Angebotsinfos> prepareAngebotsinfoSearchResult(List<RelatedTopic> angebotsinfos) {
         ArrayList<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
         for (Topic angebot : angebotsinfos) {
             // 1) assemble basic angebots infos
@@ -1248,7 +1249,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     private void addToRelatedAngebotsinfoResults(List<AngebotsinfosAssigned> angebotsinfos,
         Association assignment, Topic geoObject, Topic angebotTopic) {
-        Topic geoObjectTopic = assignment.getTopic(ROLE_TYPE_CHILD);
+        RelatedTopic geoObjectTopic = (RelatedTopic) assignment.getPlayer(ROLE_TYPE_CHILD);
         if (angebotTopic != null && geoObjectTopic != null) {
             angebotsinfos.add(prepareAngebotsInfosAssigned(geoObject, angebotTopic, assignment));
         }

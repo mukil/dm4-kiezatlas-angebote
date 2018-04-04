@@ -23,12 +23,6 @@ public class Migration2 extends Migration {
     @Override
     public void run() {
 
-        /** TopicType tagType = dm4.getTopicType("ka2.geo_object");
-        ViewConfiguration viewConfig = tagType.getViewConfig();
-        //
-        viewConfig.addSetting("dm4.webclient.view_config",
-                "dm4.webclient.multi_renderer_uri", "de.kiezatlas.angebote.geo_object_multi"); **/
-        //
         Topic angeboteWorkspace = workspaceService.createWorkspace("Angebote", "de.kiezatlas.angebote_ws",
                 SharingMode.PUBLIC);
         aclService.setWorkspaceOwner(angeboteWorkspace, AccessControlService.ADMIN_USERNAME);

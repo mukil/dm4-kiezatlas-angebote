@@ -7,7 +7,6 @@ import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
 import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
 import java.util.List;
-import javax.ws.rs.core.Response;
 
 
 
@@ -31,7 +30,7 @@ public interface AngebotService {
     public static final String PROP_ANGEBOT_START_TIME      = "ka2.angebot.start_time";
     public static final String PROP_ANGEBOT_END_TIME        = "ka2.angebot.end_time";
 
-    List<Topic> searchInAngebotsinfoChildsByText(String query);
+    List<RelatedTopic> searchInAngebotsinfoChildsByText(String query);
 
     boolean isAngeboteWorkspaceMember(String username);
 
@@ -106,7 +105,7 @@ public interface AngebotService {
      * @param now
      * @return
      */
-    List<Topic> getAssignedAngeboteByTime(long now);
+    List<RelatedTopic> getAssignedAngeboteByTime(long now);
 
     /**
      * Fetches all Angebotsinfos by searching four child types: Name, Beschreibung, Kontakt und Tags.
