@@ -1,0 +1,50 @@
+
+<div th:fragment="logo-site-link">
+    <a th:if="${#strings.contains(website, 'standard')}" title="Visit the frontpage of this website"
+        alt="Link to the frontpage of this website" href="/"
+        class="item sitename header">
+        <img class="logo" th:title="${siteName} + ' Frontpage'"
+             th:src="'/filerepo/' + ${siteLogoPath}" />
+    </a>
+    <a th:if="${!#strings.contains(website, 'standard')}" th:title="'Visit the frontpage of ' + ${website} + 's website'"
+        title="'Visit the frontpage of this website'" alt="Link to the frontpage of this website"
+        class="item sitename header" th:href="'/' + ${website}">
+        <img class="logo" th:title="${siteName} + ' Frontpage'" th:if="${not #strings.isEmpty(siteLogoPath)}"
+             th:src="'/filerepo/' + ${siteLogoPath}" />
+        <span th:if="${#strings.isEmpty(siteLogoPath)}" th:text="${siteName}">Sitename</span>
+    </a>
+</div>
+
+<!-- Teaser Area -->
+<div th:fragment="teaser-small" class="ui vertical segment teaser">
+    <div class="ui container">
+        <h2 class="header blue5bg white thin">
+            Unser Kiezatlas f&uuml;r<br/>
+            <b th:if="${geoobject}" th:text='${geoobject.bezirk}'>Mitte</b>
+            <b th:if="${!geoobject}">Berlin</b>
+        </h2>
+    </div>
+</div>
+
+<div th:fragment="footer-site-link">
+    <a th:if="${#strings.contains(website, 'standard')}" title="Visit the frontpage of this website"
+        alt="Link to the frontpage of this website" href="/">
+        <img class="logo" th:title="${siteName} + ' Frontpage'" src="/filerepo//images/kiezatlas-logo.png" />
+    </a>
+    <a th:if="${!#strings.contains(website, 'standard')}" th:title="'Visit the frontpage of ' + ${website} + 's website'"
+        title="'Visit the frontpage of this website'" alt="Link to the frontpage of this website"
+        th:href="'/' + ${website}">
+        <img class="logo" th:title="${siteName} + ' Frontpage'" th:if="${not #strings.isEmpty(siteLogoPath)}"
+             th:src="'/filerepo/' + ${siteLogoPath}" />
+        <h1 th:if="${#strings.isEmpty(siteLogoPath)}" th:text="${siteName}"></h1>
+    </a>
+</div>
+
+<div th:fragment="editor-link">
+    <div th:if="${authenticated}" class="main">
+        <!-- ### Create Edit Button into the Webclient. Therefore we need to find a Topicmap (ID) in which this topic is currently contained and visible. -->
+        Hi <span th:unless="${#strings.isEmpty(username)}" class="username" th:text="${username}"></span>,  
+        <a href="/de.deepamehta.webclient/">launch the Webclient</a> to create or edit your website.
+    </div>
+</div>
+

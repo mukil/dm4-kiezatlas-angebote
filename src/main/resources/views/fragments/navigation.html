@@ -1,4 +1,45 @@
 
+<!-- Kiezatlas 2.0 UI Navigation Menu (White) -->
+<div th:fragment="top2 (publisher)">
+
+    <div class="ui container">
+        <h3 class="citymap-title"></h3>
+        <a href="/" class="home" title="zur Startseite">
+            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="mobile-logo" />
+        </a>
+        <div class="ui borderless right menu">
+            <!--a th:if="!${#strings.contains(template, 'website-')}" href="/" class="item">Startseite</a-->
+            <!--a th:if="!${#strings.contains(template, 'page')}"
+               class="item open-sidebar" onclick="$sidebarUi.sidebar('toggle');">Men&uuml;</a-->
+               <!--  or !#strings.contains(template, 'login') or !#strings.contains(template, 'sign-up')} -->
+            <a th:if="${!authenticated}" href="/angebote/my" class="item">Einstellen</a>
+            <a th:if="${authenticated}" href="/angebote/my" class="item">Meine Eintr&auml;ge</a>
+            <!--a href="/angebote" class="item all-angebote">Angebote</a-->
+            <div class="ui simple dropdown item">
+                <span>Bezirksseiten</span> <i class="dropdown icon"></i>
+                <div class="menu" id="bezirksauswahl">
+                    <div class="item" th:each="district : ${districts}" th:id="${district.id}"
+                         th:text="${district.simpleValue}">Mitte</div>
+                </div>
+            </div>
+            <div class="ui simple dropdown item">
+                <span>Weitere Stadtpl&auml;ne</span> <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="item">Familienstadtplan</div>
+                    <div class="item">VskA Stadtteilzentren</div>
+                </div>
+            </div>
+            <a href="https://sozialraumdaten.kiezatlas.de/seiten/" class="item">Sozialraumdaten</a>
+            <a th:if="!${authenticated}" href="/sign-up/login"
+               th:class="${#strings.contains(template, 'login')} ? 'active item login' : 'item login'">Login / Registrieren</a>
+            <a th:if="${authenticated}" href="/sign-up/login"
+               th:class="${#strings.contains(template, 'logout')} ? 'active item logout' : 'item logout'">Logout</a>
+        </div>
+    </div>
+
+</div>
+
+
 <!--- Standard Horizontal Navigation (Wider Page > 900px) -->
 <div th:fragment="top (publisher)">
 

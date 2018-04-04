@@ -7,10 +7,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css"/>
-        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.website/css/kiezatlas-web.css" />
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.angebote/css/sitestyle.css" />
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
-
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/sidebar.min.js"></script>
 
@@ -20,35 +21,45 @@
 
         <meta th:replace="fragments/tracker" />
     </head>
-    <body class="kiezatlas angebotsinfos start">
+    <body class="ui page detail kiezatlas angebotsinfos start">
 
-        <div class="top-menu" th:include="fragments/navigation :: top (publisher=${is_publisher})"></div>
+        <div class="navigation">
+            <div class="top-menu" th:include="fragments/navigation :: top2 (publisher=${is_publisher})"></div>
+        </div>
 
         <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
 
-        <div class="pusher">
+        <div class="ui pusher">
 
-            <div class="white-styled-area header-message">
-                <p>Hi <span class="username"></span>!</p>
-                <p>
-                    Im Kiezatlas gibt es jetzt die M&ouml;glichkeit Informationen zu <b>Angeboten</b> und <b>Orten selbstst&auml;ndig einzutragen</b>. Dazu kurz das Wichtigste.
-                </p>
-                <p>
-                    Angebotsinfos sind <em>Vorlagen für konkrete Termine bzw. Veranstaltungszeitr&auml;ume</em> eines Angebots. Das hat den Vorteil das diese wie eine Art "Basisinformation" zu einem Angebot nur einmal eingetragen werden m&uuml;ssen aber mehreren Veranstaltungsorten &uuml;ber verschiedene Zeitr&auml;ume zugewiesen werden k&ouml;nnen.
-                    <!-- Termine sind bei uns erst einmal nur <em>Angebotszeitr&auml;ume</em> (von Tag bis Tag) -->
-                </p>
-                <p>
-                    Ein Angebot wird &ouml;ffentlich such- und sichtbar sobald die Angebotsinfos mit einem Ort im Kiezatlas terminlich verbunden sind (siehe unten, <em>Angebotszeitr&auml;me verwalten</em>).
-                </p>
-                <p>
-                    Bei neuen Orten verh&auml;lt sich das etwas anders, diese m&uuml;ssen vor der Benutzung und Veröffentlichung einmalig freigeschaltet werden.
-                    Diese Freischaltung &uuml;bernimmt eine/r <em>Kiez-AdministratorInnen</em> und du erh&auml;ltst automatisch eine Benachrichtigung (via Email) sobald dies geschehen ist.
-                </p>
+            <!-- Teaser Area -->
+            <div th:replace="fragments/widgets :: teaser-small"></div>
+
+            <!--div th:replace="fragments/search :: dialog (false, ${districts}, ${tags}, ${search}, ${searchType})"></div-->
+
+            <!-- Name, Description Area -->
+            <div class="ui vertical container segment entry">
+                <div class="white-styled-area header-message">
+                    <p>Hi <span class="username"></span>!</p>
+                    <p>
+                        Im Kiezatlas gibt es jetzt die M&ouml;glichkeit Informationen zu <b>Angeboten</b> und <b>Orten selbstst&auml;ndig einzutragen</b>. Dazu kurz das Wichtigste.
+                    </p>
+                    <p>
+                        Angebotsinfos sind <em>Vorlagen für konkrete Termine bzw. Veranstaltungszeitr&auml;ume</em> eines Angebots. Das hat den Vorteil das diese wie eine Art "Basisinformation" zu einem Angebot nur einmal eingetragen werden m&uuml;ssen aber mehreren Veranstaltungsorten &uuml;ber verschiedene Zeitr&auml;ume zugewiesen werden k&ouml;nnen.
+                        <!-- Termine sind bei uns erst einmal nur <em>Angebotszeitr&auml;ume</em> (von Tag bis Tag) -->
+                    </p>
+                    <p>
+                        Ein Angebot wird &ouml;ffentlich such- und sichtbar sobald die Angebotsinfos mit einem Ort im Kiezatlas terminlich verbunden sind (siehe unten, <em>Angebotszeitr&auml;me verwalten</em>).
+                    </p>
+                    <p>
+                        Bei neuen Orten verh&auml;lt sich das etwas anders, diese m&uuml;ssen vor der Benutzung und Veröffentlichung einmalig freigeschaltet werden.
+                        Diese Freischaltung &uuml;bernimmt eine/r <em>Kiez-AdministratorInnen</em> und du erh&auml;ltst automatisch eine Benachrichtigung (via Email) sobald dies geschehen ist.
+                    </p>
+                </div>
+
+                <div class="task-info"></div>
             </div>
 
-            <div class="task-info"></div>
-
-            <div class="angebot-area">
+            <div class="angebot-area ui segment container">
                 <h3>Meine Angebotsinfos</h3>
                 <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
                     <div class="ui input block-space-bottom">
@@ -58,7 +69,7 @@
                 <ul class="angebote"></ul>
             </div>
 
-            <div class="einrichtungs-area">
+            <div class="einrichtungs-area ui segment container">
                 <h3>Meine Orte</h3>
                 <form method="GET" action="/website/geo/create" id="angebot-form" accept-charset="UTF-8">
                     <div class="ui input block-space-bottom">
@@ -68,22 +79,10 @@
                 <ul class="einrichtungen"></ul>
             </div>
 
-            <div id="bottom">
-                <div class="menu">
-                    <ul>
-                        <li>
-                            <a href="/" title="Zurück zur Startseite">Zur&uuml;ck</a>
-                        </li>
-                        <li>
-                            <a href="/angebote" title="Alle aktuelle Angebote anzeigen">Angebotssuche</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
             <div id="dialog-confirm" title="Eintrag löschen?">Willst du diesen Datensatz wirklich entfernen?</div>
 
-            <div class="footer" th:include="fragments/navigation :: footer-links (publisher=${is_publisher})"></div>
+            <!-- Footer Segment -->
+            <div th:replace="fragments/footer :: footer-new "></div>
 
         </div>
 

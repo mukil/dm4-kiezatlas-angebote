@@ -1,5 +1,8 @@
 package de.kiezatlas.angebote;
 
+import de.kiezatlas.angebote.events.ContactAnbieterListener;
+import de.kiezatlas.angebote.events.RemovedAngebotListener;
+import de.kiezatlas.angebote.events.AssignedAngebotListener;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -27,6 +30,7 @@ import de.kiezatlas.KiezatlasService;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT;
 import static de.kiezatlas.KiezatlasService.GEO_OBJECT_NAME;
 import static de.kiezatlas.angebote.AngebotService.ANGEBOT_CREATOR_EDGE;
+import de.kiezatlas.angebote.events.AngeboteResourceRequestedListener;
 import de.kiezatlas.angebote.model.AngeboteSearchResults;
 import de.kiezatlas.angebote.model.Angebotsinfos;
 import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
@@ -60,6 +64,7 @@ import javax.ws.rs.core.Response;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.thymeleaf.context.AbstractContext;
 
 
 
@@ -131,8 +136,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/zuordnen/{topicId}")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotAssignmentView(@PathParam("topicId") String id) {
-        return getStaticResource("web/html/assignment.html");
+    public Viewable getAngebotAssignmentView(@PathParam("topicId") String id) {
+        prepareGeneralPageData("assignment");
+        return view("assignment");
     }
 
     @GET
@@ -161,8 +167,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/edit/{topicId}")
     @Produces(MediaType.TEXT_HTML)
-    public InputStream getAngebotEditView(@PathParam("topicId") long id) {
-        return getStaticResource("web/html/edit.html");
+    public Viewable getAngebotEditView(@PathParam("topicId") long id) {
+        prepareGeneralPageData("edit");
+        return view("edit");
     }
 
     @GET
@@ -281,6 +288,13 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         public void dispatch(EventListener listener, Object... params) {
             ((ContactAnbieterListener) listener).contactAngebotsAnbieter((Topic) params[0], (Topic) params[1], (Association) params[2],
                     (String) params[3], (String) params[4], (String) params[5]);
+        }
+    };
+
+    static DeepaMehtaEvent ANGEBOTE_RESOURCE_REQUESTED = new DeepaMehtaEvent(AngeboteResourceRequestedListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((AngeboteResourceRequestedListener) listener).angeboteResourceRequested((AbstractContext) params[0], (String) params[1]);
         }
     };
 
@@ -831,6 +845,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     private void prepareGeneralPageData(String templateName) {
+        dm4.fireEvent(ANGEBOTE_RESOURCE_REQUESTED, context(), templateName);
         String username = aclService.getUsername();
         viewData("authenticated", (username != null));
         viewData("username", username);

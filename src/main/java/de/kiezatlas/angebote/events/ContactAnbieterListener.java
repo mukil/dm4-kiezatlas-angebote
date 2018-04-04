@@ -1,4 +1,4 @@
-package de.kiezatlas.angebote;
+package de.kiezatlas.angebote.events;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;

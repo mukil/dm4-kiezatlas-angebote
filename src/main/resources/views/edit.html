@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Kiezatlas 2 Angebote</title>
+
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <link rel="stylesheet" href="/de.kiezatlas.angebote/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css"/>
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.website/css/kiezatlas-web.css" />
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.angebote/css/sitestyle.css" />
+
+        <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/vendor/ckeditor/ckeditor.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/vendor/ckeditor/config.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
+
+        <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="edit_angebot_page()"></script>
+        <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
+
+    </head>
+    <body class="ui page detail kiezatlas angebotsinfos edit">
+
+        <div class="navigation">
+            <div class="top-menu" th:include="fragments/navigation :: top2 (publisher=${is_publisher})"></div>
+        </div>
+
+        <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
+
+        <div class="ui pusher">
+
+            <!-- Teaser Area -->
+            <div th:replace="fragments/widgets :: teaser-small"></div>
+
+            <div class="task-info">
+                <h3>Angebotsinfos bearbeiten</h3>
+            </div>
+
+            <div class="form-area angebot ui segment container">
+                <form action="javascript:_void()" id="angebot-form" accept-charset="UTF-8">
+                    <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
+                    <div class="ui input focus">
+                        <input id="angebot-name" name="name" maxlength="128"
+                               required="true" type="text" placeholder="Name des Angebots" />
+                    </div>
+                    <br/>
+                    <textarea id="angebot-beschreibung" name="beschreibung" contenteditable="true"
+                              class="mbottom" type="text" placeholder="Beschreibung des Angebots"></textarea>
+                    <!--label for="angebot-beschreibung">(Tipp: <em>Was</em> genau, an welchem Wochentag, zu welcher <em>Uhrzeit</em>?)</label-->
+                    <br/>
+                    <label for="angebot-kontakt" id="kontakt-label">Allgemeine/r Ansprechpartner_in</label>
+                    <div class="ui input focus">
+                        <input id="angebot-kontakt" name="kontakt" class="mbottom" required="true" type="text" placeholder="Kontakt" />
+                    </div>
+                    <br/>
+                    <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)</label>
+                    <div class="ui input focus">
+                        <input id="angebot-webpage" name="webpage" class="mbottom" type="url" onkeyup="autocorrect_url(this.value)" placeholder="http://www.kiezatlas.de" />
+                    </div>
+                    <br/>
+                    <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label>
+                    <div class="ui input focus">
+                        <input id="angebot-tags" name="tags" class="mbottom" type="text" placeholder=".., .." />
+                    </div>
+                    <br/>
+                    <div class="ui input focus icon commands">
+                        <button id="do-save" class="ui olive button" onclick="do_save_angebot_and_go_home()" type="submit">
+                            <i class="icon save"></i>Speichern
+                        </button>
+                        <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
+                            <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;ume festlegen
+                        </button>
+                    </div>
+                </form>
+                <br/>
+                <!--div class="ui input focus icon">
+                    <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
+                        <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;me festlegen
+                    </button>
+                </div-->
+            </div>
+
+            <!-- Footer Segment -->
+            <div th:replace="fragments/footer :: footer-new "></div>
+
+        </div>
+
+    </body>
+</html>
+

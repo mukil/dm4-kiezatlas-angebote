@@ -5,14 +5,17 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.website/css/kiezatlas-web.css" />
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.angebote/css/sitestyle.css" />
 
         <script src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
-
         <script src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
-        <script src="/de.kiezatlas.website/css/semantic-ui/2.2/sidebar.min.js"></script>
-
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
         <script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/vendor/leaflet-1.3.1/leaflet.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
+        <!--script defer="true" src="/de.kiezatlas.website/ka-map.js"></script-->
+        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_einrichtungs_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
         <script type="text/javascript" th:inline="javascript">
@@ -25,42 +28,42 @@
         </script>
         <meta th:replace="fragments/tracker" />
     </head>
-    <body class="kiezatlas angebotsinfos detail">
+    <body class="ui page detail kiezatlas angebotsinfos detail">
 
-        <div class="top-menu" th:include="fragments/navigation :: top (publisher=${is_publisher})"></div>
+        <div class="navigation">
+            <div class="top-menu" th:include="fragments/navigation :: top2 (publisher=${is_publisher})"></div>
+        </div>
 
         <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
 
-        <div class="pusher">
+        <div class="ui pusher">
 
-            <div class="task-info">
-                <h3></h3>
-                <div class="ui input icon loading-indicator">
-                    <i class="loading spinner icon"></i>
-                </div>
-            </div>
-            <div class="detail-area ui container" id="angebot" th:data="${angebot.id}">
-                <div class="angebot-infos">
-                    <h3 class="angebot-name" th:text="${angebot.name}"></h3>
-                    <p class="body"></p>
-                </div>
-                <h3 class="assignments">Veranstaltungsorte dieses Angebots</h3>
-                <div class="geo-objects-area">
-                    <div class="einrichtungen"></div>
-                </div>
-            </div>
+            <!-- Teaser Area -->
+            <div th:replace="fragments/widgets :: teaser-small"></div>
 
-            <div id="bottom">
-                <div class="menu">
-                    <ul>
-                        <li>
-                            <a href="/angebote" title="Zurück zur Übersicht">Zur&uuml;ck</a>
-                        </li>
-                    </ul>
+            <div th:replace="fragments/search :: dialog (false, ${districts}, ${tags}, ${search}, ${searchType})"></div>
+
+            <div class="ui vertical container segment entry">
+
+                <div class="task-info">
+                    <h3></h3>
                 </div>
+                <div class="detail-area ui container" id="angebot" th:data="${angebot.id}">
+                    <div class="angebot-infos">
+                        <h3 class="angebot-name" th:text="${angebot.name}"></h3>
+                        <p class="body"></p>
+                    </div>
+                    <h3 class="assignments">Veranstaltungsorte dieses Angebots</h3>
+                    <div class="geo-objects-area">
+                        <div class="einrichtungen"></div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="footer" th:include="fragments/navigation :: footer-links (publisher=${is_publisher})"></div>
+            <!-- Footer Segment -->
+            <div th:replace="fragments/footer :: footer-new "></div>
+
         </div>
 
     </body>
