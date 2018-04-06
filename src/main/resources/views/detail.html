@@ -10,22 +10,12 @@
 
         <script defer="true" src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
-        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
-        <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
-        <script defer="true" src="/de.kiezatlas.website/vendor/leaflet-1.3.1/leaflet.js"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="render_angebotsinfo_page()"></script>
+        <script defer="true" src="/de.kiezatlas.website/vendor/leaflet-1.3.1/leaflet.js"></script>
         <!--script defer="true" src="/de.kiezatlas.website/ka-map.js"></script-->
-        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_einrichtungs_page()"></script>
-        <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
-        <script type="text/javascript" th:inline="javascript">
-        /*<![CDATA[*/
-            // App initialization
-            $(document).ready(function(e) {
-                render_angebotsinfo_page()
-            })
-        /*]]>*/
-        </script>
         <meta th:replace="fragments/tracker" />
     </head>
     <body class="ui page detail kiezatlas angebotsinfos detail">
