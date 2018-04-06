@@ -18,12 +18,11 @@
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
         <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="angebot_assignments_page()"></script>
 
-
     </head>
     <body class="ui page detail kiezatlas angebotsinfos assignment">
 
         <div class="navigation">
-            <div class="top-menu" th:include="fragments/navigation :: top2 (publisher=${is_publisher})"></div>
+            <div class="top-menu" th:include="fragments/navigation :: top-menu (publisher=${is_publisher})"></div>
         </div>
 
         <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>

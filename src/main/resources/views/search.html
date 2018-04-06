@@ -7,34 +7,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css"/>
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.website/css/kiezatlas-web.css" />
         <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
 
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-locating.js"></script>
-        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/checkbox.min.js"></script>
-        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/sidebar.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="init_search_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
         <meta th:replace="fragments/tracker" />
     </head>
-    <body class="kiezatlas angebotsinfos search">
+    <body class="ui page detail kiezatlas angebotsinfos search">
 
-        <div class="top-menu" th:include="fragments/navigation :: top (publisher=${is_publisher})"></div>
+        <div class="top-menu" th:include="fragments/navigation :: top-menu (publisher=${is_publisher})"></div>
 
         <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
 
         <div class="pusher">
 
-            <div class="headline white-styled-area-bottom-line">
+            <!-- Teaser Area -->
+            <div th:replace="fragments/widgets :: teaser-small"></div>
 
-                <div class="logoline">
-                    <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
-                    <div class="slogan">Angebotsinfos im Kiezatlas</div>
-                </div>
+            <div class="ui vertical container segment search">
 
                 <div class="form-area">
 
@@ -70,31 +68,36 @@
 
             </div>
 
-            <div class="search-content">
+            <div class="ui vertical container segment search-results">
 
-                <div class="filter-area">
-                    <div class="query-parameter"></div>
-                </div>
+                <div class="search-content">
 
-                <div id="listing" class="list-area">
-                    <h4 class="status"></h4>
-                    <div class="ui input icon loading-indicator">
-                        <i class="loading hidden spinner icon"></i>
+                    <div class="filter-area">
+                        <div class="query-parameter"></div>
                     </div>
-                    <ul class="results"></ul>
+
+                    <div id="listing" class="list-area">
+                        <h4 class="status"></h4>
+                        <div class="ui input icon loading-indicator">
+                            <i class="loading hidden spinner icon"></i>
+                        </div>
+                        <ul class="results"></ul>
+                    </div>
+
+                    <a class="ui button tiny basic" href="/angebote/my" id="anbieter-info-link"
+                       title="Sie sind Anbieter &ouml;ffentlicher und sozial-kultureller Angebote?">
+                        Infos f&uuml;r Anbieterinnen und Anbieter
+                    </a>
                 </div>
 
-                <a class="ui button tiny basic" href="/angebote/my" id="anbieter-info-link"
-                   title="Sie sind Anbieter &ouml;ffentlicher und sozial-kultureller Angebote?">
-                    Infos f&uuml;r Anbieterinnen und Anbieter
-                </a>
+                <div id="bottom" class="white-styled-area">
+                    <div class="tag-view"><h4 class="label">Angebotssuche nach Stichworten</h4><br/></div>
+                </div>
+
             </div>
 
-            <div id="bottom" class="white-styled-area">
-                <div class="tag-view"><h4 class="label">Angebotssuche nach Stichworten</h4><br/></div>
-            </div>
-
-            <div class="footer" th:include="fragments/navigation :: footer-links (publisher=${is_publisher})"></div>
+            <!-- Footer Segment -->
+            <div th:replace="fragments/footer :: footer-new "></div>
 
         </div>
 
