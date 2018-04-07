@@ -353,11 +353,6 @@ span.angebot-name {
     margin-top: 0;
 }
 
-.angebotsinfos.detail .read-more {
-    margin: 0em;
-    display: block;
-}
-
 .assignment .task-info h3,
 .assignment .date-area h3 {
     font-weight: normal;

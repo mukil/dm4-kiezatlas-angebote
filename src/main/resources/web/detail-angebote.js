@@ -29,9 +29,8 @@ function render_angebot_detail_area() {
     // render edit link
     var tags = ""
     for (var t in selected_angebot.tags) {
-        tags += '<a class="ui tiny button basic" href="/angebote?stichworte='+selected_angebot.tags[t].label+'" '
-            +'title="Zeige aktuelle Angebote mit dem Tag '+selected_angebot.tags[t].label+'">'
-            + selected_angebot.tags[t].label + '</a>'
+        // tags += '<a class="ui tiny button basic" href="/angebote?stichworte='+selected_angebot.tags[t].label+'" '
+        tags += '<span class="tag">' + selected_angebot.tags[t].label + '</span>'
         // if (t < selected_angebot.tags.length - 1) tags += ", "
     }
     $('.angebot-name').text(name)
@@ -52,7 +51,7 @@ function render_angebot_detail_area() {
             + '<a href="' + selected_angebot.webpage + '">' + selected_angebot.webpage + '</a><br/>'
     }
     if (tags !== "") {
-        angebotHTML += '<br/><span class="label tags">Stichw&ouml;rter</span><p class="tags">' + tags + '</p>'
+        angebotHTML += '<br/><span class="label tags">Stichw&ouml;rter</span><div class="stichworte">' + tags + '</p>'
     }
     $('.angebot-infos p.body').html(angebotHTML)
     $('.task-info .loading').addClass("hidden")
