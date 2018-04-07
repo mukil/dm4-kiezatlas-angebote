@@ -38,45 +38,49 @@
 
             <!-- Name, Description Area -->
             <div class="ui vertical container segment entry">
-                <div class="white-styled-area header-message">
-                    <p>Hi <span class="username"></span>!</p>
-                    <p>
-                        Im Kiezatlas gibt es jetzt die M&ouml;glichkeit Informationen zu <b>Angeboten</b> und <b>Orten selbstst&auml;ndig einzutragen</b>. Dazu kurz das Wichtigste.
-                    </p>
-                    <p>
-                        Angebotsinfos sind <em>Vorlagen für konkrete Termine bzw. Veranstaltungszeitr&auml;ume</em> eines Angebots. Das hat den Vorteil das diese wie eine Art "Basisinformation" zu einem Angebot nur einmal eingetragen werden m&uuml;ssen aber mehreren Veranstaltungsorten &uuml;ber verschiedene Zeitr&auml;ume zugewiesen werden k&ouml;nnen.
-                        <!-- Termine sind bei uns erst einmal nur <em>Angebotszeitr&auml;ume</em> (von Tag bis Tag) -->
-                    </p>
-                    <p>
-                        Ein Angebot wird &ouml;ffentlich such- und sichtbar sobald die Angebotsinfos mit einem Ort im Kiezatlas terminlich verbunden sind (siehe unten, <em>Angebotszeitr&auml;me verwalten</em>).
-                    </p>
-                    <p>
-                        Bei neuen Orten verh&auml;lt sich das etwas anders, diese m&uuml;ssen vor der Benutzung und Veröffentlichung einmalig freigeschaltet werden.
-                        Diese Freischaltung &uuml;bernimmt eine/r <em>Kiez-AdministratorInnen</em> und du erh&auml;ltst automatisch eine Benachrichtigung (via Email) sobald dies geschehen ist.
-                    </p>
-                </div>
 
-                <div class="task-info"></div>
+                <p>Hi <span class="username"></span>!</p>
+                <p>
+                    Im Kiezatlas gibt es jetzt die M&ouml;glichkeit Informationen zu <b>Angeboten</b> und <b>Orten selbstst&auml;ndig einzutragen</b>. Dazu kurz das Wichtigste.
+                </p>
+                <p>
+                    Angebotsinfos sind <em>Vorlagen für konkrete Termine bzw. Veranstaltungszeitr&auml;ume</em> eines Angebots. Das hat den Vorteil das diese wie eine Art "Basisinformation" zu einem Angebot nur einmal eingetragen werden m&uuml;ssen aber mehreren Veranstaltungsorten &uuml;ber verschiedene Zeitr&auml;ume zugewiesen werden k&ouml;nnen.
+                    <!-- Termine sind bei uns erst einmal nur <em>Angebotszeitr&auml;ume</em> (von Tag bis Tag) -->
+                </p>
+                <p>
+                    Ein Angebot wird &ouml;ffentlich such- und sichtbar sobald die Angebotsinfos mit einem Ort im Kiezatlas terminlich verbunden sind (siehe unten, <em>Angebotszeitr&auml;me verwalten</em>).
+                </p>
+                <p>
+                    Bei neuen Orten verh&auml;lt sich das etwas anders, diese m&uuml;ssen vor der Benutzung und Veröffentlichung einmalig freigeschaltet werden.
+                    Diese Freischaltung &uuml;bernimmt eine/r <em>Kiez-AdministratorInnen</em> und du erh&auml;ltst automatisch eine Benachrichtigung (via Email) sobald dies geschehen ist.
+                </p>
+
+            </div>
+
+            <div class="ui vertical segment commands blue4bg">
+                <div class="task-info ui container"></div>
             </div>
 
             <div class="angebot-area ui segment container">
                 <h3>Meine Angebotsinfos</h3>
                 <form method="GET" action="/angebote/edit/0" id="angebot-form" accept-charset="UTF-8">
                     <div class="ui input block-space-bottom">
-                        <button type="submit" class="ui olive button">Neues Angebot</button>
+                        <button type="submit" class="ui darkblue thin button"><i class="big-char">+</i>Neues Angebot erstellen</button>
                     </div>
                 </form>
                 <ul class="angebote"></ul>
             </div>
 
-            <div class="einrichtungs-area ui segment container">
-                <h3>Meine Orte</h3>
-                <form method="GET" action="/website/geo/create" id="angebot-form" accept-charset="UTF-8">
-                    <div class="ui input block-space-bottom">
-                        <button type="submit" class="ui olive button">Neuer Ort</button>
-                    </div>
-                </form>
-                <ul class="einrichtungen"></ul>
+            <div class="einrichtungs-area ui segment blue4bg">
+                <div class="ui container">
+                    <h3>Meine Orte</h3>
+                    <form method="GET" action="/website/geo/create" id="angebot-form" accept-charset="UTF-8">
+                        <div class="ui input block-space-bottom">
+                            <button type="submit" class="ui darkblue thin button"><i class="big-char">+</i>Neuen Ort einrichten</button>
+                        </div>
+                    </form>
+                    <ul class="einrichtungen"></ul>
+                </div>
             </div>
 
             <div id="dialog-confirm" title="Eintrag löschen?">Willst du diesen Datensatz wirklich entfernen?</div>

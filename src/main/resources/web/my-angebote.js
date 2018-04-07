@@ -16,17 +16,18 @@ function render_angebots_item(item) {
     var created = $.datepicker.formatDate("dd. MM yy", created_val)
     var modified = $.datepicker.formatDate("dd. MM yy", modified_val)
     // console.log("Angebot Item", item, created, modified)
-    $('ul.angebote').append('<li id="'+item.id+'"><a href="/angebote/'+item.id+'" title="View Angebotsinfo"><b>' + item.value + '</b></a>'
-        + '<div class="list-commands">'
-            + '<div class="ui input focus edit-angebot"><button title="Angebotsinfos bearbeiten" '
-                + 'onclick="go_edit_angebot('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
-            + '<div class="ui input focus edit-assignments"><button title="Hier kannst du deine '
-                + 'Angebotsinfos Einrichtungen terminlich zuweisen" onclick="go_edit_assignments('+item.id+')">'
-                + '<i class="add to calendar icon" />Angebotszeiträume veröffentlichen</button></div>'
-            + '<div class="ui input focus delete-angebot"><button title="Achtung: Löscht diese '
-                + 'Angebotsinfo" onclick="delete_my_angebot('+item.id+')"><i class="trash icon" /></button></div>'
-        + '</div>'
-        + '<br/><small>Erstellt am ' + created + ', zuletzt bearbeitet am '+ modified + '</small></li>')
+    $('ul.angebote').append('<li id="'+item.id+'" class="blue4bg">'
+        + '<a href="/angebote/'+item.id+'" title="View Angebotsinfo"><h3>' + item.value + '</h3></a>'
+        + '<small>Erstellt am ' + created + ', zuletzt bearbeitet am '+ modified + '</small>'
+        + '<br/>'
+            + '<a class="command" href="javascript:go_edit_angebot('+item.id+')" title="Angebotsinfos bearbeiten" '
+                + '><i class="icon caret right" />Bearbeiten</a>'
+            + '<a class="command" title="Hier kannst du deine '
+                + 'Angebotsinfos Einrichtungen terminlich zuweisen" href="javascript:go_edit_assignments('+item.id+')">'
+                + '<i class="icon caret right" />Angebotszeitr&auml;ume veröffentlichen</a>'
+            + '<a class="command" title="Achtung: Löscht diese '
+                + 'Angebotsinfo" href="javascript:delete_my_angebot('+item.id+')"><i class="icon caret right" />L&ouml;schen</a>'
+        +'</li>')
 }
 
 function load_users_einrichtungen() {
@@ -44,15 +45,14 @@ function render_einrichtungs_item(item) {
     if (isInTrash) itemTitle = 'Ortsdatensatz liegt zur Löschung im Papierkorb'
     if (isUnconfirmed) itemTitle = 'Ortsdatensatz ist aktuell nicht öffentlich'
     // console.log("Einrichtung", item, isInTrash)
-    $('ul.einrichtungen').append('<li id="'+item.id+'" class="'+item.class+'" title="' + itemTitle + '">'
-        + '<a href="/website/geo/'+item.id+'"><b>' + item.name + '</b></a>'
-        + '<div class="list-commands">'
-            + '<div class="ui input focus edit-angebot"><button title="Einrichtungsdatensatz ansehen" '
-                + 'onclick="go_edit_einrichtung('+item.id+')"><i class="edit icon" />Ansehen</button></div>'
-            + '<div class="ui input focus edit-angebot"><button title="Einrichtungsdatensatz bearbeiten" '
-                + 'onclick="go_edit_einrichtung_form('+item.id+')"><i class="edit icon" />Bearbeiten</button></div>'
-        + '</div>'
-        + '<br/><small>Erstellt am ' + item.created_string + ', zuletzt bearbeitet am '+ item.last_modified_string + '</small></li>')
+    $('ul.einrichtungen').append('<li id="'+item.id+'" class="'+item.class+' whitebg" title="' + itemTitle + '">'
+        + '<a href="/website/geo/'+item.id+'"><h3>' + item.name + '</h3></a>'
+        + '<small>Erstellt am ' + item.created_string + ', zuletzt bearbeitet am '+ item.last_modified_string + '</small>'
+        + '<br/><a class="command" title="Einrichtungsdatensatz ansehen" '
+            + 'href="javascript:go_edit_einrichtung('+item.id+')"><i class="caret right icon" />Ansehen</a>'
+        + '<a class="command" title="Einrichtungsdatensatz bearbeiten" '
+                + 'href="javascript:go_edit_einrichtung_form('+item.id+')"><i class="caret right icon" />Bearbeiten</a>'
+        + '</li>')
 }
 
 function delete_my_angebot(id) {

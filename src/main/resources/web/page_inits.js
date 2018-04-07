@@ -77,19 +77,19 @@ function my_entries_page() {
                 console.log("Permissions Info", info)
                 var $shortcuts = $('<div class="shortcuts"><h3>Redaktionelle Links</h3>')
                 if (info.confirmation) {
-                    $shortcuts.append('<a href="/website/list/freischalten">Neue Orte freischalten</a>')
+                    $shortcuts.append('<a class="ui button" href="/website/list/freischalten">Neue Orte freischalten</a>')
                     if (info.bezirke.length > 0) {
-                        $shortcuts.append('<a href="/website/list/bezirksregionen">StadtteilkoordinatorInnen</a>')
+                        $shortcuts.append('<a class="ui button" href="/website/list/bezirksregionen">StadtteilkoordinatorInnen</a>')
                     }
                     if ((info.bezirksregionen.length > 0) || (info.bezirke.length > 0)) {
-                        $shortcuts.append('<a href="/website/list/ansprechpartner">AnsprechpartnerInnen verwalten</a>')
+                        $shortcuts.append('<a class="ui button" href="/website/list/ansprechpartner">AnsprechpartnerInnen verwalten</a>')
                     }
                 }
                 if (info.bezirke.length > 0 || info.bezirksregionen.length > 0) {
-                    $shortcuts.append('<a href="/website/list/filter">Gro&szlig;e Listenansicht</a>')
+                    $shortcuts.append('<a class="ui button" href="/website/list/filter">Gro&szlig;e Listenansicht</a>')
                 }
                 if (info.confirmation || (info.bezirke.length > 0 || info.bezirksregionen.length > 0)) {
-                    $('.task-info').append('<p>&nbsp;</p>').append($shortcuts)
+                    $('.task-info').append($shortcuts)
                 }
             })
             //

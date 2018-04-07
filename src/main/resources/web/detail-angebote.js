@@ -60,7 +60,7 @@ function render_angebot_detail_area() {
 
 function render_angebot_assignment() {
     // Display Assignments
-    var $einrichtungen = $('.geo-objects-area .einrichtungen')
+    var $einrichtungen = $('.geo-objects-area')
         $einrichtungen.empty()
     if (geo_assignments.length === 0) {
         $('.help').html('F&uuml;r dieses Angebot sind uns aktuell keine Veranstaltungszeitr&auml;ume bekannt.')

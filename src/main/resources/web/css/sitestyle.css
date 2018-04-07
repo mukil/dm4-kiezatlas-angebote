@@ -1,75 +1,9 @@
 
-.header-message {
-    margin-top: 5em;
-    padding: 1em 2em;
-}
-
-.header-message .username {
-    font-weight: bold;
-    color: #27638C;
-}
-
-#marker-name b,
-h3 {
-    color: #27638C;
-}
-
-.form-area .search-hint {
-    margin-top: 10px;
-}
-
-.assignment .geo-objects-area .label,
-.assignment label,
-span.label,
-h3.label {
-    color: #a9a9a9;
-}
-
-.commands .label.hint {
-    font-weight: bold;
-    color: #8f1414;
-}
-
-.assignment .geo-objects-area label {
-    color: #343434;
-}
-
-.search .results li.read-more a.create-link,
-a {
-    color: #27638C;
-    text-decoration: underline;
-    text-decoration-color: #8f1414;
-}
-
-.edit .task-info {
-    margin-top: 5em;
-    margin-left: 2em;
-}
-
-.start .task-info {
-    margin-top: 1em;
-    margin-left: 2em;
-}
-
-.start .einrichtungs-area,
-.start .angebot-area {
-    margin-left: 2em;
-    margin-top: 0em;
-    margin-bottom: 2em;
-}
-
-.detail .detail-area {
-    margin-top: 5em;
-    margin-left: 2em;
-}
-
 .angebot-infos span.name,
 .angebot-infos span.description {
     display: none;
 }
 
-.list-area,
-.detail-area,
 .search .task-info,
 .assignments .task-info {
     margin: 0.7em;
@@ -77,193 +11,11 @@ a {
 
 .detail-area .assignments,
 .detail-area .angebot-name {
-    border-bottom: 1px solid #fff;
-    padding: .5em;
     margin-bottom: 0em;
-}
-
-.detail h3.assignments  {
-    margin-top: 2em;
-    color: #555;
-}
-
-.detail .assignments h3 {
-    margin-bottom: 0em;
-    margin-top: 2em;
 }
 
 .assignment .angebots-infos {
     color: #333;
-}
-
-.search .slogan {
-    font-size: 2em;
-    margin-top: 0.3em;
-    font-weight: bold;
-}
-
-.search form .ui.input input#query {
-    width: 260px;
-}
-
-.search form .ui.input input {
-    width: 400px;
-    /** margin-left: 1em; */
-    padding-right: 1em !important;
-}
-
-.search button.ui.basic.primary {
-    /** background-color: #fff !important;
-    border: #343434; **/
-    padding: 7px;
-}
-
-.search .nearby-dialog.ui.input {
-    /** display: none; **/
-    display: inline-block;
-    margin-top: 1em;
-}
-
-.search .form-area form {
-    display: inline-block;
-    min-width: 340px;
-    text-align: left;
-}
-
-.search .search-content,
-.search .logoline,
-.search .form-area,
-.search .filter-area,
-.search .list-area,
-.search .search-results.container {
-    max-width: 1200px !important;
-    margin: auto;
-}
-
-.search .logoline {
-    padding-left: 4em;
-}
-
-.search .form-area {
-    border: 1px solid #efefef;
-    border-bottom: 0px;
-    padding-bottom: 1em;
-    margin-top: 1em;
-    text-align: center;
-}
-
-.search .search-content {
-    padding-left: 2em;
-}
-
-.search .ui.input input {
-    background-color: #efefef;
-}
-
-.search .list-area .loading-indicator,
-.task-info .loading-indicator {
-    font-size: 2.5em; color: #27638C;
-    opacity: .9;
-}
-
-.task-info .loading-indicator {
-    width: 50%; margin: auto;
-    position: relative; top: 3em;
-}
-
-.search .list-area .loading-indicator {
-    position: relative;
-    top: 2em; left: 2em;
-}
-
-.task-info .loading-indicator i.icon,
-.search .list-area .loading-indicator i.icon {
-    opacity: .9;
-    left: -2em;
-    top: 0em;
-}
-
-.search .list-area .read-more p {
-    margin-left: 0px;
-}
-
-.search .task-info {
-    margin-top: 3em;
-    margin-left: 2em;
-}
-
-.search .contact {
-    padding: 5px;
-    padding-left: 0px;
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.search .list-area ul.results {
-    padding-left: 0px;
-    margin-top: 0px;
-    min-height: 150px;
-}
-
-.search .list-area ul li.read-more a {
-    text-decoration: none;
-}
-
-.list-area .header.read-more {
-    display: block;
-}
-
-.list-area h4.status,
-.list-area .header.read-more h4 {
-    font-weight: normal;
-    margin-top: .5em;
-}
-
-.list-area h4.status {
-    margin-top: 2em;
-}
-
-.list-area .read-more,
-.detail .read-more,
-.search .read-more {
-    background-color: #e3e3e3;
-    margin-top: 10px;
-    display: inline-block;
-    text-decoration: none;
-}
-
-.search .read-more {
-    margin-top: 0px;
-}
-
-.search  a.read-more {
-    margin: 10px;
-}
-
-.list-area .results li.read-more {
-    background-color: #EAEAEA;
-    margin-right: 2em;
-    width: 98%;
-}
-
-.list-area .results li .air-distance {
-    padding-left: 1.2em;
-    padding-top: 3px;
-    color: #27638C;
-    font-size: 0.9em;
-}
-
-
-.list-area .results .klick,
-.list-area .results .username,
-.list-area .results .kontakt {
-    margin-right: 1em;
-}
-
-.list-area .results .klick {
-    cursor: pointer;
-    text-decoration: underline;
-    color: #666;
 }
 
 .assignment .left-side {
@@ -301,12 +53,6 @@ a {
     border: 1px solid #aaa;
 }
 
-.mobile-logo {
-    display: inline-block;
-    padding: 0.5em 1em 0.5em 1em;
-    border-left: 0px solid transparent;
-}
-
 .right-side h3.linked a {
     font-size: .9em;
     float: right;
@@ -316,8 +62,6 @@ a {
 
 /** Geo Objects in Angebots Listing */
 
-.einrichtungen li,
-.angebote li,
 .concrete-assignment {
     background: #fff;
     padding: 1em;
@@ -330,13 +74,6 @@ a {
     margin-top: 6em;
 }
 
-.angebotsinfos .body,
-.geo-objects-area {
-    padding: 1em;
-    padding-top: 0em;
-    margin-top: 0em;
-}
-
 .geo-objects-area .einrichtungen .result-item {
     padding-bottom: 1em;
 }
@@ -344,8 +81,6 @@ a {
 .concrete-assignment {
     cursor: pointer;
 }
-
-.geo-objects-area .einrichtungen
 
 .geo-objects-area .einrichtungen {
     margin-top: 1em;
@@ -364,6 +99,7 @@ a {
 .concrete-assignment:hover {
     box-shadow: 2px 2px 2px 0px #a9a9a9;
 }
+
 .concrete-assignment.selected {
     box-shadow: 3px 3px 2px 0px #a9a9a9;
 }
@@ -403,20 +139,12 @@ div.ui-datepicker {
     overflow-y: auto;
 }
 
-.geo-objects-area .label {
-    color: #777;
-}
-
 .form-area .geo-objects-area {
     max-height: 220px;
 }
 
 .angebot-area {
     position: relative;
-}
-
-.angebot-area h3 {
-    margin-top: 3em;
 }
 
 .list-area,
@@ -577,34 +305,6 @@ div.ui-datepicker {
     margin-left: 5px;
 }
 
-
-.task-info .shortcuts {
-    color: #002856;
-    margin: 1em;
-    display: inline;
-    margin-left: 0px;
-    padding: 5px;
-    padding-left: 8px;
-    padding-right: 8px;
-    vertical-align: top;
-    text-align: left;
-    margin-bottom: 2em;
-}
-
-.task-info .shortcuts a {
-    text-decoration: none;
-    margin-right: 1em;
-    padding: .45em;
-    background-color: #fff;
-    font-size: 1.2em;
-    border: 1px solid #27638C;
-}
-
-.task-info .shortcuts a:hover {
-    background-color: #002856;
-    color: #fff;
-}
-
 .block-space {
     display: block;
     margin-top: 1em;
@@ -622,20 +322,6 @@ span.angebot-name {
 
 .assignment .task-info {
     margin-left: .5em;
-}
-
-body.angebotsinfos.start .header-message p,
-body.angebotsinfos.start .task-info,
-body.angebotsinfos.start .angebot-area,
-body.angebotsinfos.start .einrichtungs-area,
-body.angebotsinfos.detail .detail-area,
-body.angebotsinfos.detail .task-info,
-body.angebotsinfos.edit .task-info,
-body.angebotsinfos.edit .form-area {
-    max-width: 1170px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
 }
 
 .angebotsinfos.detail .detail-area .edit-link {
@@ -767,7 +453,7 @@ body.angebotsinfos.edit .form-area {
 .form-area.angebot .cke_textarea_inline {
     margin-top: 3em;
     background-color: #fff;
-    padding: .5em; padding-top: 0px;
+    padding: .5em;
     border-radius: 5px;
     border: 1px solid #85B7D9;
 }
@@ -794,18 +480,6 @@ div.disabled {
     opacity: .6;
 }
 
-.einrichtungs-area li,
-.angebot-area li {
-    padding: 1em;
-    margin: .5em 0em .5em 0em;
-    font-size: 1.2em;
-}
-
-.einrichtungs-area li b,
-.angebot-area li b {
-    color: #27638C;
-}
-
 .einrichtungs-area li a,
 .angebot-area li a {
     text-decoration: none;
@@ -814,7 +488,6 @@ div.disabled {
 einrichtungs-area li a:hover,
 .angebot-area li a:hover {
     text-decoration: underline;
-    text-decoration-color: #8f1414;
 }
 
 .angebot-area li .list-commands,
@@ -857,56 +530,24 @@ ul.angebote li small {
     margin-left: 2em;
 }
 
-/** ---- Lower main menu ---- */
+/** CKEditor Overrides */
 
-/** .menu {
-    position: relative;
-    width: 90%;
-    margin: auto;
-    padding: 1em;
-    text-align: center;
-} */
-
-#navigation ul,
-.menu ul {
-    list-style-type: none;
-    font-size: 1.2em;
-    padding-left: 0px;
-    margin: 0px;
+/* Make the content area look like an input field */
+.cke_wysiwyg_frame {
+    box-shadow: inset 0px 1px 2px #444;
 }
 
-#navigation ul li {
-    display: inline-block;
+.cke_editable {
+    padding: 10px;
     background-color: #fff;
-    padding: 7px;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-right: 5px;
-    margin-left: 0px;
-    margin-top: 0px;
+    border: 1px solid #9f9f9f;
+    border-radius: 4px;
+    max-width: 640px;
+    min-height: 140px;
+    margin-top: 35px;
 }
 
-.menu ul li {
-    display: inline-block;
-    background-color: #EAEAEA;
-    padding: 7px;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-right: 5px;
-    margin-left: 5px;
-    margin-top: 1em;
-}
-
-#navigation ul li a,
-.menu ul li a {
-    text-decoration: none;
-}
-
-#navigation ul li:hover a,
-.menu ul li:hover a {
-    text-decoration: underline;
-    text-decoration-color: #8f1414;
-}
+/** --- Tag cloud --- **/
 
 .search .tag-view h4 {
     margin-bottom: .5em;
@@ -940,44 +581,6 @@ ul.angebote li small {
     font-size: 2.5em;
 }
 
-/** --- Distinct footer area --- */
-
-#bottom {
-    margin-top: 2em;
-    font-size: 1.2em;
-    text-align: center;
-    padding: 1em;
-    background-color: #fff;
-}
-
-#bottom h4 {
-    font-weight: normal;
-}
-
-.search .tag-view {
-    padding-bottom: 2em;
-}
-
-#bottom img.logo {
-    max-width: 150px;
-    height: auto;
-}
-
-.revise .commands,
-.revise #contact {
-    margin-top: 3em;
-}
-
-.revise #email-body {
-    width: 600px;
-    height: 120px;
-    padding: .5em;
-}
-
-#dialog-confirm {
-    display: none;
-}
-
 @media (max-width: 1400px) {
     .search form .ui.input input {
         width: 390px;
@@ -1000,16 +603,6 @@ ul.angebote li small {
 }
 
 @media (max-width: 1200px) {
-    body.angebotsinfos.start .header-message p,
-    body.angebotsinfos.start .task-info,
-    body.angebotsinfos.start .angebot-area,
-    body.angebotsinfos.start .einrichtungs-area,
-    body.angebotsinfos.detail .detail-area,
-    body.angebotsinfos.detail .task-info,
-    body.angebotsinfos.edit .task-info,
-    body.angebotsinfos.edit .form-area {
-        width: 90%;
-    }
     #name-search {
         width: 50%;
     }
@@ -1163,23 +756,6 @@ ul.angebote li small {
     .search .nearby-dialog.ui.input #nearby{
         width: 160px;
     }
-}
-
-/** CKEditor Overrides */
-
-/* Make the content area look like an input field */
-.cke_wysiwyg_frame {
-    box-shadow: inset 0px 1px 2px #444;
-}
-
-.cke_editable {
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #9f9f9f;
-    border-radius: 4px;
-    max-width: 640px;
-    min-height: 140px;
-    margin-top: 35px;
 }
 
 @media print {

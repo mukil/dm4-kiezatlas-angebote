@@ -34,52 +34,56 @@
             <!-- Teaser Area -->
             <div th:replace="fragments/widgets :: teaser-small"></div>
 
-            <div class="task-info">
-                <h3>Angebotsinfos bearbeiten</h3>
-            </div>
+            <div class="ui vertical container segment entry">
 
-            <div class="form-area angebot ui segment container">
-                <form action="javascript:_void()" id="angebot-form" accept-charset="UTF-8">
-                    <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
-                    <div class="ui input focus">
-                        <input id="angebot-name" name="name" maxlength="128"
-                               required="true" type="text" placeholder="Name des Angebots" />
-                    </div>
+                <div class="task-info">
+                    <h3>Angebotsinfos bearbeiten</h3>
+                </div>
+
+                <div class="form-area angebot">
+                    <form action="javascript:_void()" id="angebot-form" accept-charset="UTF-8">
+                        <!--label for="angebot-name" id="name-label">Name des Angebots</label-->
+                        <div class="ui input focus">
+                            <input id="angebot-name" name="name" maxlength="128"
+                                   required="true" type="text" placeholder="Name des Angebots" />
+                        </div>
+                        <br/>
+                        <textarea id="angebot-beschreibung" name="beschreibung" contenteditable="true"
+                                  class="mbottom" type="text" placeholder="Beschreibung des Angebots"></textarea>
+                        <!--label for="angebot-beschreibung">(Tipp: <em>Was</em> genau, an welchem Wochentag, zu welcher <em>Uhrzeit</em>?)</label-->
+                        <br/>
+                        <label for="angebot-kontakt" id="kontakt-label">Allgemeine/r Ansprechpartner_in</label>
+                        <div class="ui input focus">
+                            <input id="angebot-kontakt" name="kontakt" class="mbottom" required="true" type="text" placeholder="Kontakt" />
+                        </div>
+                        <br/>
+                        <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)</label>
+                        <div class="ui input focus">
+                            <input id="angebot-webpage" name="webpage" class="mbottom" type="url" onkeyup="autocorrect_url(this.value)" placeholder="http://www.kiezatlas.de" />
+                        </div>
+                        <br/>
+                        <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label>
+                        <div class="ui input focus">
+                            <input id="angebot-tags" name="tags" class="mbottom" type="text" placeholder=".., .." />
+                        </div>
+                        <br/>
+                        <div class="ui input focus icon commands">
+                            <button id="do-save" class="ui green thin button" onclick="do_save_angebot_and_go_home()" type="submit">
+                                <i class="icon save"></i>Speichern
+                            </button>
+                            <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui thin button">
+                                <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;ume festlegen
+                            </button>
+                        </div>
+                    </form>
                     <br/>
-                    <textarea id="angebot-beschreibung" name="beschreibung" contenteditable="true"
-                              class="mbottom" type="text" placeholder="Beschreibung des Angebots"></textarea>
-                    <!--label for="angebot-beschreibung">(Tipp: <em>Was</em> genau, an welchem Wochentag, zu welcher <em>Uhrzeit</em>?)</label-->
-                    <br/>
-                    <label for="angebot-kontakt" id="kontakt-label">Allgemeine/r Ansprechpartner_in</label>
-                    <div class="ui input focus">
-                        <input id="angebot-kontakt" name="kontakt" class="mbottom" required="true" type="text" placeholder="Kontakt" />
-                    </div>
-                    <br/>
-                    <label for="angebot-webpage" id="webpage-label">Mehr Infos zum Angebot (URL)</label>
-                    <div class="ui input focus">
-                        <input id="angebot-webpage" name="webpage" class="mbottom" type="url" onkeyup="autocorrect_url(this.value)" placeholder="http://www.kiezatlas.de" />
-                    </div>
-                    <br/>
-                    <label for="angebot-tags" id="tags-label">Stichw&ouml;rter</label>
-                    <div class="ui input focus">
-                        <input id="angebot-tags" name="tags" class="mbottom" type="text" placeholder=".., .." />
-                    </div>
-                    <br/>
-                    <div class="ui input focus icon commands">
-                        <button id="do-save" class="ui olive button" onclick="do_save_angebot_and_go_home()" type="submit">
-                            <i class="icon save"></i>Speichern
-                        </button>
+                    <!--div class="ui input focus icon">
                         <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
-                            <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;ume festlegen
+                            <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;me festlegen
                         </button>
-                    </div>
-                </form>
-                <br/>
-                <!--div class="ui input focus icon">
-                    <button id="assignment-link" data-my-href="#" onclick="do_save_angebot_and_go_assign()" class="ui primary button">
-                        <i class="save icon"></i>+&nbsp;&nbsp;<i class="add to calendar icon"></i>Angebotszeitr&auml;me festlegen
-                    </button>
-                </div-->
+                    </div-->
+                </div>
+
             </div>
 
             <!-- Footer Segment -->
