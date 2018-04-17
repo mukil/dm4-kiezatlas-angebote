@@ -69,11 +69,6 @@
     margin-top: 1em;
 }
 
-.angebotsinfos.assignment .left-side,
-.angebotsinfos.assignment .right-side {
-    margin-top: 6em;
-}
-
 .geo-objects-area .einrichtungen .result-item {
     padding-bottom: 1em;
 }
@@ -315,11 +310,6 @@ div.ui-datepicker {
     margin-bottom: 1em;
 }
 
-span.einrichtung-name,
-span.angebot-name {
-    font-style: italic;
-}
-
 .assignment .task-info {
     margin-left: .5em;
 }
@@ -357,12 +347,6 @@ span.angebot-name {
 .assignment .date-area h3 {
     font-weight: normal;
     margin-top: 0px;
-}
-
-.assignment .task-info .angebot-name,
-.assignment .date-area .angebot-name,
-.assignment .date-area .einrichtung-name {
-    font-weight: bold;
 }
 
 .assignment .ticker label,

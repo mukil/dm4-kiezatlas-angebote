@@ -91,4 +91,5 @@ function render_angebot_assignment() {
     }
     // equip all buttons with a click handler each (at once)
     // $einrichtungen.on('click', select_assignment)
+    $('.geo-objects-area a').on('click', click) // sse dm4-kiezatlas-website/ka-startseite.js
 }

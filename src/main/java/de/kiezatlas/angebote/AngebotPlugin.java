@@ -175,7 +175,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/{topicId}")
     @Produces(MediaType.TEXT_HTML)
-    public Viewable getAngebotDetailView(@PathParam("topicId") long id, @QueryParam("context") String site, @QueryParam("search") String search,
+    public Viewable getAngebotDetailView(@PathParam("topicId") long id, @QueryParam("context") long contextId, @QueryParam("search") String search,
             @QueryParam("koordinate") String koordinate, @QueryParam("zoomstufe") String zoomstufe,
             @QueryParam("type") String searchType, @QueryParam("method") String searchMethod,
             @QueryParam("nearby") String searchNearby) {
@@ -183,7 +183,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         Topic angebot = dm4.getTopic(id);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
             viewData("angebot", prepareAngebotsinfos(angebot));
-            prepareSearchTemplateParameter(search, site, searchMethod, searchType, searchNearby);
+            prepareSearchTemplateParameter(search, contextId, searchMethod, searchType, searchNearby);
             prepareGeneralPageData("detail");
             return view("detail");
         }
@@ -848,10 +848,10 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return my;
     }
 
-    private void prepareSearchTemplateParameter(String search, String site,
+    private void prepareSearchTemplateParameter(String search, long contextId,
             String method, String type, String nearby) {
         viewData("search", (search == null) ? "" : search);
-        viewData("searchContext", (site == null) ? 0 : site);
+        viewData("searchContext", (contextId <= 0) ? 0 : contextId);
         viewData("searchMethod", (method == null) ? "quick" : method);
         viewData("searchNearby", (nearby == null) ? "berlin" : nearby);
         viewData("searchType", (type == null) ? "place" : type);
