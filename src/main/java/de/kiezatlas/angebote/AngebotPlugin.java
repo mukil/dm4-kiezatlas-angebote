@@ -182,6 +182,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         // return getStaticResource("web/html/detail.html");
         Topic angebot = dm4.getTopic(id);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
+            viewData("tags", getAllTagTopics());
             viewData("angebot", prepareAngebotsinfos(angebot));
             prepareSearchTemplateParameter(search, contextId, searchMethod, searchType, searchNearby);
             prepareGeneralPageData("detail");
