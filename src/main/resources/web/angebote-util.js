@@ -219,14 +219,6 @@ function value_sort_desc(a, b) {
     return 0 //default return value (no sorting)
 }
 
-// ---- Kiezatlas 2 Website Script Copy ----
-
-function logout() {
-    $.post('/accesscontrol/logout', function(username) {
-        window.document.location.reload()
-    })
-}
-
 // ---------- Parsing German Date Label Utilities ------------- //
 
 function remove_dots(string) {

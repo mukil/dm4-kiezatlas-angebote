@@ -20,12 +20,10 @@
             /*<![CDATA[*/
                 var frontpage = false
                 searchText = /*[[${search}]]*/ '';
-                searchType = /*[[${searchType}]]*/ 'place';
+                searchType = /*[[${searchType}]]*/ 'event';
                 searchContext = /*[[${searchContext}]]*/ '0';
                 searchMethod = /*[[${searchMethod}]]*/ 'quick';
                 searchNearby = /*[[${searchNearby}]]*/ undefined;
-                console.log("initializing search=", searchText, "type=", searchType, "site=", searchContext,
-                    "method=", searchMethod, "nearby=", searchNearby)
             /*]]>*/
         </script>
         <meta th:replace="fragments/tracker" />

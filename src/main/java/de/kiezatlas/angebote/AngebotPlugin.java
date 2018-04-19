@@ -854,7 +854,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         viewData("searchContext", (contextId <= 0) ? 0 : contextId);
         viewData("searchMethod", (method == null) ? "quick" : method);
         viewData("searchNearby", (nearby == null) ? "berlin" : nearby);
-        viewData("searchType", (type == null) ? "place" : type);
+        viewData("searchType", (type == null) ? "event" : type);
     }
 
     private void prepareGeneralPageData(String templateName) {

@@ -37,7 +37,7 @@ function init_search_page() {
 
 // ----------------------------------  The Major Search Operations --------- //
 
-function fire_angebote_search(noupdate) {
+function fire_angebote_search(noupdate, callback) {
     var queryString = $('#query').val()
     leading_wildcard = $('.ui.checkbox.toggle').checkbox('is checked')
     if (search_input.length === 0 && (queryString.length === 0 && !location_coords)) {
@@ -84,6 +84,7 @@ function fire_angebote_search(noupdate) {
     console.log("Search Query: " + luceneQueryString + ", Location", locationValue, "Radius", location_radius, "DateTime", dateTime)
     $.getJSON('/angebote/search?query=' + luceneQueryString + '&location=' + locationValue + '&radius='
             + location_radius + '&datetime=' + dateTime, function(results) {
+        if (callback) callback(results)
         hide_search_loading_sign()
         angebotsinfos = results
         render_search_results()
