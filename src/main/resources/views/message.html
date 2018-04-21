@@ -5,50 +5,60 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.website/css/kiezatlas-web.css" />
         <link rel="stylesheet" href="/de.kiezatlas.website/css/sitestyle.css"/>
+
+        <script defer="true" src="/de.kiezatlas.angebote/vendor/jquery/jquery-1.9.1.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
+
+        <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('message')"></script>
+
         <meta th:replace="fragments/tracker" />
     </head>
     <body class="kiezatlas topic">
 
-        <div class="top-menu" th:include="fragments/navigation :: top (publisher=${is_publisher})"></div>
+        <!-- Following Menu -->
+        <nav id="lower-page-nav" th:include="fragments/navigation :: lower-page-nav"></nav>
 
-        <div id="header">
-            <div class="welcome">
-            </div>
+        <div class="navigation">
+            <div class="top-menu" th:include="fragments/navigation :: top-menu (publisher=${is_publisher})"></div>
         </div>
 
-        <!-- Details Area -->
-        <div id="detail-area" th:class="${angebotsinfos} ? 'angebotsinfos'">
-            <div class="commands">
-            </div>
-            <!-- ### map -->
-            <div class="info-area">
-                <div class="infos">
-                    <h3 th:text='${name}'>Name des Eintrags</h3>
-                    <p th:if="${!#strings.isEmpty(message)}" th:utext="${message}"></p>
+        <div th:replace="fragments/navigation :: vertical-nav (publisher=${is_publisher})"></div>
+
+        <div class="ui pusher">
+
+            <!-- Teaser Area -->
+            <div th:replace="fragments/widgets :: teaser-small"></div>
+
+            <div th:replace="fragments/search :: dialog (false, ${districts}, ${tags}, ${search}, ${searchType})"></div>
+
+            <div id="header" class="ui vertical segment container">
+                <div class="welcome">
                 </div>
             </div>
+
+            <!-- Details Area -->
+            <div id="detail-area" class="ui vertical segment blue4bg body" th:addclass="${angebotsinfos} ? 'angebotsinfos'">
+                <div class="commands ui container">
+                </div>
+                <!-- ### map -->
+                <div class="info-area ui container">
+                    <div class="infos">
+                        <h3 th:text='${name}'>Message Name</h3>
+                        <p th:if="${!#strings.isEmpty(message)}" th:utext="${message}"></p>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
-        <!-- Kiezatlas Standard Website section -->
-        <div id="pages">
-            <ul>
-                <li><a href="/aktuelles">Aktuelles</a></li>
-                <li><a href="/projektbeschreibung">Projektbeschreibung</a></li>
-                <li><a href="/dies-das">Dies und Das</a></li>
-                <li><a href="/weitere-atlanten">Weitere Atlanten</a></li>
-                <li><a href="http://pax.spinnenwerk.de/~kiezatlas/index.php?id=6">Impressum</a></li>
-                <li><a href="/datenschutzhinweise">Datenschutzhinweise</a></li>
-                <li><a href="/api-documentation">API</a></li>
-                <li><a href="/open-source">Open Source</a></li>
-                <li><a href="/links">Links</a></li>
-            </ul>
-            <p></p>
-        </div>
-
-        <div id="bottom">
-            <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" width="150" />
-        </div>
+        <!-- Footer Segment -->
+        <div th:replace="fragments/footer :: footer-new "></div>
 
     </body>
 </html>

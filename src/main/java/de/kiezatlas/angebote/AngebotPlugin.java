@@ -16,7 +16,6 @@ import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.accesscontrol.AccessControlService;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.RelatedObject;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.event.ServiceResponseFilterListener;
@@ -37,7 +36,7 @@ import de.kiezatlas.angebote.model.AngebotsinfosAssigned;
 import de.mikromedia.webpages.model.Webpage;
 import de.mikromedia.webpages.WebpageService;
 import de.mikromedia.webpages.model.Website;
-import java.io.InputStream;
+import java.net.URI;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
@@ -120,17 +119,15 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Viewable getAngebotListView() {
-        prepareGeneralPageData("search");
-        return view("search");
+    public Response getAngebotListView() {
+        return Response.seeOther(URI.create("/?search=&type=event&method=fulltext&context=0&nearby=undefined")).build();
     }
 
     @GET
     @Path("/stichwort/{tagName}")
     @Produces(MediaType.TEXT_HTML)
-    public Viewable getAngebotListView(@PathParam("tagName") String tag) {
-        prepareGeneralPageData("search/" + tag);
-        return view("search");
+    public Response getAngebotListView(@PathParam("tagName") String tag) {
+        return Response.seeOther(URI.create("/?search=" + tag + "&type=event&method=fulltext&context=0&nearby=undefined")).build();
     }
 
     @GET
@@ -853,8 +850,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             String method, String type, String nearby) {
         viewData("search", (search == null) ? "" : search);
         viewData("searchContext", (contextId <= 0) ? 0 : contextId);
-        viewData("searchMethod", (method == null) ? "quick" : method);
-        viewData("searchNearby", (nearby == null) ? "berlin" : nearby);
+        viewData("searchMethod", (method == null) ? "fulltext" : method);
+        viewData("searchNearby", (nearby == null) ? "undefined" : nearby);
         viewData("searchType", (type == null) ? "event" : type);
     }
 

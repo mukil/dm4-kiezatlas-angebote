@@ -18,16 +18,20 @@
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
         <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="edit_angebot_page()"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('event-edit')"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
 
     </head>
     <body class="ui page detail kiezatlas angebotsinfos edit">
 
+        <!-- Following Menu -->
+        <nav id="lower-page-nav" th:include="fragments/navigation :: lower-page-nav"></nav>
+
         <div class="navigation">
             <div class="top-menu" th:include="fragments/navigation :: top-menu (publisher=${is_publisher})"></div>
         </div>
 
-        <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
+        <div th:replace="fragments/navigation :: vertical-nav (publisher=${is_publisher})"></div>
 
         <div class="ui pusher">
 

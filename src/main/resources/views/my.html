@@ -13,21 +13,24 @@
         <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
-        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.2/sidebar.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
         <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="my_entries_page()"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
+        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('my-entries')"></script>
 
         <meta th:replace="fragments/tracker" />
     </head>
     <body class="ui page detail kiezatlas angebotsinfos start">
 
+        <nav id="lower-page-nav" th:include="fragments/navigation :: lower-page-nav"></nav>
+
         <div class="navigation">
             <div class="top-menu" th:include="fragments/navigation :: top-menu (publisher=${is_publisher})"></div>
         </div>
 
-        <div class="ui vertical left menu sidebar" th:include="fragments/navigation :: vertical (publisher=${is_publisher})"></div>
+        <div th:replace="fragments/navigation :: vertical-nav (publisher=${is_publisher})"></div>
 
         <div class="ui pusher">
 

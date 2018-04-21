@@ -15,7 +15,6 @@ module.exports = function(grunt) {
                         'src/main/resources/web/edit-angebote.js',
                         'src/main/resources/web/my-angebote.js',
                         'src/main/resources/web/revise-angebote.js',
-                        'src/main/resources/web/search-angebote.js',
                         'src/main/resources/web/tags-ui.js'
                     ]
                 }
