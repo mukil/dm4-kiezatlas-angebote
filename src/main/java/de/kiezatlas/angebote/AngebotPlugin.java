@@ -179,7 +179,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         // return getStaticResource("web/html/detail.html");
         Topic angebot = dm4.getTopic(id);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
-            viewData("tags", getAllTagTopics());
+            viewData("tags", getAngeboteTags());
             viewData("angebot", prepareAngebotsinfos(angebot));
             prepareSearchTemplateParameter(search, contextId, searchMethod, searchType, searchNearby);
             prepareGeneralPageData("detail");
@@ -654,6 +654,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
      */
     @GET
     @Path("/tags")
+    @Override
     public List<Topic> getAngeboteTags() {
         List<Topic> result = new ArrayList<Topic>();
         try {
@@ -662,7 +663,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 // 1) tag is related to angebotsinfos
                 List<RelatedTopic> angebote = getParentAngebotTopicsAggregating(tag);
                 for (RelatedTopic angebot : angebote) {
-                    // 2) that angebotsinfo has any kind of location assignment
+                    // 2) that angebotsinfo has ANY kind of location assignment
                     List<RelatedTopic> assignments = getAssignedGeoObjectTopics(angebot);
                     if (assignments.size() >= 1 && !result.contains(tag)) {
                         result.add(tag);

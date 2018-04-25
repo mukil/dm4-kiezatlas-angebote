@@ -61,6 +61,11 @@ public interface AngebotService {
     List<RelatedTopic> getAngeboteTopics(long geoObjectId);
 
     /**
+     * @return      List of all tags of "Angebote" which are assigned to a Geo Object (typeUri="ka2.geo_object").
+     */
+    List<Topic> getAngeboteTags();
+
+    /**
      * @return      List of all "Angebot" topics related to the given Geo Object (typeUri="ka2.geo_object").
      */
     List<RelatedTopic> getAngeboteTopicsByUri(String topicId);

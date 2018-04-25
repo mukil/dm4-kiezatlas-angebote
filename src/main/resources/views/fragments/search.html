@@ -122,8 +122,8 @@
                                             <button id="do-nearby" title="Standort suchen" class="ui icon button"
                                                 onclick="javascript:do_search_streetcoordinates()">Go</button>
                                             <div class="message"></div>
-                                            <button id="do-locating" title="Meinen aktuellen Standort nutzen" class="circular ui icon button basic"
-                                                onclick="javascript:do_browser_location()"><i class="location arrow icon"></i><span>Standort nutzen</span></button>
+                                            <!--button id="do-locating" title="Meinen aktuellen Standort nutzen" class="circular ui icon button basic"
+                                                onclick="javascript:do_browser_location()"><i class="location arrow icon"></i><span>Standort nutzen</span></button-->
                                         </div>
                                     </form>
                                 </div>
@@ -160,12 +160,6 @@
                         <div class="ui form">
                             <div class="grouped fields">
                                 <div class="field">
-                                    <div class="ui radio checkbox 7284">
-                                        <input type="radio" onchange="berlinSearchChecked(this)" name="area" id="7284" tabindex="0"/>
-                                        <label for="7284">Treptow-Köpenick</label>
-                                    </div>
-                                </div>
-                                <div class="field">
                                     <div class="ui radio checkbox 7275">
                                         <input type="radio" onchange="berlinSearchChecked(this)" name="area" id="7275" tabindex="0"/>
                                         <label for="7275">Mitte</label>
@@ -177,18 +171,18 @@
                                         <label for="7287">Neukölln</label>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="seven wide column district attributes">
-                        <div class="ui form">
-                            <div class="grouped fields">
                                 <div class="field">
                                     <div class="ui radio checkbox 7296">
                                         <input type="radio" onchange="berlinSearchChecked(this)" name="area" id="7296" tabindex="0"/>
                                         <label for="7296">Spandau</label>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="seven wide column district attributes">
+                        <div class="ui form">
+                            <div class="grouped fields">
                                 <div class="field">
                                     <div class="ui radio checkbox 7299">
                                         <input type="radio" onchange="berlinSearchChecked(this)" name="area" id="7299" tabindex="0"/>
@@ -201,6 +195,12 @@
                                         <label for="7281">Tempelhof-Schöneberg</label>
                                     </div>
                                 </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox 7284">
+                                        <input type="radio" onchange="berlinSearchChecked(this)" name="area" id="7284" tabindex="0"/>
+                                        <label for="7284">Treptow-Köpenick</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -209,7 +209,7 @@
                             <div class="grouped fields">
                                 <div class="field">
                                     <div class="ui radio checkbox 1707925">
-                                        <input type="radio" disabled="disabled" onchange="berlinSearchChecked(this)" name="area" id="1707925" tabindex="0"/>
+                                        <input type="radio" disabled="disabled" name="area" id="1707925" tabindex="0"/>
                                         <label for="1707925">Marzahn-Hellersdorf</label>
                                     </div>
                                 </div>
