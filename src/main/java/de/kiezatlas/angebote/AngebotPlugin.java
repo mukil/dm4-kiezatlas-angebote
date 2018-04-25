@@ -181,7 +181,6 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         if (angebot.getTypeUri().equals(ANGEBOT)) {
             viewData("tags", getAngeboteTags());
             viewData("angebot", prepareAngebotsinfos(angebot));
-            prepareSearchTemplateParameter(search, contextId, searchMethod, searchType, searchNearby);
             prepareGeneralPageData("detail");
             return view("detail");
         }
@@ -845,15 +844,6 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             }
         }
         return my;
-    }
-
-    private void prepareSearchTemplateParameter(String search, long contextId,
-            String method, String type, String nearby) {
-        viewData("search", (search == null) ? "" : search);
-        viewData("searchContext", (contextId <= 0) ? 0 : contextId);
-        viewData("searchMethod", (method == null) ? "fulltext" : method);
-        viewData("searchNearby", (nearby == null) ? "undefined" : nearby);
-        viewData("searchType", (type == null) ? "event" : type);
     }
 
     private void prepareGeneralPageData(String templateName) {
