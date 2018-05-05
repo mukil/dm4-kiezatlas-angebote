@@ -1,6 +1,7 @@
 package de.kiezatlas.angebote.model;
 
 import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.util.JavaUtils;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +30,52 @@ public class Angebotsinfos implements JSONEnabled {
         }
         return null;
     }
-   
+
+    public String getWebpage() {
+        try {
+            return json.getString("webpage");
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+
+    public String getKontakt() {
+        try {
+            return json.getString("kontakt");
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+
+    public String getBeschreibung() {
+        try {
+            return json.getString("beschreibung");
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+
+    public String getCreator() {
+        try {
+            return json.getString("creator");
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+
+    public String getTags() {
+        try {
+            return json.getJSONArray("tags").toString();
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+
     public void setName(String nameValue) {
         try {
             json.put("name", nameValue);
@@ -96,6 +142,22 @@ public class Angebotsinfos implements JSONEnabled {
 
     public JSONObject toJSON() {
         return json;
+    }
+
+    public String toJsonLD() {
+        try {
+            String eventDescr = getBeschreibung();
+            eventDescr = eventDescr.replaceAll("\"", "&quot;");
+            JSONObject event = new JSONObject();
+            event.put("@context", "http://schema.org");
+            event.put("@type", "Event");
+            event.put("name", getName());
+            event.put("description", JavaUtils.stripHTML(eventDescr));
+            return event.toString().replace("\\","");
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @Override

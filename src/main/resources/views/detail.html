@@ -71,6 +71,10 @@
 
         </div>
 
+        <div th:if="${eventMarkup}" class="metadata">
+            <script th:replace="fragments/schema-org :: place (${eventMarkup})" />
+        </div>
+
     </body>
 </html>
 

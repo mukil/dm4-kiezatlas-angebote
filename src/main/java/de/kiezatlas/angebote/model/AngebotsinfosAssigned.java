@@ -2,6 +2,7 @@ package de.kiezatlas.angebote.model;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.util.JavaUtils;
 import java.text.DateFormat;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -13,7 +14,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 /**
  * A data transfer object as returned by the Kiezatlas Angebots service.
- * ### Free us of the "dm4-kiezatlas-website" dependency.
  */
 public class AngebotsinfosAssigned implements JSONEnabled {
 
@@ -365,6 +365,25 @@ public class AngebotsinfosAssigned implements JSONEnabled {
 
     public long getId() {
         return Long.parseLong(getAngebotsId());  // ### should be getAssignmentId()...
+    }
+
+    public String toJsonLD() {
+        try {
+            String eventDescr = getDescription();
+            eventDescr = eventDescr.replaceAll("\"", "&quot;");
+            JSONObject event = new JSONObject();
+            event.put("@context", "http://schema.org");
+            event.put("@type", "Event");
+            event.put("name", getAngebotsName());
+            event.put("description", JavaUtils.stripHTML(eventDescr));
+            event.put("location", getLocationAddress());
+            event.put("startDate", getStartDate());
+            event.put("endDate", getEndDate());
+            return event.toString().replace("\\","");
+        } catch (JSONException ex) {
+            Logger.getLogger(Angebotsinfos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     /** Aggregated used to "cluster" geo objects on the map which share the same address. **/
