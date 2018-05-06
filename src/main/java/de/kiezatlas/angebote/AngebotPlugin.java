@@ -172,10 +172,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     @GET
     @Path("/{topicId}")
     @Produces(MediaType.TEXT_HTML)
-    public Viewable getAngebotDetailView(@PathParam("topicId") long id, @QueryParam("context") long contextId, @QueryParam("search") String search,
-            @QueryParam("koordinate") String koordinate, @QueryParam("zoomstufe") String zoomstufe,
-            @QueryParam("type") String searchType, @QueryParam("method") String searchMethod,
-            @QueryParam("nearby") String searchNearby) {
+    public Viewable getAngebotDetailView(@PathParam("topicId") long id, @QueryParam("search") String search, @QueryParam("type") String searchType,
+            @QueryParam("method") String searchMethod, @QueryParam("context") long contextId, @QueryParam("nearby") String searchNearby) {
         // return getStaticResource("web/html/detail.html");
         Topic angebot = dm4.getTopic(id);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
@@ -183,6 +181,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             viewData("tags", getAngeboteTags());
             viewData("angebot", angebotsinfo);
             viewData("eventMarkup", angebotsinfo.toJsonLD());
+            prepareSearchTemplateParameter(search, contextId, searchMethod, searchType, searchNearby);
             prepareGeneralPageData("detail");
             return view("detail");
         }
@@ -846,6 +845,15 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             }
         }
         return my;
+    }
+
+    private void prepareSearchTemplateParameter(String search, long contextId, String method,
+            String type, String nearby) {
+        viewData("search", (search == null) ? "" : search);
+        viewData("searchContext", (contextId <= 0) ? 0 : contextId);
+        viewData("searchMethod", (method == null) ? "quick" : method);
+        viewData("searchNearby", (nearby == null) ? "undefined" : nearby);
+        viewData("searchType", (type == null) ? "place" : type);
     }
 
     private void prepareGeneralPageData(String templateName) {

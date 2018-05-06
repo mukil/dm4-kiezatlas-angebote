@@ -17,8 +17,9 @@
     </parent>
 
     <properties>
-        <dm4.deploy.dir>/Users/malt/source/kiezatlas-4.9.1/bundle-deploy</dm4.deploy.dir>
+        <!--dm4.deploy.dir>/Users/malt/source/kiezatlas-4.9.1/bundle-deploy</dm4.deploy.dir-->
 	<!--dm4.deploy.dir>/home/malted/Downloads/deepamehta-4.8.2/bundle-deploy</dm4.deploy.dir-->
+	<!--dm4.deploy.dir>/home/malted/source/kiezatlas-4.9.1/bundle-deploy</dm4.deploy.dir-->
     </properties>
 
     <dependencies>

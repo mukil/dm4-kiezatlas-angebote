@@ -12,10 +12,7 @@
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
         <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
-
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="render_angebotsinfo_page()"></script>
-        <script defer="true" type="text/javascript" src="/de.kiezatlas.website/search-angebote.js"></script>
-        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('event')"></script>
         <script th:inline="javascript">
             /*<![CDATA[*/
                 var frontpage = false
@@ -26,6 +23,8 @@
                 searchNearby = /*[[${searchNearby}]]*/ undefined;
             /*]]>*/
         </script>
+        <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('event')"></script>
+        <script defer="true" type="text/javascript" src="/de.kiezatlas.website/search-angebote.js"></script>
         <meta th:replace="fragments/tracker" />
     </head>
     <body class="ui page detail kiezatlas angebotsinfos detail">
