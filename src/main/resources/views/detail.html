@@ -15,11 +15,12 @@
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="render_angebotsinfo_page()"></script>
         <script th:inline="javascript">
             /*<![CDATA[*/
+            /** Fixme: Search paramters are initialized with "null" on server side **/
                 var frontpage = false
                 searchText = /*[[${search}]]*/ '';
-                searchType = /*[[${searchType}]]*/ 'event';
-                searchContext = /*[[${searchContext}]]*/ '0';
-                searchMethod = /*[[${searchMethod}]]*/ 'quick';
+                searchType = 'event';
+                searchContext = '0';
+                searchMethod = 'quick';
                 searchNearby = /*[[${searchNearby}]]*/ undefined;
             /*]]>*/
         </script>
