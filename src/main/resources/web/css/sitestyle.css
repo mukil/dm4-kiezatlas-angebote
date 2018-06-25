@@ -49,7 +49,7 @@
 .right-side .offer-area {
     margin-top: 1em;
     background-color: #fff;
-    padding: 0em 1em 0em 1em;
+    padding: 1em;
     border: 1px solid #aaa;
 }
 
@@ -67,10 +67,6 @@
     padding: 1em;
     border: 1px solid #27638C;
     margin-top: 1em;
-}
-
-.geo-objects-area .einrichtungen .result-item {
-    padding-bottom: 1em;
 }
 
 .concrete-assignment {
@@ -134,8 +130,13 @@ div.ui-datepicker {
     overflow-y: auto;
 }
 
+.angebotsinfos .search-hint {
+    margin-top: 1em;
+}
+
 .form-area .geo-objects-area {
-    max-height: 220px;
+    margin-top: 1em;
+    max-height: 300px;
 }
 
 .angebot-area {
@@ -488,7 +489,7 @@ einrichtungs-area li a:hover,
 
 ul.einrichtungen li small,
 ul.angebote li small {
-    color: #999;
+    color: #383838;
 }
 
 /** --- Upper Top Menu --- **/

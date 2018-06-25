@@ -17,8 +17,22 @@ var tagging = new function() {
     this.fetchAllTagTopics = function(callback) {
         restc.request("GET", "/angebote/tags/all", undefined, function(response) {
             availableTags = response
+            if (availableTags) {
+                availableTags.sort(value_sort_asc)
+            }
             if (callback) callback()
         })
+    }
+
+    function value_sort_asc(a, b) {
+        var nameA = a.value.toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
+        var nameB = b.value.toLowerCase().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
+        //
+        if (nameA > nameB) // sort string descending
+          return 1
+        if (nameA < nameB)
+          return -1
+        return 0 //default return value (no sorting)
     }
 
     this.init = function(domElementId, itemSelectionHandler) {
