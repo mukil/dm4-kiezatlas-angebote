@@ -689,8 +689,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             @QueryParam("location") String location, @QueryParam("radius") String radius,
             @QueryParam("datetime") long timestamp) {
         try {
-            log.info("Angebote Search Search Input \"" + query + "\"");
-            String queryString = prepareLuceneQueryString(query, true, true, false);
+            String queryString = preparePhraseOrTermLuceneQuery(query);
             log.info("Angebote Search \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
             List<AngebotsinfosAssigned> einrichtungsAngebote = new ArrayList<AngebotsinfosAssigned>();
             // 1) Spatial Query, searching Einrichtungen by location and assemble related angebotsinfos
@@ -1043,6 +1042,18 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             }
         }
         return new ArrayList(uniqueResults.values());
+    }
+
+    private String preparePhraseOrTermLuceneQuery(String userQuery) {
+        StringBuilder queryPhrase = new StringBuilder();
+        if (userQuery.contains(" ")) {
+            queryPhrase.append("\"" + userQuery + "\"");
+            queryPhrase.append(" OR ");
+            queryPhrase.append("" + userQuery.replaceAll(" ", "?") + "*");
+        } else {
+            queryPhrase.append("*" + userQuery + "*");
+        }
+        return queryPhrase.toString();
     }
 
     /** Find 1:1 copy in dm4-wiezatlas-website plugin */
