@@ -398,10 +398,14 @@ function render_assignments_listing() {
     // ### show address or districts, too
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
+        var zusatzinfo = (obj.hasOwnProperty("zusatzinfo")) ? '<span class="label">Zusatz: </span> ' + obj.zusatzinfo + '<br/>' : ''
+        var kontaktVorOrt = (obj.hasOwnProperty("kontakt")) ? '<span class="label">Kontakt vor Ort: </span> ' + obj.kontakt : ''
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
         var $element = $('<div id="' + obj.id + '" class="concrete-assignment" '
             + ' title="Zum bearbeiten dieses Zeitraums bitte Klicken"><h3>'
-            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div>')
+            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p>'
+            + '<p>' + zusatzinfo + kontaktVorOrt + '</p>'
+            + '</div>')
         $('.right-side div.einrichtungen').append($element)
     }
     // equip all buttons with a click handler each (at once)
