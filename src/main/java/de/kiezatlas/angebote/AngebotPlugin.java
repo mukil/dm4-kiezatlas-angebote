@@ -689,8 +689,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             @QueryParam("location") String location, @QueryParam("radius") String radius,
             @QueryParam("datetime") long timestamp) {
         try {
-            log.info("Angebote Search Search Input \"" + query + "\"");
-            String queryString = prepareLuceneQueryString(query, false, true, false, true);
+            String queryString = preparePhraseOrTermLuceneQuery(query);
             log.info("Angebote Search \"" + queryString + "\", Coordinates \"" + location + "\", Radius \"" + radius + "\"");
             List<AngebotsinfosAssigned> einrichtungsAngebote = new ArrayList<AngebotsinfosAssigned>();
             // 1) Spatial Query, searching Einrichtungen by location and assemble related angebotsinfos
@@ -1045,43 +1044,27 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return new ArrayList(uniqueResults.values());
     }
 
-    /** Find 1:1 copy in dm4-wiezatlas-website plugin */
-    private String prepareLuceneQueryString(String userQuery, boolean doSplitWildcards,
-                                            boolean appendWildcard, boolean doExact, boolean leadingWildcard) {
-        String queryPhrase = new String();
-        // 1) split query input by whitespace and append a wildcard to each term
-        if (doSplitWildcards) {
-            String[] terms = userQuery.split(" ");
-            int count = 1;
-            for (String term : terms) {
-                if (appendWildcard && !term.isEmpty()) {
-                    queryPhrase += term + "* ";
-                } else if (!term.isEmpty()) {
-                    queryPhrase += term;
-                    if (terms.length < count) queryPhrase += " ";
+    private String preparePhraseOrTermLuceneQuery(String userQuery) {
+        StringBuilder queryPhrase = new StringBuilder();
+        if (userQuery.contains(" ")) {
+            queryPhrase.append("\"" + userQuery + "\"");
+            queryPhrase.append(" OR ");
+            queryPhrase.append("" + userQuery.replaceAll(" ", "?") + "*");
+            queryPhrase.append(" OR ");
+            String[] words = userQuery.split(" ");
+            for (int i = 0; i < words.length; i++) {
+                String word = words[i];
+                queryPhrase.append("*" + word + "*");
+                if (i < words.length -1) {
+                    queryPhrase.append(" AND ");
+                } else {
+                    queryPhrase.append(" ");
                 }
-                count++;
             }
-            queryPhrase = queryPhrase.trim();
-        } else if (doExact) {
-            // 3) remove (potential "?", introduced as trigger for exact search), quote query input and append fuzzy command
-            queryPhrase = userQuery.trim().replaceAll("\\?", "");
-            queryPhrase = "\"" + queryPhrase + "\"~0.9";
-        } else if (!doSplitWildcards && !appendWildcard && !leadingWildcard) {
-            // 4) if none, return trimmed user query input
-            queryPhrase = userQuery.trim();
-        } else if (appendWildcard && leadingWildcard && !doSplitWildcards) {
-            queryPhrase = "*" + userQuery.trim() + "*";
-        } else if (appendWildcard && !doSplitWildcards) {
-            // 2) trim and append a wildcard to the query input
-            queryPhrase = userQuery.trim() + "*";
-        } else if (leadingWildcard && !doSplitWildcards) {
-            queryPhrase = "*" + userQuery.trim();
+        } else {
+            queryPhrase.append("*" + userQuery + "*");
         }
-        log.info("Prepared Query Phrase \""+userQuery+"\" => \""+queryPhrase+"\" (doSplitWildcards: "
-            + doSplitWildcards + ", appendWildcard: " + appendWildcard + ", leadingWildcard: "
-            + leadingWildcard +", doExact: " + doExact + ")");
-        return queryPhrase;
+        return queryPhrase.toString();
     }
 
     private Angebotsinfos prepareAngebotsinfos(Topic angebot) {

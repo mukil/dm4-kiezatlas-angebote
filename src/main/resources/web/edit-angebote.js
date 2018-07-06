@@ -298,10 +298,10 @@ function do_delete_assignment() {
 var districtId = undefined
 
 function do_submit_search_form() {
-    do_search_geo_objects_by_name(render_geo_object_search_results)
+    do_fulltext_geo_object_search(render_geo_object_search_results)
 }
 
-function do_search_geo_objects_by_name(renderer) { // usually calls show_geo_object_search_results
+function do_fulltext_geo_object_search(renderer) { // usually calls show_geo_object_search_results
     var queryString = $("#name-search").val()
     queryString = encodeURIComponent(queryString, "UTF-8")
     if (queryString.length === 0) {
@@ -339,7 +339,7 @@ function set_search_district_filter() {
     if (districtId === "none") {
         districtId = undefined
     }
-    do_search_geo_objects_by_name(render_geo_object_search_results)
+    do_fulltext_geo_object_search(render_geo_object_search_results)
 }
 
 function render_geo_object_search_results(results) {
@@ -398,10 +398,14 @@ function render_assignments_listing() {
     // ### show address or districts, too
     for (var i in geo_assignments) {
         var obj = geo_assignments[i]
+        var zusatzinfo = (obj.hasOwnProperty("zusatzinfo")) ? '<span class="label">Zusatz: </span> ' + obj.zusatzinfo + '<br/>' : ''
+        var kontaktVorOrt = (obj.hasOwnProperty("kontakt")) ? '<span class="label">Kontakt vor Ort: </span> ' + obj.kontakt : ''
         // var startDate = $.datepicker.formatDate('DD, dd.mm yy', new Date(obj.anfang_timestamp));
         var $element = $('<div id="' + obj.id + '" class="concrete-assignment" '
             + ' title="Zum bearbeiten dieses Zeitraums bitte Klicken"><h3>'
-            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p></div>')
+            + obj.name + '</h3><p><i>' + obj.anfang + '</i> &ndash; <i>' + obj.ende + '</i></p>'
+            + '<p>' + zusatzinfo + kontaktVorOrt + '</p>'
+            + '</div>')
         $('.right-side div.einrichtungen').append($element)
     }
     // equip all buttons with a click handler each (at once)
@@ -474,7 +478,7 @@ function get_oneday_checkbox_value() {
 
 function handle_name_search_input(e) {
     if (e.keyCode === 13) {
-        do_search_geo_objects_by_name(render_geo_object_search_results)
+        do_fulltext_geo_object_search(render_geo_object_search_results)
     }
 }
 

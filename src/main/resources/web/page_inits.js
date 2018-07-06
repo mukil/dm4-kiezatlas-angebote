@@ -88,7 +88,7 @@ function my_entries_page() {
                         + "<a href=\"mailto:support@kiezatlas.de\">info@kiezatlas.de</a></p><p>Falls Du f&uuml;r die Kiezatlas Website bereits einen Account hast, bitte logge dich ein.</p>")
                 } else {
                     load_users_angebote()
-                    $('.logged-out').html('Zur Ver&ouml;ffentlichung ihrer Angebotsinfo nutzen Sie daher bitte die Funktion &ldquo;Angebotszeitr&auml;me verwalten&rdquo; (siehe unten).')
+                    $('.logged-out').html('Zur Ver&ouml;ffentlichung ihrer Angebotsinfo nutzen Sie daher bitte die Funktion &ldquo;Angebotszeitr&auml;me ver&ouml;ffentlichen&rdquo; (siehe unten).')
                 }
             })
         }
