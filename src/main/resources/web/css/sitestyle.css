@@ -137,6 +137,7 @@ div.ui-datepicker {
 .form-area .geo-objects-area {
     margin-top: 1em;
     max-height: 300px;
+    padding: .25em;
 }
 
 .angebot-area {

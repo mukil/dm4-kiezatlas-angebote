@@ -2,7 +2,6 @@
 var $sidebarUi = undefined
 
 function angebot_assignments_page() {
-    $("#name-search").on("keyup", handle_name_search_input)
     // load_username()
     has_angebote_membership(function(state) {
         if (state) {

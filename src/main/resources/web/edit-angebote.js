@@ -308,6 +308,7 @@ function do_fulltext_geo_object_search(renderer) { // usually calls show_geo_obj
         $("#name-search").attr("placeholder", "Bitte geben Sie einen Ortsnamen ein")
         $("#name-search").focus()
     }
+    do_form_text_query_expansion(queryString)
     // ### hacking message display
     var searchResource = "/website/search?search="
     var queryHash = queryString
@@ -333,6 +334,32 @@ function do_fulltext_geo_object_search(renderer) { // usually calls show_geo_obj
     return queryHash
 }
 
+function do_form_text_query_expansion(val) {
+    var query = val
+    var streetNameResource = "/website/search/name/street?name=" + encodeURIComponent(query)
+    // var bezirksregionNameResource = "/website/search/name/region?name=" + encodeURIComponent(query)
+    $.getJSON(streetNameResource, function (addresses) {
+        console.log(addresses.length, "Addresses found", addresses)
+        if (addresses.length > 0) {
+            var streetNames = '<div class="street-hint">Stattdessen suchen nach Einrichtungen mit '
+            streetNames += '<span class="parameter" onclick="do_form_street_query(this)">' + query +'</span> als Adresse?'
+            streetNames += '</div>'
+            $('.search-info').empty()
+            $('.search-info').append(streetNames)
+        }
+    })
+    /** $.getJSON(bezirksregionNameResource, function (bezirksregionen) {
+        console.log(bezirksregionen.length, "Bezirksregionen identified", bezirksregionen, "for bezirksregion name query " + query)
+    }) **/
+}
+
+function do_form_street_query(el) {
+    var streetNameResource = "/website/search/street?name=" + encodeURIComponent(el.innerText)
+    $.getJSON(streetNameResource, function (geo_objects) {
+        render_geo_object_search_results(geo_objects)
+    })
+}
+
 function set_search_district_filter() {
     var $selection = $('#district-filter')
     districtId = $selection.val()
@@ -344,7 +371,6 @@ function set_search_district_filter() {
 
 function render_geo_object_search_results(results) {
     $('.form-area div.einrichtungen').empty()
-    console.log("Geo Objects Search Results", results)
     for (var i in results) {
         var obj = results[i]
         if (obj) {
@@ -476,10 +502,19 @@ function get_oneday_checkbox_value() {
     console.log("1-Tag Checkbox Value", val)
 }
 
-function handle_name_search_input(e) {
-    if (e.keyCode === 13) {
-        do_fulltext_geo_object_search(render_geo_object_search_results)
-    }
+function do_street_query(el) {
+    var streetNameResource = "/website/search/street?name=" + encodeURIComponent(el.innerText)
+    $.getJSON(streetNameResource, function (geo_objects) {
+        var $container = $('.result-list .container')
+        $container.empty()
+        if (geo_objects.length > 0) {
+            results = geo_objects
+            console.log("Render search results", results)
+            render_place_fulltext_search_results(0, geo_objects.length, geo_objects.length, $container)
+            hide_search_loading_sign()
+            show_results_container()
+        }
+    })
 }
 
 function select_geo_object(e) {
