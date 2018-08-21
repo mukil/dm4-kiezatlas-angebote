@@ -827,6 +827,11 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         return false;
     }
 
+    @Override
+    public Topic getAngeboteWorkspace() {
+        return workspaces.getWorkspace(WORKSPACE_ANGEBOTE_URI);
+    }
+
     // ------------------------------------------------------------------------ Private Utility Methods
 
     private List<Topic> getUsersAngebotsinfoTopics () {

@@ -34,6 +34,8 @@ public interface AngebotService {
 
     boolean isAngeboteWorkspaceMember(String username);
 
+    Topic getAngeboteWorkspace();
+
     /**
      * @return      Details for a specific "Angebotsinfo" topic Id.
      */

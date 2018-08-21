@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Kiezatlas - Angebote</name>
     <groupId>de.kiezatlas</groupId>
     <artifactId>dm49-kiezatlas-angebote</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.7.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
