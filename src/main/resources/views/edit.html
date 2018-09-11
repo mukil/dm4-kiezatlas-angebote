@@ -15,12 +15,13 @@
         <script defer="true" src="/de.kiezatlas.angebote/vendor/ckeditor/config.js"></script>
         <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js"></script>
         <script defer="true" src="/de.kiezatlas.angebote/page_inits.js" onload="edit_angebot_page()"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('event-edit')"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
-
+        <meta th:replace="fragments/tracker" />
     </head>
     <body class="ui page detail kiezatlas angebotsinfos edit">
 

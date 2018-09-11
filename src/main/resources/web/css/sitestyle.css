@@ -18,6 +18,20 @@
     color: #333;
 }
 
+.revise .label {
+    color: #999;
+}
+
+.revise #email-body {
+    width: 50%;
+    min-height: 200px;
+    padding: .5em;
+}
+
+.form-of-address {
+    padding-left: .5em;
+}
+
 .assignment .left-side {
     width: 45%;
     display: inline-block;

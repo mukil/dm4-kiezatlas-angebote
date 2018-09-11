@@ -7,10 +7,12 @@
         <link rel="stylesheet" href="/de.kiezatlas/style/kiezatlas.css"/>
 
         <link rel="stylesheet" href="/de.kiezatlas.angebote/dist/vendor/jquery-ui-1.12.1-kiezatlas.min.css"/>
-        <link rel="stylesheet" href="/de.kiezatlas.angebote/css/sitestyle.css"/>
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.website/css/kiezatlas-web.css" />
+        <link rel="stylesheet" type="text/css" href="/de.kiezatlas.angebote/css/sitestyle.css" />
 
         <script defer="true" src="/de.kiezatlas.angebote/dist/vendor/jquery-1.9.1-and-1.12.1-ui-custom.min.js"></script>
         <script defer="true" src="/de.kiezatlas.website/dist/vendor/dm4-webclient-utils.min.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
         <script defer="true" src="/de.deepamehta.accesscontrol/script/vendor/sha256.js"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
 
@@ -19,62 +21,70 @@
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
         <meta th:replace="fragments/tracker" />
     </head>
-    <body class="kiezatlas revise">
+    <body class="ui page detail kiezatlas revise">
 
-        <div id="header">
-            <div class="welcome ui container">
-                <h3>Zuweisung der folgenden Angebotsinformationen zu Ort <b class="einrichtungs-name">Y</b> aufheben</h3>
-                <p>Auf dieser Seite k&ouml;nnen Sie als unsere/r AnsprechpartnerIn f&uuml;r diesen Ort <b class="einrichtungs-name">Y</b> eine fehlerhafte oder ungewollte Zuweisungen von Angebotsinformation aufheben.</p>
-            </div>
+        <!-- Following Menu -->
+        <nav id="lower-page-nav" th:include="fragments/navigation :: lower-page-nav"></nav>
+
+        <div class="navigation">
+            <div class="top-menu" th:include="fragments/navigation :: top-menu (publisher=${is_publisher})"></div>
         </div>
 
-        <!-- Details Area -->
-        <div class="ui container">
-            <div class="info" id="-1">
-                <br/><br/>
-                <span class="label">Es handelt sich hierbei um das Angebot</span><br/>
-                <h3 class="angebots-name"></h3>
-                <span class="label">F&uuml;r den Zeitraum vom </span><span class="von"></span> bis <span class="bis"></span><br/><br/>
-                <span class="label">Angebotsbeschreibung</span><br/>
-                <p class="angebots-beschreibung"></p>
-                <p>
-                    <span class="label">Kontakt</span>&nbsp;<span class="kontakt"></span><br/><br/>
-                    <span class="label">Ort</span>&nbsp;<span class="einrichtungs-name"></span><br/><br/>
-                    <span class="label">Webpage</span><br/>
-                    <a class="webpage"></a>
-                    <!-- Angelegt von <em class="creator"></em>. -->
-                </p>
-            </div>
-            <div id="contact">
-                <h3>Anbieter_in kontaktieren</h3>
-                <span class="label">Nachricht</span><br/><br/>
-                <div class="label">Hallo <span class="anbieter-name"></span>,</div><br/>
-                <textarea name="message" id="email-body" placeholder="Nachricht der Email"/><br/>
-                <br/><br/>
-                <span class="mail-status"></span>
-                <br/>
-                <button id="sendmail" class="ui button" onclick="send_revise_message()">Email senden</button>
-            </div>
-            <div class="commands">
-                <button class="ui olive button" onclick="go_to_frontpage()">Zuweisung ist OK</button>
-                <button class="ui basic red button" title="Entfernt dieses Angebot aus Ihrem Veranstaltungskalender" onclick="do_confirm_revision()">Zuweisung aufheben</button>
-                <!--a class="remove-button ui button" href="#showremove" >Zuweisung aufheben</a><br/-->
-                <br/>
-                <span class="label hint">Hinweis: Die Aufhebung kann nicht r&uuml;ckg&auml;ngig gemacht werden.</span>
-            </div>
-        </div>
+        <div th:replace="fragments/navigation :: vertical-nav (publisher=${is_publisher})"></div>
 
-        <div id="bottom">
-            <p>
-                <img src="/de.kiezatlas.website/images/kiezatlas2-logo.png" class="logo"
-                     title="Kiezatlas 2 Logo" alt="Grafik: Kiezatlas Logo"/>
-            </p>
+        <div class="ui pusher">
+
+            <div id="header">
+                <div class="welcome ui container">
+                    <br/><br/>
+                    <h3>Zuweisung der folgenden Angebotsinformationen zu Ort <b class="einrichtungs-name">Y</b> aufheben</h3>
+                    <p>Auf dieser Seite k&ouml;nnen Sie als unsere/r AnsprechpartnerIn f&uuml;r den Ort <b class="einrichtungs-name">Y</b> eine fehlerhafte oder ungewollte Zuweisungen eines Angebots aufheben.
+                        Alternativ k&ouml;nnen Sie für etwaige R&uuml;ckfragen oder f&uuml;r die Bitte zur Korrektur des Angebots den/die AnbieterIn auf dieser Seit eper Email kontaktieren.</p>
+                </div>
+            </div>
+
+            <!-- Details Area -->
+            <div class="ui container">
+                <div class="info" id="-1">
+                    <br/>
+                    <span class="label">Es handelt sich hierbei um das folgende Angebot:</span><br/>
+                    <h3 class="angebots-name"></h3>
+                    <span class="label">F&uuml;r den Zeitraum vom </span><span class="von"></span> bis <span class="bis"></span><br/><br/>
+                    <span class="label">Angebotsbeschreibung</span><br/>
+                    <p class="angebots-beschreibung"></p>
+                    <p>
+                        <span class="label">Kontakt</span>&nbsp;<span class="kontakt"></span><br/><br/>
+                        <span class="label">Veranstaltungsort</span>&nbsp;<span class="einrichtungs-name"></span><br/><br/>
+                        <span class="label">Webpage</span><br/>
+                        <a class="webpage"></a>
+                        <!-- Angelegt von <em class="creator"></em>. -->
+                    </p>
+                </div>
+                <br/><br/>
+                <div id="contact">
+                    <h3>Anbieter_in per Email kontaktieren</h3>
+                    <div class="form-of-address">Hallo <span class="anbieter-name"></span>,</div><br/>
+                    <textarea name="message" id="email-body" placeholder="Ihr Nachricht an den bzw. die AnbieterIn zur Rückfrage per Email"/><br/>
+                    <br/><br/>
+                    <span class="mail-status"></span>
+                    <br/>
+                    <button id="sendmail" class="ui button" onclick="send_revise_message()">Email senden</button>
+                </div>
+                <div class="commands">
+                    <button class="ui olive button" onclick="go_to_frontpage()">Zuweisung ist OK</button>
+                    <button class="ui basic red button" title="Entfernt dieses Angebot aus Ihrem Veranstaltungskalender" onclick="do_confirm_revision()">Zuweisung aufheben</button>
+                    <!--a class="remove-button ui button" href="#showremove" >Zuweisung aufheben</a><br/-->
+                    <br/>
+                    <span class="label hint">Hinweis: Die Aufhebung kann nicht r&uuml;ckg&auml;ngig gemacht werden.</span>
+                </div>
+            </div>
+
+            <!-- Footer Segment -->
+            <div th:replace="fragments/footer :: footer-new "></div>
+
         </div>
 
         <div id="dialog-confirm" title="Angebot entfernen?">Willst du diesen Angebotszeitraum entfernen?</div>
-
-        <!-- Piwik -->
-        <img th:src="@{https://stats.infokitchen.net/piwik.php(idsite=2,rec=1,action_name='Kiezatlas+2+Angebotsinfo+Revision')}" style="border:0" alt="" />
 
     </body>
 </html>
