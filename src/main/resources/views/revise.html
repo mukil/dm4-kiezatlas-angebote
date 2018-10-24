@@ -15,7 +15,9 @@
         <script defer="true" src="/de.kiezatlas.website/css/semantic-ui/2.3/dist/semantic.min.js"></script>
         <script defer="true" src="/de.deepamehta.accesscontrol/script/vendor/sha256.js"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-restclient.js"></script>
-
+        <script defer="true" src="/de.kiezatlas.website/vendor/leaflet-1.3.1/leaflet.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/vendor/leaflet-1.3.1/L.CircleEditor.js"></script>
+        <script defer="true" src="/de.kiezatlas.website/ka-map.js"></script>
         <script defer="true" src="/de.kiezatlas.angebote/dist/angebote-ui-complete.js" onload="render_angebotsrevise_page()"></script>
         <script defer="true" src="/de.kiezatlas.website/ka-startseite.js" onload="init_page('revise')"></script>
         <!--script src="/de.kiezatlas.angebote/dist/angebote-ui-complete.min.js"></script-->
@@ -81,7 +83,6 @@
 
             <!-- Footer Segment -->
             <div th:replace="fragments/footer :: footer-new "></div>
-
         </div>
 
         <div id="dialog-confirm" title="Angebot entfernen?">Willst du diesen Angebotszeitraum entfernen?</div>
