@@ -379,7 +379,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 Association assignment = getAssignmentAssociation(angebot, einrichtung);
                 if (!justActive) {
                     results.add(prepareAngebotsInfosAssigned(einrichtung, angebot, assignment));
-                } else if (justActive && assignmentEndsInTheFuture(assignment)) { // skip offers which toDate is in the past
+                } else if (justActive && isAssignmentActiveNow(assignment)) { // skip offers which toDate is in the past
                     results.add(prepareAngebotsInfosAssigned(einrichtung, angebot, assignment));
                 }
             }
@@ -706,7 +706,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                         // if no assignment exists, angebotsinfo (resp. einrichtung with all its..) is not a result
                         if (offers != null && offers.size() > 0) {
                             for (Topic offer : offers) {
-                                AngebotsinfosAssigned relatedOffer = prepareAngebotsinfosAssigned(inst, offer);
+                                AngebotsinfosAssigned relatedOffer = prepareActiveAngebotsinfosAssigned(inst, offer);
                                 double distanceOfLocation = geomaps.getDistance(searchPoint, instGeoCoord);
                                 relatedOffer.setLocationSearchDistance(distanceOfLocation);
                                 einrichtungsAngebote.add(relatedOffer);
@@ -920,7 +920,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     private boolean isAssignmentActiveNow(Association assoc) {
-        long timestamp = new Date().getTime();
+        long timestamp = new Date().getTime(); // ### FIXME: specify time retrieved
         Long from = getAssignmentFromTime(assoc);
         Long to = getAssignmentToTime(assoc);
         return ((from < timestamp && to > timestamp) || // == "An activity currently open"
@@ -928,11 +928,14 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 (from < timestamp && to < 0)); // == "Has started and has no toDate set
     }
 
+    /**
+     * ### TODO: Rethink this. It reads as if events not yet started (ending in the future)
+     * are included in the results **/
     private boolean assignmentEndsInTheFuture(Association assoc) {
-        long timestamp = new Date().getTime();
+        long timestamp = new Date().getTime(); // ### FIXME: specify time retrieved
         Long from = getAssignmentFromTime(assoc);
         Long to = getAssignmentToTime(assoc);
-        return (to > timestamp || (from < timestamp && to < 0)); // Still happens OR to date is -1
+        return (to > timestamp || (from < timestamp && to < 0)); // Event is active OR to date is -1
     }
 
     /** Currently unused **/
@@ -1111,8 +1114,8 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 List<RelatedTopic> geoObjects = getAssignedGeoObjectTopics(angebot);
                 JSONArray locations = new JSONArray();
                 for (RelatedTopic geoObject : geoObjects) {
-                    Association assignment = getAssignmentAssociation(angebot, geoObject);
-                    locations.put(prepareAngebotsInfosAssigned(geoObject, angebot, assignment).toJSON());
+                    AngebotsinfosAssigned angebotsinfo = prepareActiveAngebotsinfosAssigned(geoObject, angebot);
+                    locations.put(angebotsinfo.toJSON());
                 }
                 if (locations.length() > 0) {
                     result.setLocations(locations);
@@ -1123,6 +1126,12 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
             }
         }
         return results;
+    }
+
+    private AngebotsinfosAssigned prepareActiveAngebotsinfosAssigned(Topic geoObject, Topic angebot) {
+        Association assignment = getAssignmentAssociation(angebot, geoObject);
+        if (isAssignmentActiveNow(assignment)) prepareAngebotsInfosAssigned(geoObject, angebot, assignment);
+        return null;
     }
 
     private AngebotsinfosAssigned prepareAngebotsinfosAssigned(Topic geoObject, Topic angebot) {
