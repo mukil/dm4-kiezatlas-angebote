@@ -39,6 +39,24 @@ mvn clean package
 Version History
 ---------------
 
+**0.7.2** -- UPCOMING
+
+* Completely revised search dialog fragment in coordination with dm4-kiezatlas-website
+* Spatial and fulltext search only returns currently active offers as results (#17)
+* Adapted all user dialogs to new dm4-kiezatlas-website web design (#15, #16 among many other untracked issues)
+* Improvements for "Meine Einträge" (#11) and "Angebotszeiträume verwalten" (#14, #13)dialogs
+* Compatibility with IE 11 (#7, #9)
+* Added basic https://schema.org/Event markup to detail pages
+* Improved lucene search query phrase
+* Adapted main menu navigation entries
+* Bugfixes: alphabetically ascending sorting of tags (#12), fixes duplicate tags (#8)
+
+Source code compatible with DeepaMehta 4.9.x
+
+**0.4.x** -- 
+
+See commits for details of the 0.4.x releases.
+
 **0.3** -- Winter, 2016
 
 * Many small improvements for the user interface

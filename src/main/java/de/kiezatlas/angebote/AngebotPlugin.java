@@ -178,7 +178,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
         Topic angebot = dm4.getTopic(id);
         if (angebot.getTypeUri().equals(ANGEBOT)) {
             Angebotsinfos angebotsinfo = prepareAngebotsinfos(angebot);
-            viewData("tags", getAngeboteTags());
+            viewData("tags", getActiveAngeboteTags());
             viewData("angebot", angebotsinfo);
             viewData("eventMarkup", angebotsinfo.toJsonLD());
             prepareSearchTemplateParameter(search, contextId, searchMethod, searchType, searchNearby);
@@ -677,6 +677,41 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     }
 
     /**
+     * Builds up a list of tags related to angebotsinfos which are assigned to locations.
+     */
+    @GET
+    @Path("/tags/active")
+    @Override
+    public List<Topic> getActiveAngeboteTags() {
+        List<Topic> result = new ArrayList<Topic>();
+        try {
+            List<Topic> tags = dm4.getTopicsByType(TaggingService.TAG);
+            for (Topic tag : tags) {
+                // 1) tag is related to angebotsinfos
+                List<RelatedTopic> angebote = getParentAngebotTopicsAggregating(tag);
+                for (RelatedTopic angebot : angebote) {
+                    // 2) that angebotsinfo has ANY kind of location assignment
+                    List<RelatedTopic> assignments = getAssignedGeoObjectTopics(angebot);
+                    for (RelatedTopic geoObject : assignments) {
+                        if (isAssignmentActiveNow(geoObject.getRelatingAssociation())) {
+                            log.info("Fetching tags of Angebot " + angebot.getSimpleValue()
+                                    + " ID: " + angebot.getId() + ", is ACTIVE at "
+                                    + geoObject.getSimpleValue() + " ID: " + geoObject.getId());
+                            if (!result.contains(tag)) {
+                                log.info("> Loaded Tag " + tag.getSimpleValue());
+                                result.add(tag);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.warning("Exception raised during fetching tags");
+        }
+        return result;
+    }
+
+    /**
      * Builds up a list of search results (Geo Objects to be displayed in a map) by text query also if these
      * are not currently active in time.
      * @param query
@@ -707,9 +742,11 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                         if (offers != null && offers.size() > 0) {
                             for (Topic offer : offers) {
                                 AngebotsinfosAssigned relatedOffer = prepareActiveAngebotsinfosAssigned(inst, offer);
-                                double distanceOfLocation = geomaps.getDistance(searchPoint, instGeoCoord);
-                                relatedOffer.setLocationSearchDistance(distanceOfLocation);
-                                einrichtungsAngebote.add(relatedOffer);
+                                if (relatedOffer != null) {
+                                    double distanceOfLocation = geomaps.getDistance(searchPoint, instGeoCoord);
+                                    relatedOffer.setLocationSearchDistance(distanceOfLocation);
+                                    einrichtungsAngebote.add(relatedOffer);
+                                }
                             }
                         }
                     }
@@ -1106,6 +1143,7 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
     private List<Angebotsinfos> prepareAngebotsinfoSearchResult(List<RelatedTopic> angebotsinfos) {
         ArrayList<Angebotsinfos> results = new ArrayList<Angebotsinfos>();
         for (Topic angebot : angebotsinfos) {
+            log.info("Inspecting angebotsinfo: \"" + angebot.getSimpleValue() + "\" as search result");
             // 1) assemble basic angebots infos
             Angebotsinfos result = prepareAngebotsinfos(angebot);
             // 2) check if angebots info isnt already in our resultset
@@ -1115,7 +1153,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                 JSONArray locations = new JSONArray();
                 for (RelatedTopic geoObject : geoObjects) {
                     AngebotsinfosAssigned angebotsinfo = prepareActiveAngebotsinfosAssigned(geoObject, angebot);
-                    locations.put(angebotsinfo.toJSON());
+                    if (angebotsinfo != null) {
+                        locations.put(angebotsinfo.toJSON());
+                    }
                 }
                 if (locations.length() > 0) {
                     result.setLocations(locations);
@@ -1130,7 +1170,9 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
 
     private AngebotsinfosAssigned prepareActiveAngebotsinfosAssigned(Topic geoObject, Topic angebot) {
         Association assignment = getAssignmentAssociation(angebot, geoObject);
-        if (isAssignmentActiveNow(assignment)) prepareAngebotsInfosAssigned(geoObject, angebot, assignment);
+        if (isAssignmentActiveNow(assignment)) {
+            return prepareAngebotsInfosAssigned(geoObject, angebot, assignment);
+        }
         return null;
     }
 
