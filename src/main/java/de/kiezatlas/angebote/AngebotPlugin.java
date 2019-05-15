@@ -694,11 +694,11 @@ public class AngebotPlugin extends ThymeleafPlugin implements AngebotService,
                     List<RelatedTopic> assignments = getAssignedGeoObjectTopics(angebot);
                     for (RelatedTopic geoObject : assignments) {
                         if (isAssignmentActiveNow(geoObject.getRelatingAssociation())) {
-                            log.info("Fetching tags of Angebot " + angebot.getSimpleValue()
+                            log.fine("Fetching tags of Angebot " + angebot.getSimpleValue()
                                     + " ID: " + angebot.getId() + ", is ACTIVE at "
                                     + geoObject.getSimpleValue() + " ID: " + geoObject.getId());
                             if (!result.contains(tag)) {
-                                log.info("> Loaded Tag " + tag.getSimpleValue());
+                                log.fine("> Loaded Tag " + tag.getSimpleValue());
                                 result.add(tag);
                             }
                         }
